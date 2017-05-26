@@ -1,0 +1,9 @@
+{% extends "banner.html" %}
+  {% block content %}
+      <form action="new" method="post">
+      <table>
+          {{ form.as_table }}
+          <p><input type="submit" value="新建用户"></p>
+      </table>
+      </form>
+  {% endblock %}

@@ -1,0 +1,24 @@
+<html>
+    <style type="text/css">
+        body{
+            color: #000000;background:#eeffdd;padding:0 5em;margin:0}
+        h1{padding:2em 1em;background:#c4dce8;color:#447e9b}
+        h2{color:#000000;border-top:1px dotted #fff;margin-top:2em}
+        p{margin:1em 0}
+      </style>
+
+    <div id="header">
+        <a href="/hello">主页</a> /
+        <a href="/dnstest/testerlist">测试人员</a> /
+        <a href="/dnstest/testsuitelist">用例集合</a> /
+        <a href="/dnstest/subscribelist">测试任务</a> /
+
+    </div>
+
+      <body>
+        <h1>DNS测试</h1>
+        <h2>{{ secondTitle }}</h2>
+        {% block content %}
+        {% endblock %}
+      </body>
+</html>

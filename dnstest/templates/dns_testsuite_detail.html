@@ -1,0 +1,25 @@
+{% extends "dnsbanner.html" %}
+  {% block content %}
+      <h3>用例集合查看</h3>
+      <table width = "1000" border="0">
+      <tr>
+          <th align="center">No.</th>
+          <th align="center">集合名</th>
+          <th align="center">开发者</th>
+          <th align="center">创建时间</th>
+          <th align="center">修改时间</th>
+          <th align="center">说明</th>
+
+      </tr>
+      {% for suite in suite_list %}
+      <tr>
+          <td align="center">{{ suite.id }}</td>
+          <td align="center">{{ suite.suiteName }}</td>
+          <td align="center">{{ suite.developer }}</td>
+          <td align="center">{{ suite.createTime }}</td>
+          <td align="center">{{ suite.editTime }}</td>
+          <td align="center">{{ suite.suiteIntroduction }}</td>
+      </tr>
+      {% endfor %}
+      </table>
+  {% endblock %}
