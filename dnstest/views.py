@@ -71,3 +71,9 @@ def new_test_plan(request):
     else:
         form = CnTestSubscribeForm
     return render_to_response('dns_new_plan.html', locals())
+
+def returncss(request):
+    # with open('dnstest/templates/static/assets/css/main.css','r') as cssFile:
+    #     csscontent = cssFile.readlines()
+    # return HttpResponse('\r'.join(csscontent))
+    pass

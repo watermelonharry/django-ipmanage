@@ -26,4 +26,5 @@ urlpatterns = [
     url('^operateinfo/$', views.operate_list),
     url('^testsuitelist/(?P<suiteId>\d+)/$', views.testsuite_list),
     url('^testsuitelist/$', views.testsuite_list),
+    url('^static/assets/css/main.css/$', views.returncss),
 ]

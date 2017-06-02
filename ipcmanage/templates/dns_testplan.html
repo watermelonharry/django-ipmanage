@@ -1,0 +1,45 @@
+{% extends "dnsbanner.html" %}
+  {% block content %}
+      <h3>测试集合信息</h3>
+      <table width = "1000" border="0">
+      <tr>
+          <th align="center">No.</th>
+          <th align="center">预约时间</th>
+          <th align="center">测试名</th>
+          <th align="center">创建者</th>
+          <th align="center">指向IP</th>
+          <th align="center">监听IP</th>
+          <th align="center">监听字段</th>
+          <th align="center">优先级</th>
+          <th align="center">操作</th>
+          <th align="center">包含用例</th>
+      </tr>
+      {% for job in plan_list %}
+      <tr>
+          <td align="center">{{ job.id }}</td>
+          <td align="center">{{ job.subscribeTime|date:"n/d H:i:s"}}</td>
+          <td align="center">{{ job.testName }}</td>
+          <td align="center">{{ job.testOwner }}</td>
+          <td align="center">{{ job.t_fake_ip }}</td>
+          <td align="center">{{ job.t_client_ip }}</td>
+          <td align="center">{{ job.t_qname }}</td>
+          <td align="center">{{ job.level }}</td>
+          <td align="center">
+                  {% ifequal job.testStatus 0 %}
+                      <form action="." method="post">
+                      <input type="submit" value="开始执行">
+                      <input type="hidden" id="status" value="1" name="status">
+                      <input type="hidden" id="subId" value={{ job.id }} name="subId">
+                    </form>
+                  {% endifequal %}
+              {% ifequal job.testStatus 1 %}<div style="color: darkgreen;font-weight: bold">等待执行</div>{% endifequal %}
+              {% ifequal job.testStatus 2 %}<div style="color: chartreuse;font-weight: bold">正在执行</div>{% endifequal %}
+              {% ifequal job.testStatus 3 %}<div style="color: lightseagreen"><a href="report_{{ job.id }}" >查看结果</a></div> {% endifequal %}
+              </td>
+          <td align="center">{{ job.case_str }}</td>
+      </tr>
+      {% endfor %}
+      </table>
+      <hr>
+      <h3><a href="new">新建测试计划</a> </h3>
+  {% endblock %}
