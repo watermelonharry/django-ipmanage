@@ -14,7 +14,7 @@ Including another URLconf
     2. Import the include() function: from django.conf.urls import url, include
     3. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
 import views
 
@@ -27,4 +27,6 @@ urlpatterns = [
     url('^testsuitelist/(?P<suiteId>\d+)/$', views.testsuite_list),
     url('^testsuitelist/$', views.testsuite_list),
     url('^static/assets/css/main.css/$', views.returncss),
+
+    url('^api/', include('dnstest.apiurls')),
 ]

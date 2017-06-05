@@ -17,6 +17,8 @@ urlpatterns = patterns('',
     url('^pretest/$', pre_test),
     url('^dnstest/', include('dnstest.urls')),
 
+    url('^usermanage/', include('userManage.urls')),
+
     url(r'^admin/', admin.site.urls),
     url(r'^register/', register),
 )
