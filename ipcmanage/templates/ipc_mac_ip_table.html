@@ -1,0 +1,85 @@
+{% extends "ipc_banner.html" %}
+  {% block content %}
+      <div class="container marketing">
+      <!-- Three columns of text below the carousel -->
+      <div class="row">
+        <div class="col-lg-6">
+            <h4>自动分配</h4>
+            <p>输入IP起始地址，自动按id分配IP</p>
+            <p><a class="btn btn-info" href="." role="button">自动分配&raquo;</a></p>
+
+        </div>
+        <div class="col-lg-6">
+          <h4>开始执行</h4>
+            <p>按照下表的MAC-IP-OSD设置局域网内的IPC</p>
+          <p><a class="btn btn-info" href="." role="button">开始执行 &raquo;</a></p>
+        </div>
+      </div>
+    </div>
+      <hr>
+      <div class="container">
+      <h2 class="sub-header">已保存的MAC-IP对应信息</h2>
+          <div class="table-responsive">
+            <table class="table table-striped" id="mac_table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>MAC</th>
+                  <th>IP</th>
+                  <th>OSD设置</th>
+                  <th>#</th>
+                </tr>
+              </thead>
+              <tbody>
+{#                <tr>#}
+{#                  <td>1,001</td>#}
+{#                  <td>Lorem</td>#}
+{#                  <td>ipsum</td>#}
+{#                  <td>dolor</td>#}
+{#                  <td>sit</td>#}
+{#                </tr>#}
+              {% for ip in ip_list %}
+                  <tr>
+                  <td>{{ ip.id }}</td>
+                  <td>{{ ip.mac_addr }}</td>
+                  <td>{{ ip.static_ip }}</td>
+                  <td>{{ ip.osd_text }}</td>
+                  <td><a data-toggle="modal" data-target="#edit_modal" class="btn-sm btn-primary" id={{ ip.id }} role="button">修改</a>
+{#                      <button data-toggle="modal" data-target="#edit_modal" class="btn-sm btn-primary">修改</button>#}
+                      <a class="btn-sm btn-danger" id={{ ip.id }} role="button">删除</a>
+                  </td>
+
+                  </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+
+
+      </div>
+    <hr>
+      <div class="modal fade" id="edit_modal" >
+      <div class="modal-dialog" >
+          <div class="modal-content">
+              <div class="modal-header">修改</div>
+              <div class="modal-body">弹框内容</div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-sm btn-success">确定</button>
+                  <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">取消</button>
+              </div>
+          </div>
+      </div>
+      </div>
+      <script>
+      $('.btn-primary').on('click', function () {
+{#            alert('button clicked'+this.id);#}
+          $('#content_container').append('<p>添加的文字</p>');
+          $('.modal-body').append('<p>添加内容'+this.id+ $('#mac_table')+'</p>');
+        });
+      $('#edit_modal').on('hide.bs.modal',function (e) {
+          $(document).reload();
+      });
+      </script>
+  {% endblock %}

@@ -19,6 +19,7 @@ from django.contrib import admin
 import views
 
 urlpatterns = [
+    url('^$', views.welcome),
     url('^caselist/$', views.case_list),
     url('^testerlist/$', views.tester_list),
     url('^subscribelist/$', views.subs_list),
@@ -28,5 +29,4 @@ urlpatterns = [
     url('^testsuitelist/$', views.testsuite_list),
     url('^static/assets/css/main.css/$', views.returncss),
 
-    url('^api/', include('dnstest.apiurls')),
 ]

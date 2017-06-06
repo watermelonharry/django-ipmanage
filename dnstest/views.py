@@ -7,9 +7,11 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from models import *
-import datetime
 from forms import CnTestSubscribeForm
 
+def welcome(request):
+    return render_to_response('dns_welcome.html',{'firstTitle':u'DNS报文解析测试工具',
+                                                  'firstTitle_content':u'用于测试DUT对于DNS回复报文的解析功能是否正常'})
 
 def case_list(request):
     case_list = CnCaseInfo.objects.all()
