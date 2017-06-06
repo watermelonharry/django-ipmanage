@@ -1,22 +1,88 @@
-<html>
-    <style type="text/css">
-        body{
-            color: #000000;background:#eeffdd;padding:0 5em;margin:0}
-        h1{padding:1em 1em;background:#c4dce8;color:#447e9b}
-        h2{color:#000000;border-top:1px dotted #fff;margin-top:1em}
-        p{margin:1em 0}
-      </style>
-{#    <link rel="stylesheet" type="text/css" href="/static/admin/css/base.css">#}
-{#    <link rel="stylesheet" type="text/css" href="/static/admin/css/login.css">#}
-    <div id="header">
-        <a href="/hello">主页</a> /
-        <a href="/dnstest/testerlist">测试人员</a> /
-{#        <a href="/dnstest/testsuitelist">用例集合</a> /#}
-    </div>
-      <body>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load staticfiles %}
+        <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.css">
+        <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap-theme.css">
+{#        <script src="//upcdn.b0.upaiyun.com/libs/jqueryui/jquery.ui-1.9.0.min.js"></script>#}
+{#        <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>#}
+        <!-- 引入 Bootstrap -->
+{#        <link href="http://apps.bdimg.com/libs/bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet">#}
+{#        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>#}
+{#        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>#}
+        <script type="text/javascript" src="{% static 'bootstrap/js/jquery.min.js' %}"></script>
+        <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
+
+        <!-- <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link rel="icon" href="../../favicon.ico">
+        <title>Navbar Template for Bootstrap</title>
+    </head>
+    <body>
+        <div class="container">
+
+            <!-- Static navbar -->
+            <nav class="navbar navbar-default">
+            <div class="container-fluid">
+              <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/hello">测试工具集合</a>
+              </div>
+              <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                  <li><a href="#">主页</a></li>
+                  <li><a href="#">关于</a></li>
+                  <li><a href="#">联系我</a></li>
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">工具列表<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                      <li><a href="/dnstest">-DNS解析测试</a></li>
+                      <li><a href="#">-IPC管理工具</a></li>
+                      <li><a href="#">-其他工具</a></li>
+                      <li role="separator" class="divider"></li>
+                      <li class="dropdown-header">分割线</li>
+                      <li><a href="#">tool1</a></li>
+                      <li><a href="#">tool2</a></li>
+                    </ul>
+                  </li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                  <!-- <li class="active"><a href="./">Default <span class="sr-only">(current)</span></a></li> -->
+                  <li><a href="#">快速入口</span></a></li>
+                  <li><a href="#">A</a></li>
+                  <li><a href="#">B</a></li>
+                </ul>
+              </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+        </nav>
+
+        <!-- Main component for a primary marketing message or call to action -->
+        <div class="jumbotron">
         <h1>{{ firstTitle }}</h1>
-        <h3>{{ secondTitle }}</h3>
+        <p>{{ firstTitle_content }}</p>
+        <p><!-- 
+          <a class="btn btn btn-primary" role="button">点我试试</a>
+        </p> -->
+        </div>
+        </div> <!-- /container -->
+
         {% block content %}
         {% endblock %}
-      </body>
+
+        <div id="footer">
+            <div class="container">
+                <div class="copyright" align="center"><a href="#"> &copy; based on bootstrap </a>| 2017  </div>
+            </div>
+        </div>
+        </body>
 </html>

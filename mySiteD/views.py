@@ -9,23 +9,20 @@ def hello(request):
     replyList =[{'name':u'DNS报文解析测试工具', 'url':'/dnstest/testsuitelist'},
                 ]
     firstTitle = u'WELCOME!! :D'
-    secondTitle = u'已有测试工具列表'
+    firstTitle_content = u'这里集成了一些测试会用到的小工具。点击上方工具列表查看。'
     return render_to_response('hello.html', locals())
 
 
 def time(request):
-    now = datetime.datetime.now()
     firstTitle = u'时间显示'
-    secondTitle = u'tttttttttttt'
-    return render_to_response('current_time.html', {'current_time':now,
+    firstTitle_content = datetime.datetime.now()
+    return render_to_response('current_time.html', {'current_time':firstTitle_content,
                                                     'firstTitle':firstTitle,
-                                                    'secondTitle':secondTitle})
-
+                                                    'firstTitle_content':firstTitle_content})
 
 def pre_test(request):
-    now = datetime.datetime.now()
-    firstTitle = u'测试工具'
-    secondTitle = u'DNS测试'
+    firstTitle = u'测试页面'
+    firstTitle_content = u'按键测试'
     return render_to_response('pre_test.html', locals())
 
 def register(request):

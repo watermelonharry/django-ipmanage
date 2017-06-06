@@ -37,7 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'dnstest',
-    'userManage',
+    # 'userManage',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -66,6 +66,9 @@ DATABASES = {
 
 # add template dirs
 TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'mySiteD/templates'),]
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
