@@ -29,6 +29,9 @@ class CnStaticIpcTable(models.Model):
     def __unicode__(self):
         return self.mac_addr
 
+    class Meta:
+        ordering = ('id',)
+
 class CnTempIpcTable(models.Model):
     """
     临时文件的IPC-IP对应表格
