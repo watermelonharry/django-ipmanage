@@ -38,12 +38,13 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'dnstest',
     'ipcmanage',
+    'rest_framework',
 )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -53,6 +54,26 @@ ROOT_URLCONF = 'mySiteD.urls'
 
 WSGI_APPLICATION = 'mySiteD.wsgi.application'
 
+# TEMPLATES = [
+# {
+#     'BACKEND': 'django.template.backends.django.DjangoTemplates',
+#     'DIRS': [
+#         'templates',
+#     ],
+#     'APP_DIRS': True,
+#     'OPTIONS': {
+#         'context_processors': [
+#             'django.template.context_processors.debug',
+#             'django.template.context_processors.request',
+#             'django.contrib.auth.context_processors.auth',
+#             'django.contrib.messages.context_processors.messages',
+#         ],
+#         'loaders': [
+#              'django.template.loaders.filesystem.Loader',
+#              'django.template.loaders.app_directories.Loader'
+#         ],
+#     },
+# },]
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases

@@ -3,16 +3,21 @@
       <div class="container marketing">
       <!-- Three columns of text below the carousel -->
       <div class="row">
-        <div class="col-lg-6">
+        <div class="col-lg-4">
             <h4>自动分配</h4>
             <p>输入IP起始地址，自动按id分配IP</p>
             <p><a class="btn btn-info" href="." role="button">自动分配&raquo;</a></p>
 
         </div>
-        <div class="col-lg-6">
+        <div class="col-lg-4">
           <h4>开始执行</h4>
             <p>按照下表的MAC-IP-OSD设置局域网内的IPC</p>
           <p><a class="btn btn-info" href="." role="button">开始执行 &raquo;</a></p>
+        </div>
+        <div class="col-lg-4">
+          <h4>添加新的MAC</h4>
+            <p>添加新的MAC-IP对应关系到数据库中</p>
+          <p><a class="btn btn-info" role="button" id="add_new_btn" data-toggle="modal" data-target="#add_modal" data-backdrop="static">添加IPC &raquo;</a></p>
         </div>
       </div>
     </div>
@@ -23,30 +28,24 @@
             <table class="table table-striped" id="mac_table">
               <thead>
                 <tr>
-                  <th>#</th>
+                  <th>序号</th>
+                  <th>内部索引</th>
                   <th>MAC</th>
                   <th>IP</th>
                   <th>OSD设置</th>
-                  <th>#</th>
+                  <th>操作</th>
                 </tr>
               </thead>
               <tbody>
-{#                <tr>#}
-{#                  <td>1,001</td>#}
-{#                  <td>Lorem</td>#}
-{#                  <td>ipsum</td>#}
-{#                  <td>dolor</td>#}
-{#                  <td>sit</td>#}
-{#                </tr>#}
               {% for ip in ip_list %}
                   <tr>
+                  <td>{{ forloop.counter }}</td>
                   <td>{{ ip.id }}</td>
                   <td>{{ ip.mac_addr }}</td>
                   <td>{{ ip.static_ip }}</td>
                   <td>{{ ip.osd_text }}</td>
-                  <td><a data-toggle="modal" data-target="#edit_modal" class="btn-sm btn-primary" id={{ ip.id }} role="button">修改</a>
-{#                      <button data-toggle="modal" data-target="#edit_modal" class="btn-sm btn-primary">修改</button>#}
-                      <a class="btn-sm btn-danger" id={{ ip.id }} role="button">删除</a>
+                  <td><a data-toggle="modal" data-target="#edit_modal" data-backdrop="static" class="btn-sm btn-primary btn-edit" name = {{ip.id}} role="button">修改</a>
+                      <a class="btn-sm btn-danger btn-del" name={{ ip.id }} role="button">删除</a>
                   </td>
 
                   </tr>
@@ -64,22 +63,174 @@
       <div class="modal-dialog" >
           <div class="modal-content">
               <div class="modal-header">修改</div>
-              <div class="modal-body">弹框内容</div>
+              <div class="modal-body">
+                  <form class="form-horizontal" role="form" id="edit_old_ipc">
+                      <div class="form-group">
+                      <label for="edit_mac" class="col-sm-2 control-label">MAC地址</label>
+                      <div class="col-sm-10">
+                          <input type="text" class="form-control" id="mac_addr" name="mac_addr" value="mac">
+                      </div>
+                      </div>
+                      <div class="form-group">
+                      <label for="edit_ip" class="col-sm-2 control-label">IP地址</label>
+                      <div class="col-sm-10">
+                          <input type="text" class="form-control" id="static_ip" name="static_ip" value="ip">
+                      </div>
+                      </div>
+                      <div class="form-group">
+                      <label for="edit_osd" class="col-sm-2 control-label">OSD文字</label>
+                      <div class="col-sm-10">
+                          <input type="text" class="form-control" id="osd_text" name="osd_text" value="osd">
+                      </div>
+                      </div>
+                      <div class="form-group">
+                      <label for="edit_people" class="col-sm-2 control-label">修改人</label>
+                      <div class="col-sm-10">
+                          <input type="text" class="form-control" id="editor_name" name="editor_name" value="editor">
+                      </div>
+                      </div>
+                      <input type="hidden" class="form-control" id="id" name="id" value="id">
+                  </form>
+              </div>
               <div class="modal-footer">
-                  <button type="button" class="btn btn-sm btn-success">确定</button>
+                  <button type="button" class="btn btn-sm btn-success" id="save_edit">确定</button>
                   <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">取消</button>
               </div>
           </div>
       </div>
       </div>
+      <!--添加IPC窗口-->
+      <div class="modal fade" id="add_modal" >
+      <div class="modal-dialog" >
+          <div class="modal-content">
+              <div class="modal-header">添加新的IPC</div>
+              <div class="modal-body">
+                  <form class="form-horizontal" role="form" id="add_new_ipc">
+                      <div class="form-group">
+                      <label for="edit_mac" class="col-sm-2 control-label">MAC地址 *</label>
+                      <div class="col-sm-10">
+                          <input type="text" class="form-control" id="mac_addr" name="mac_addr" placeholder="必填字段">
+                      </div>
+                      </div>
+                      <div class="form-group">
+                      <label for="edit_ip" class="col-sm-2 control-label">IP地址 *</label>
+                      <div class="col-sm-10">
+                          <input type="text" class="form-control" id="static_ip" name="static_ip" placeholder="必填字段">
+                      </div>
+                      </div>
+                      <div class="form-group">
+                      <label for="edit_osd" class="col-sm-2 control-label">OSD文字 </label>
+                      <div class="col-sm-10">
+                          <input type="text" class="form-control" id="osd_text" name="osd_text" placeholder="可空">
+                      </div>
+                      </div>
+                      <div class="form-group">
+                      <label for="edit_people" class="col-sm-2 control-label">添加人 *</label>
+                      <div class="col-sm-10">
+                          <input type="text" class="form-control" id="editor_name" name="editor_name" placeholder="必填字段">
+                      </div>
+                      </div>
+                      <!-- <input type="hidden" class="form-control" id="id" name="id" value="id"> -->
+                  </form>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-sm btn-success" id="confirm_save_btn">确定</button>
+                  <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">取消</button>
+              </div>
+          </div>
+      </div>
+      </div>
+
       <script>
-      $('.btn-primary').on('click', function () {
-{#            alert('button clicked'+this.id);#}
-          $('#content_container').append('<p>添加的文字</p>');
-          $('.modal-body').append('<p>添加内容'+this.id+ $('#mac_table')+'</p>');
+      $('.btn-edit').on('click', function () {
+          $.getJSON('/ipcmanage/api/tables/'+this.name, function (data) {
+            console.log(data);
+              $('#edit_modal').find("form").find('#mac_addr').val(data.mac_addr);
+              $('#edit_modal').find("form").find('#static_ip').val(data.static_ip);
+              $('#edit_modal').find("form").find('#osd_text').val(data.osd_text);
+              $('#edit_modal').find("form").find('#editor_name').val(data.editor_name);
+              $('#edit_modal').find("form").find('#id').val(data.id);})
+          });
+      <!--删除记录-->
+      $('.btn-del').on('click', function () {
+        $.ajax({
+              type:"DELETE",
+              url:"/ipcmanage/api/tables/"+this.name,
+              dataType:"json",
+              contentType:"application/json",
+              data: JSON.stringify({
+                      "id":this.name
+              }),
+              context:$(document),
+              success:function(e){
+                  alert("删除成功!");
+              },
+              error:function(e){
+                  alert("删除失败"+String(e));
+              }
+          })
         });
-      $('#edit_modal').on('hide.bs.modal',function (e) {
-          location.reload();
+      <!--增加记录-->
+      $('#confirm_save_btn').on('click', function () {
+        var add_data=getJsonForm($('#add_modal'));
+        console.log(add_data)
+        $.ajax({
+              type:"POST",
+              url:"/ipcmanage/api/tables/",
+              dataType:"json",
+              contentType:"application/json",
+              data: JSON.stringify(add_data),
+              context:$(document),
+              success:function(e){
+                  alert("添加成功!");
+                  this.modal('hide');
+              },
+              error:function(e){
+                  alert("添加失败"+String(e));
+                  console.log(e);
+              }
+          })
+        });
+      <!--更改记录-->
+      $('#save_edit').on('click', function () {
+          var change_data = getJsonForm($('#edit_modal'));
+          console.log(change_data);
+          $.ajax({
+              type:"PUT",
+              url:"/ipcmanage/api/tables/"+ $('#edit_modal').find("form").find('#id').val(),
+              dataType:"json",
+              contentType:"application/json",
+              data: JSON.stringify(change_data),
+              context:$('#edit_modal'),
+              success:function(e){
+                  alert("修改成功!");
+                  this.modal('hide');
+              },
+              error:function(e){
+                  alert("修改失败"+String(e));
+              }
+
+          })
       });
+
+
+      $('#edit_modal').on('hide.bs.modal',function (e) {
+{#          location.reload();#}
+      });
+      $('#edit_modal').on('show.bs.modal',function (e) {
+
+      });
+
+      function getJsonForm(target){
+        var json = {
+          "id":target.find("form").find('#id').val(),
+          "mac_addr":target.find("form").find('#mac_addr').val(),
+          "static_ip":target.find("form").find('#static_ip').val(),
+          "osd_text":target.find("form").find('#osd_text').val(),
+          "editor_name":target.find("form").find('#editor_name').val()
+        };
+        return json;
+      }
+
       </script>
   {% endblock %}

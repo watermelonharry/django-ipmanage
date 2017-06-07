@@ -17,6 +17,11 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 import views
+from rest_framework import routers
+
+# router = routers.DefaultRouter()
+# router.register(r'tables', views.api_ip_list)
+# router.register(r'^tables/(?P<id>[0-9]+)/$',views.api_ip_mac_detail)
 
 urlpatterns = [
     url('^$', views.welcome),
@@ -30,4 +35,9 @@ urlpatterns = [
     # url('^testsuitelist/$', views.testsuite_list),
     # url('^static/assets/css/main.css/$', views.returncss),
 
+    ##api urls
+    # url(r'^api/', include(router.urls)),
+    # url(r'^api/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api/tables/$', views.api_ip_list),
+    url(r'^api/tables/(?P<id>[0-9]+)/$', views.api_ip_mac_detail),
 ]
