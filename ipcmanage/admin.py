@@ -7,4 +7,4 @@ from ipcmanage.models import *
 
 admin.site.register(CnIpcOperateInfo)
 admin.site.register(CnStaticIpcTable)
-admin.site.register(CnTempIpcTable)
+admin.site.register(CnIpcChangeLogDetail)

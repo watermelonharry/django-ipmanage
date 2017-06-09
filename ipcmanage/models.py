@@ -53,13 +53,12 @@ class CnIpcChangeLogDetail(models.Model):
 
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
-    #todo: 添加OSD等其他设置
 
     def __unicode__(self):
         return self.mac_addr
 
     class Meta:
-        ordering = ('create_time',)
+        ordering = ('operate_id', 'create_time',)
 
 
 class CnIpcOperateInfo(models.Model):
@@ -67,12 +66,13 @@ class CnIpcOperateInfo(models.Model):
     操作记录表格
     """
     operator_name = models.CharField(max_length=20)
-    operate_type=models.IntegerField(max_length=2, choices=((1, u'添加IPC'),
-                                                            (2, u'删除IPC'),
-                                                            (3, u'修改IPC')))
+    operate_type=models.IntegerField(max_length=2)
     create_time = models.DateTimeField(auto_now_add=True)
     #操作批次ID,以time.time()整数位为id
-    operate_id = models.CharField(max_length=20)
+    operate_id = models.CharField(max_length=20,)
+    ip_start = models.IPAddressField()
+    ip_count = models.IntegerField(max_length=3)
+    progress = models.IntegerField(max_length=3, default=0)
 
     def __unicode__(self):
         return self.operate_id + u'|' + self.operator_name

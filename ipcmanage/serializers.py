@@ -35,3 +35,13 @@ class CnStaticIpTableSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = CnStaticIpcTable
         fields = ('id','mac_addr','static_ip','osd_text','editor_name')
+
+class CnOperateInfoSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = CnIpcOperateInfo
+        fields = ('id','operate_id','operator_name','operate_type', 'ip_start', 'ip_count', 'progress')
+
+class CnIpcLogDetailSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = CnIpcChangeLogDetail
+        fields = ('id','operate_id','ipc_id', 'mac_addr', 'static_ip', 'osd_text', 'ori_ip', 'status', 'edit_time')
