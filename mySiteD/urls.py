@@ -13,11 +13,14 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url('^hello/$', hello),
     url('^$', hello),
+
     url('^time/$', time),
     url('^pretest/$', pre_test),
     url('^dnstest/', include('dnstest.urls')),
 
-    url('^usermanage/', include('userManage.urls')),
+    url('^ipcmanage/', include('ipcmanage.urls')),
+
+    # url('^usermanage/', include('userManage.urls')),
 
     url(r'^admin/', admin.site.urls),
     url(r'^register/', register),

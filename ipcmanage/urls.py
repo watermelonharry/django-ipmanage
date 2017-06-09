@@ -14,11 +14,18 @@ Including another URLconf
     2. Import the include() function: from django.conf.urls import url, include
     3. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
-import apiviews
+import views
+from rest_framework import routers
+
+# router = routers.DefaultRouter()
+# router.register(r'tables', views.api_ip_list)
+# router.register(r'^tables/(?P<id>[0-9]+)/$',views.api_ip_mac_detail)
 
 urlpatterns = [
+    url('^$', views.welcome),
+    url('^iptables/$',views.show_ip_table),
     # url('^caselist/$', views.case_list),
     # url('^testerlist/$', views.tester_list),
     # url('^subscribelist/$', views.subs_list),
@@ -28,5 +35,12 @@ urlpatterns = [
     # url('^testsuitelist/$', views.testsuite_list),
     # url('^static/assets/css/main.css/$', views.returncss),
 
-    url('^operateinfo/(?P<operatorId>\d+)/$', apiviews.operate_list),
+    ##api urls
+    # url(r'^api/', include(router.urls)),
+    # url(r'^api/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api/tables/$', views.api_ip_list),
+    url(r'^api/tables/(?P<id>[0-9]+)/$', views.api_ip_mac_detail),
+    url(r'^api/mission/$', views.api_start_set_ipc),
+    url(r'^api/mission/(?P<operate_id>[0-9]+)/$', views.api_operate_info),
+    url(r'^api/mission/detail/$', views.api_operate_detail),
 ]
