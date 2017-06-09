@@ -51,6 +51,12 @@ def api_ip_list(request):
     if request.method == 'GET':
         ip_macs = CnStaticIpcTable.objects.all()
         serializer = CnStaticIpTableSerializer(ip_macs,many=True)
+
+        #json str
+        # j=JSONRenderer().render(serializer.data)
+        # #dict list
+        # import json
+        # g = json.loads(j)
         return JSONResponse(serializer.data)
 
     elif request.method == 'POST':
