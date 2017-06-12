@@ -45,12 +45,10 @@ class CnIpcChangeLogDetail(models.Model):
     static_ip = models.IPAddressField()
     osd_text = models.CharField(max_length=40, blank=True)
     ori_ip = models.IPAddressField()
-    status = models.IntegerField(max_length=5, choices={(1, u'设置IP到.60'),
-                                                        (2, u'恢复出厂成功'),
-                                                        (3, u'设置IP到指定地址'),
-                                                        (4, u'设置OSD成功'),
-                                                        })
-
+    # status = models.IntegerField(max_length=5, choices={(1, u'设置IP到.60'),(2, u'恢复出厂成功'),
+    #                                                     (3, u'设置IP到指定地址'),
+    #                                                     (4, u'设置OSD成功')})
+    status = models.IntegerField(max_length=5)
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 

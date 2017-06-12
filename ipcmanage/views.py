@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+from django.db.models.query import QuerySet
 
 from django.shortcuts import render
 
@@ -84,7 +84,7 @@ def api_operate_info(request, operate_id):
         data = JSONParser().parse(request)
         serializer = CnOperateInfoSerializer(op_info, data=data)
 
-        if data.get['operate_id'] != operate_id:
+        if data['operate_id'] != operate_id:
             return JSONResponse(serializer.errors, status=400)
 
         if serializer.is_valid():
@@ -102,8 +102,12 @@ def api_operate_detail(request):
     data = JSONParser().parse(request)
     if request.method == 'GET':
         operate_id = data.get('operate_id')
-        all_detail_info = CnIpcChangeLogDetail.objects.get(operate_id=operate_id)
-        serializer = CnIpcLogDetailSerializer(all_detail_info, many=True)
+        all_detail_info = CnIpcChangeLogDetail.objects.filter(operate_id=operate_id)
+        if type(all_detail_info) is QuerySet:
+            serializer = CnIpcLogDetailSerializer(all_detail_info, many=True)
+        else:
+            serializer = CnIpcLogDetailSerializer(all_detail_info)
+
         return JSONResponse(serializer.data)
 
         #todo:获取指定op_id对应的log_list
