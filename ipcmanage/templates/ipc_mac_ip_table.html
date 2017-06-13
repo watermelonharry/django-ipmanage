@@ -257,17 +257,36 @@
           data: JSON.stringify(json_data),
           success:function(e){
             console.log("success", e);
-            on_time_check();
+            $('#start_scan_modal').modal('toggle');
+            $('#scanning_modal').modal('toggle');
+            var timer_id = setInterval(on_time_check(json_data.operate_id),2000);
           },
           error:function(e){
             console.log("failed", e);
-          },
+          }
         });
       })
       
-      function on_time_check(e){
-        $('#start_scan_modal').modal('toggle');
-        $('#scanning_modal').modal('toggle');
+      function on_time_check(op_id){
+          $.ajax({
+          type:"GET",
+          url:"/ipcmanage/api/mission/"+op_id,
+          dataType:"json",
+          contentType:"application/json",
+          success:function(js_data){
+            console.log("success", js_data);
+              var total = Number(js_data.ip_count);
+              var fin = Number(js_data.progress);
+              var progress = String((total-fin)/total) + "%";
+            $('#scanning_probar').attr("style", "width: "+progress);
+              if(total == fin){
+                  clearInterval(timer_id);
+              }
+          },
+          error:function(e){
+            console.log("failed", e);
+          }
+        });
       };
 
       <!--关闭分配-->

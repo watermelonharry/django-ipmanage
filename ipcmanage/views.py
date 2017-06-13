@@ -45,6 +45,13 @@ def show_ip_table(request):
                                                         'firstTitle_content': u'批量管理IPC的IP地址',
                                                         'ip_list': ip_list})
 
+def show_mission_datail(request, operate_id):
+    detail_list = CnIpcChangeLogDetail.objects.filter(operate_id=operate_id)
+    return render_to_response('mission_detail_table.html', {'firstTitle': u'IPC批量IP设置工具',
+                                                            'firstTitle_content': u'查看任务明细',
+                                                            'detail_list': detail_list,
+                                                            'operate_id': operate_id})
+
 
 def api_start_set_ipc(request):
     """
