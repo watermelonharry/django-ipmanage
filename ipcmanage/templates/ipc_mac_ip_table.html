@@ -216,7 +216,7 @@
       </div>
 
       <!--执行中窗口-->
-      <div class="modal fade" id="scanning_modal" >
+      <div class="modal fade" id="scanning_modal" data-backdrop="static">
       <div class="modal-dialog" >
           <div class="modal-content">
               <div class="modal-header">
@@ -228,6 +228,7 @@
                   </div>
               </div>
               <div class="modal-footer">
+                  <button type="button" class="btn btn-sm btn-success" id="show_detail_btn" name="">查看详细</button>
                   <button type="button" class="btn btn-sm btn-success" id="scanning_confirm_btn" >确定</button>
                   <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="scanning_abort_btn">终止任务</button>
               </div>
@@ -237,6 +238,15 @@
 
 
       <script>
+      $('#batch_upload_btn').on('click', function(){
+          timer_id = window.setInterval(alert,1000);
+      })
+
+      <!--查看任务详细详细-->
+      var timer_id;
+      $('#show_detail_btn').on('click', function(){
+          window.open('../mission_detail/'+$('#show_detail_btn').attr("name"));
+      })
       <!--开始执行-->
       $('#confirm_scan_ip_btn').on('click', function(){
         var json_data = {
@@ -246,7 +256,7 @@
           'ip_start':$('#scan_start_str').val(),
           'ip_count':$('#scan_count_str').val()
         };
-
+          $('#show_detail_btn').attr("name", json_data.operate_id);
         console.log(json_data);
         
         $.ajax({
@@ -259,7 +269,8 @@
             console.log("success", e);
             $('#start_scan_modal').modal('toggle');
             $('#scanning_modal').modal('toggle');
-            var timer_id = setInterval(on_time_check(json_data.operate_id),2000);
+            timer_id = window.setInterval(on_time_check,2000);
+              console.log(timer_id);
           },
           error:function(e){
             console.log("failed", e);
@@ -267,7 +278,8 @@
         });
       })
       
-      function on_time_check(op_id){
+      function on_time_check(){
+          var op_id = $('#show_detail_btn').attr("name");
           $.ajax({
           type:"GET",
           url:"/ipcmanage/api/mission/"+op_id,
@@ -277,10 +289,13 @@
             console.log("success", js_data);
               var total = Number(js_data.ip_count);
               var fin = Number(js_data.progress);
-              var progress = String((total-fin)/total) + "%";
+              var progress = String(fin*100/total) + "%";
+              console.log("request mission progress", progress, timer_id);
             $('#scanning_probar').attr("style", "width: "+progress);
               if(total == fin){
-                  clearInterval(timer_id);
+                  window.clearInterval(timer_id);
+                  console.log("clear interval")
+                  alert('设置完成！')
               }
           },
           error:function(e){
