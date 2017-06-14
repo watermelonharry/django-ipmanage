@@ -230,7 +230,7 @@
               <div class="modal-footer">
                   <button type="button" class="btn btn-sm btn-success" id="show_detail_btn" name="">查看详细</button>
                   <button type="button" class="btn btn-sm btn-success" id="scanning_confirm_btn" >确定</button>
-                  <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="scanning_abort_btn">终止任务</button>
+                  <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="scanning_abort_btn">退出</button>
               </div>
           </div>
       </div>
@@ -238,6 +238,12 @@
 
 
       <script>
+      $('#scanning_abort_btn').on('click', function(){
+          window.clearInterval(timer_id);
+          $('#scanning_probar').attr("style", "width: 0%");
+
+      })
+
       $('#batch_upload_btn').on('click', function(){
           timer_id = window.setInterval(alert,1000);
       })
@@ -269,7 +275,7 @@
             console.log("success", e);
             $('#start_scan_modal').modal('toggle');
             $('#scanning_modal').modal('toggle');
-            timer_id = window.setInterval(on_time_check,2000);
+            timer_id = window.setInterval(on_time_check,5000);
               console.log(timer_id);
           },
           error:function(e){

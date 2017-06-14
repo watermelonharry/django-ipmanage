@@ -26,8 +26,6 @@ class JSONResponse(HttpResponse):
         super(JSONResponse, self).__init__(content, **kwargs)
 
 
-TD_LIST = []
-
 """
 views
 
@@ -51,7 +49,18 @@ def show_mission_datail(request, operate_id):
                                                             'firstTitle_content': u'查看任务明细',
                                                             'detail_list': detail_list,
                                                             'operate_id': operate_id})
-
+def api_plan_unfinished(request):
+    """
+    显示未开始的任务
+    """
+    if request.method == 'GET':
+        try:
+            wait_plan_info = CnIpcOperateInfo.objects.filter(progress=0)[0]
+            serializer = CnOperateInfoSerializer(wait_plan_info)
+            return JSONResponse(serializer.data)
+        except:
+            serializer = CnOperateInfoSerializer()
+            return JSONResponse(serializer.errors, status=400)
 
 def api_start_set_ipc(request):
     """
@@ -66,11 +75,23 @@ def api_start_set_ipc(request):
     if request.method == 'POST':
         data = JSONParser().parse(request)
         op_id = data.get('operate_id')
-        #todo:开始任务线程
+
+        # global TD_LIST
+        # if len(TD_LIST) == 0:
+        #     ip_macs = CnStaticIpcTable.objects.all()
+        #     serializer = CnStaticIpTableSerializer(ip_macs, many=True)
+        #     j=JSONRenderer().render(serializer.data)
+        #     ipcmanager = ipcc.IPCCtrlManager(tid=op_id,
+        #                                   scanPlanJsonStr=json.dumps(data),
+        #                                   settings=j)
+        #     TD_LIST.append(ipcmanager)
+        #     ipcmanager.start()
+
         serializer = CnOperateInfoSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return JSONResponse(serializer.data, status=201)
+
         return JSONResponse(serializer.errors, status=400)
 
 
@@ -145,6 +166,7 @@ def api_ip_list(request):
 
     elif request.method == 'POST':
         data = JSONParser().parse(request)
+        data['mac_addr'] = data['mac_addr'].replace('-', '', 4)
         serializer = CnStaticIpTableSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

@@ -30,7 +30,7 @@ class CnStaticIpcTable(models.Model):
         return self.mac_addr
 
     class Meta:
-        ordering = ('id',)
+        ordering = ('mac_addr',)
 
 class CnIpcChangeLogDetail(models.Model):
     """
@@ -56,7 +56,7 @@ class CnIpcChangeLogDetail(models.Model):
         return self.mac_addr
 
     class Meta:
-        ordering = ('operate_id', 'create_time',)
+        ordering = ('static_ip','create_time')
 
 
 class CnIpcOperateInfo(models.Model):
@@ -74,3 +74,8 @@ class CnIpcOperateInfo(models.Model):
 
     def __unicode__(self):
         return self.operate_id + u'|' + self.operator_name
+
+class CnRemoteTerminal(models.Model):
+    """
+    远程终端注册
+    """

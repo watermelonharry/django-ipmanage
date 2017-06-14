@@ -42,6 +42,7 @@ urlpatterns = [
     url(r'^api/tables/$', views.api_ip_list),
     url(r'^api/tables/(?P<id>[0-9]+)/$', views.api_ip_mac_detail),
     url(r'^api/mission/$', views.api_start_set_ipc),
+    url(r'^api/mission/wait/$', views.api_plan_unfinished),
     url(r'^api/mission/(?P<operate_id>[0-9]+)/$', views.api_operate_info),
     url(r'^api/mission/detail/$', views.api_operate_detail),
 ]
