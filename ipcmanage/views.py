@@ -49,6 +49,13 @@ def show_mission_datail(request, operate_id):
                                                             'firstTitle_content': u'查看任务明细',
                                                             'detail_list': detail_list,
                                                             'operate_id': operate_id})
+
+def show_mission_info(request):
+    mission_info_list = CnIpcOperateInfo.objects.all()
+    return render_to_response('mission_info.html',{'firstTitle': u'IPC批量IP设置工具',
+                                                    'firstTitle_content': u'查看历史任务',
+                                                    'info_list': mission_info_list})
+
 def api_plan_unfinished(request):
     """
     显示未开始的任务
