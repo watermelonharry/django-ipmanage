@@ -49,6 +49,22 @@ def show_mission_datail(request, operate_id):
                                                             'firstTitle_content': u'查看任务明细',
                                                             'detail_list': detail_list,
                                                             'operate_id': operate_id})
+
+def show_mission_info(request):
+    mission_info_list = CnIpcOperateInfo.objects.all()
+    return render_to_response('mission_info.html',{'firstTitle': u'IPC批量IP设置工具',
+                                                    'firstTitle_content': u'查看历史任务',
+                                                    'info_list': mission_info_list})
+
+def download_iptables(reqeust):
+    ip_list = CnStaticIpcTable.objects.all()
+    ip_list = CnStaticIpTableSerializer(ip_list, many=True).data
+    content_json = unicode(JSONRenderer().render(ip_list))
+    response = HttpResponse(content_json, content_type = 'APPLICATION/OCTET=STREAM')
+    response['Content-Disposition'] = 'attachment; filename=ip_mac.txt'
+    response['Content-Length'] = len(content_json)
+    return response
+
 def api_plan_unfinished(request):
     """
     显示未开始的任务

@@ -75,6 +75,9 @@ class CnIpcOperateInfo(models.Model):
     def __unicode__(self):
         return self.operate_id + u'|' + self.operator_name
 
+    class Meta:
+        ordering = ('create_time',)
+
 class CnRemoteTerminal(models.Model):
     """
     远程终端注册

@@ -26,7 +26,9 @@ from rest_framework import routers
 urlpatterns = [
     url('^$', views.welcome),
     url('^iptables/$',views.show_ip_table),
+    url('^iptables/download/$',views.download_iptables),
     url('^mission_detail/(?P<operate_id>[0-9]+)/$',views.show_mission_datail),
+    url('^mission/$',views.show_mission_info),
     # url('^caselist/$', views.case_list),
     # url('^testerlist/$', views.tester_list),
     # url('^subscribelist/$', views.subs_list),
