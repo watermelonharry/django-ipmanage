@@ -4,7 +4,7 @@ from django.db.models.query import QuerySet
 from django.shortcuts import render
 
 # Create your views here.
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect,StreamingHttpResponse
 from django.shortcuts import render_to_response
 from serializers import CnStaticIpTableSerializer, CnIpcLogDetailSerializer, CnOperateInfoSerializer
 from models import CnStaticIpcTable, CnIpcChangeLogDetail, CnIpcOperateInfo
@@ -55,6 +55,15 @@ def show_mission_info(request):
     return render_to_response('mission_info.html',{'firstTitle': u'IPC批量IP设置工具',
                                                     'firstTitle_content': u'查看历史任务',
                                                     'info_list': mission_info_list})
+
+def download_iptables(reqeust):
+    ip_list = (k.get_content() for k in CnStaticIpcTable.objects.all())
+    # ip_list = CnStaticIpTableSerializer(ip_list, many=True).data
+    # content_json = unicode(JSONRenderer().render(ip_list))
+    response = StreamingHttpResponse(ip_list, content_type = 'APPLICATION/OCTET=STREAM')
+    response['Content-Disposition'] = 'attachment; filename=ip_mac.txt'
+    # response['Content-Length'] = len(ip_list)
+    return response
 
 def api_plan_unfinished(request):
     """

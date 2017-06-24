@@ -29,6 +29,10 @@ class CnStaticIpcTable(models.Model):
     def __unicode__(self):
         return self.mac_addr
 
+    def get_content(self):
+        content = '  '.join(map(unicode, [self.id, self.mac_addr, self.static_ip, self.osd_text, self.edit_time, self.editor_name]))
+        return content + u'\n\r'
+
     class Meta:
         ordering = ('mac_addr',)
 

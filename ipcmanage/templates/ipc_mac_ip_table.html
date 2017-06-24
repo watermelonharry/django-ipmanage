@@ -25,6 +25,10 @@
             <p><a class="btn btn-info" role="button" id="show_mission_btn" >查看任务列表&raquo;</a></p>
             <p>查看历史任务信息</p>
         </div>
+        <div class="col-lg-3">
+            <p><a class="btn btn-info" role="button" id="down_load_settings_btn" >下载配置&raquo;</a></p>
+            <p>下载配置文件到本地</p>
+        </div>
       </div>
     </div>
       <hr>
@@ -242,6 +246,10 @@
 
 
       <script>
+      <!--下载配置-->
+      $('#down_load_settings_btn').on('click',function(){
+        location.href="./download";
+      })
       <!--查看任务信息-->
       $('#show_mission_btn').on('click', function(){
           window.open('../mission');
