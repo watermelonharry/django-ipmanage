@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'dnstest',
     'ipcmanage',
+    'ipcset',
     'rest_framework',
 )
 
