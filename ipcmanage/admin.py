@@ -8,3 +8,5 @@ from ipcmanage.models import *
 admin.site.register(CnIpcOperateInfo)
 admin.site.register(CnStaticIpcTable)
 admin.site.register(CnIpcChangeLogDetail)
+admin.site.register(CnTestEngieer)
+admin.site.register(CnRemoteTerminal)
