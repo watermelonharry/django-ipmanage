@@ -20,8 +20,8 @@
           <div class="table-responsive">
             <table class="table table-striped" id="mac_table">
               <thead>
-                <tr>
-                  <th>序号</th>
+                <tr class=locktop>
+                  <th><label class="checkbox-inline"><input type="checkbox" id="select_all">全选</label></th>
                   <th>MAC地址</th>
                   <th>IP地址</th>
                   <th>IPC型号</th>
@@ -37,7 +37,7 @@
 
               {% for setting in setting_list %}
                   <tr>
-                  <td> {{ forloop.counter }}</td>
+                  <td><input type="checkbox" class="checkbox-single" name={{setting.id}} value={{setting.id}}></td>
                   <td>{{ setting.mac_addr }}</td>
                   <td>{{ setting.current_ip }}</td>
                   <td>{{ setting.type_id.model_name }}</td>
@@ -287,6 +287,12 @@
 
 
       <script>
+      $('#select_all').click(function(){
+          alert(this.checked);
+          $('input[class="checkbox-single"]').attr("checked",this.checked); 
+      })
+
+
       <!--下载配置-->
       $('#down_load_settings_btn').on('click',function(){
         location.href="./download";
