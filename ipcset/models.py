@@ -65,40 +65,46 @@ class BaseTypeTable(models.Model):
         #todo:
         pass
 
-    class Meta:
-        ordering = ('id',)
-
-class BaseMacTable(models.Model):
-    """
-    MAC-型号表
-    """
-    mac_addr = models.CharField(max_length=16,unique=True)
-    type_id = models.ForeignKey(BaseTypeTable)
-
-    editor_name = models.CharField(max_length=20)
-    create_time = models.DateTimeField(auto_now_add=True)
-    edit_time = models.DateTimeField(auto_now=True)
-
-    def __unicode__(self):
-        return unicode(self.mac_addr)
-
-    def get_mac(self):
-        return unicode(self.mac_addr)
-
-    def get_content(self):
-        #todo:
-        pass
+    def get_model_name(self):
+        return unicode(self.model_name)
 
     class Meta:
         ordering = ('id',)
+
+# class BaseMacTable(models.Model):
+#     """
+#     MAC-型号表
+#     """
+#     mac_addr = models.CharField(max_length=16,unique=True)
+#     type_id = models.ForeignKey(BaseTypeTable)
+#
+#     editor_name = models.CharField(max_length=20)
+#     create_time = models.DateTimeField(auto_now_add=True)
+#     edit_time = models.DateTimeField(auto_now=True)
+#
+#     def __unicode__(self):
+#         return unicode(self.mac_addr)
+#
+#     def get_mac(self):
+#         return unicode(self.mac_addr)
+#
+#     def get_content(self):
+#         #todo:
+#         pass
+#
+#     class Meta:
+#         ordering = ('id',)
 
 
 class VideoSettingTable(models.Model):
     """
     设置表
     """
-    mac_addr_id = models.ForeignKey(BaseMacTable)
+    mac_addr = models.CharField(max_length=16, unique=True)
     current_ip = models.IPAddressField()
+    type_id = models.ForeignKey(BaseTypeTable)
+
+
     set_resolution = models.CharField(max_length=20)
     set_bitrate = models.IntegerField(max_length=10)
     set_framerate = models.CharField(max_length=20)
@@ -110,7 +116,7 @@ class VideoSettingTable(models.Model):
     edit_time = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return unicode(self.mac_addr_id)
+        return unicode(self.mac_addr)
 
     def get_content(self):
         # todo:
@@ -146,7 +152,7 @@ class MissionDetailTable(models.Model):
     任务明细表
     """
     mission_id = models.ForeignKey(MissionInfoTable)
-    mac_id = models.ForeignKey(BaseMacTable)
+    mac_addr = models.CharField(max_length=16)
     ip_addr = models.IPAddressField()
     set_resolution = models.CharField(max_length=10)
     set_bitrate = models.CharField(max_length=10)
@@ -164,4 +170,4 @@ class MissionDetailTable(models.Model):
         pass
 
     class Meta:
-        ordering = ('mac_id',)
+        ordering = ('mac_addr',)

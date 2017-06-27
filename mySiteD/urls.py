@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     url('^dnstest/', include('dnstest.urls')),
 
     url('^ipcmanage/', include('ipcmanage.urls')),
+    url('^ipcset/', include('ipcset.urls')),
 
     # url('^usermanage/', include('userManage.urls')),
 

@@ -4,56 +4,50 @@
       <!-- Three columns of text below the carousel -->
       <div class="row">
         <div class="col-lg-3">
-            <p><a class="btn btn-info" role="button" id="assign_ip_btn" data-toggle="modal" data-target="#assign_ip_modal" data-backdrop="static">自动分配&raquo;</a></p>
-            <p>输入IP起始地址，自动按id分配IP。</p>
+            <p><a class="btn btn-info" role="button" id="assign_ip_btn" data-toggle="modal" data-target="#assign_ip_modal" data-backdrop="static">开始设置&raquo;</a></p>
+            <p>针对选中的设备，开始批量设置。</p>
         </div>
         <div class="col-lg-3">
-          <p><a class="btn btn-info" id="assign_ip_btn" data-toggle="modal" data-target="#start_scan_modal" data-backdrop="static" role="button">开始执行 &raquo;</a></p>
-          <p>按照下表的MAC-IP-OSD设置局域网内的IPC。</p>
+          <p><a class="btn btn-info" role="button" id="add_new_btn" data-toggle="modal" data-target="#add_modal" data-backdrop="static">添加设备 &raquo;</a></p>
+          <p>添加新的设备到数据库中。</p>
         </div>
-        <div class="col-lg-3">
-          <p><a class="btn btn-info" role="button" id="add_new_btn" data-toggle="modal" data-target="#add_modal" data-backdrop="static">添加IPC &raquo;</a></p>
-          <p>添加新的MAC-IP对应关系到数据库中。</p>
-        </div>
-        <div class="col-lg-3">
-          <p><a class="btn btn-info" role="button" id="batch_upload_btn" data-toggle="modal" data-target="#batch_modal" data-backdrop="static">批量导入 &raquo;</a></p>
-          <p>导入本地JSON格式的文件，将文件中的MAC-IP映射上传到数据库。</p>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-3">
-            <p><a class="btn btn-info" role="button" id="show_mission_btn" >查看任务列表&raquo;</a></p>
-            <p>查看历史任务信息</p>
-        </div>
-        <div class="col-lg-3">
-            <p><a class="btn btn-info" role="button" id="down_load_settings_btn" >下载配置&raquo;</a></p>
-            <p>下载配置文件到本地</p>
-        </div>
+
       </div>
     </div>
       <hr>
       <div class="container">
-      <h2 class="sub-header">已保存的MAC-IP对应信息</h2>
+      <h2 class="sub-header">查看详细设置信息</h2>
           <div class="table-responsive">
             <table class="table table-striped" id="mac_table">
               <thead>
                 <tr>
                   <th>序号</th>
-                  <th>MAC</th>
-                  <th>IP</th>
-                  <th>OSD设置</th>
+                  <th>MAC地址</th>
+                  <th>IP地址</th>
+                  <th>IPC型号</th>
+                  <th>分辨率</th>
+                  <th>帧率</th>
+                  <th>比特率</th>
+                  <th>同步OSD</th>
+                  <th>修改人</th>
                   <th>操作</th>
                 </tr>
               </thead>
               <tbody>
-              {% for ip in ip_list %}
+
+              {% for setting in setting_list %}
                   <tr>
-                  <td>{{ forloop.counter }}</td>
-                  <td>{{ ip.mac_addr }}</td>
-                  <td>{{ ip.static_ip }}</td>
-                  <td>{{ ip.osd_text }}</td>
-                  <td><a data-toggle="modal" data-target="#edit_modal" data-backdrop="static" class="btn-sm btn-primary btn-edit" name = {{ip.id}} role="button">修改</a>
-                      <a class="btn-sm btn-danger btn-del" name={{ ip.id }} role="button">删除</a>
+                  <td> {{ forloop.counter }}</td>
+                  <td>{{ setting.mac_addr }}</td>
+                  <td>{{ setting.current_ip }}</td>
+                  <td>{{ setting.type_id.model_name }}</td>
+                  <td>{{ setting.set_resolution }}</td>
+                  <td>{{ setting.set_framerate }}</td>
+                  <td>{{ setting.set_bitrate }}</td>
+                  <td>{{ setting.operate_type }}</td>
+                  <td>{{ setting.editor_name }}</td>
+                  <td><a data-toggle="modal" data-target="#edit_modal" data-backdrop="static" class="btn-sm btn-primary btn-edit" name = {{setting.id}} role="button">修改</a>
+                      <a class="btn-sm btn-danger btn-del" name={{ setting.id }} role="button">删除</a>
                   </td>
 
                   </tr>
@@ -70,31 +64,55 @@
       <div class="modal fade" id="edit_modal" >
       <div class="modal-dialog" >
           <div class="modal-content">
-              <div class="modal-header">修改</div>
+              <div class="modal-header">修改单条设置</div>
               <div class="modal-body">
-                  <form class="form-horizontal" role="form" id="edit_old_ipc">
+                  <form class="form-horizontal" role="form" id="edit_old_setting">
                       <div class="form-group">
-                      <label for="edit_mac" class="col-sm-2 control-label">MAC地址</label>
-                      <div class="col-sm-10">
+                      <label for="edit_mac" class="col-sm-4 control-label">MAC地址</label>
+                      <div class="col-sm-6">
                           <input type="text" class="form-control" id="mac_addr" name="mac_addr" value="mac">
                       </div>
                       </div>
                       <div class="form-group">
-                      <label for="edit_ip" class="col-sm-2 control-label">IP地址</label>
-                      <div class="col-sm-10">
-                          <input type="text" class="form-control" id="static_ip" name="static_ip" value="ip">
+                      <label for="edit_ip" class="col-sm-4 control-label">IP地址</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="current_ip" name="current_ip" value="ip">
                       </div>
                       </div>
                       <div class="form-group">
-                      <label for="edit_osd" class="col-sm-2 control-label">OSD文字</label>
-                      <div class="col-sm-10">
-                          <input type="text" class="form-control" id="osd_text" name="osd_text" value="osd">
+                      <label for="edit_osd" class="col-sm-4 control-label">IPC类型</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="type_id" name="type_id" value="type">
                       </div>
                       </div>
                       <div class="form-group">
-                      <label for="edit_people" class="col-sm-2 control-label">修改人</label>
-                      <div class="col-sm-10">
-                          <input type="text" class="form-control" id="editor_name" name="editor_name" value="editor">
+                      <label for="edit_people" class="col-sm-4 control-label">设置分辨率</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="set_resolution" name="set_resolution" value="">
+                      </div>
+                      </div>
+                        <div class="form-group">
+                      <label for="edit_people" class="col-sm-4 control-label">设置帧率</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="set_framerate" name="set_framerate" value="">
+                      </div>
+                      </div>
+                        <div class="form-group">
+                      <label for="edit_people" class="col-sm-4 control-label">设置比特率</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="set_bitrate" name="set_bitrate" value="">
+                      </div>
+                      </div>
+                        <div class="form-group">
+                      <label for="edit_people" class="col-sm-4 control-label">同步OSD</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="operate_type" name="operate_type" value="">
+                      </div>
+                      </div>
+                        <div class="form-group">
+                      <label for="edit_people" class="col-sm-4 control-label">修改人</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="editor_name" name="editor_name" value="">
                       </div>
                       </div>
                       <input type="hidden" class="form-control" id="id" name="id" value="id">
@@ -111,34 +129,57 @@
       <div class="modal fade" id="add_modal" >
       <div class="modal-dialog" >
           <div class="modal-content">
-              <div class="modal-header">添加新的IPC</div>
+              <div class="modal-header">添加新的设备</div>
               <div class="modal-body">
-                  <form class="form-horizontal" role="form" id="add_new_ipc">
+                  <form class="form-horizontal" role="form" id="add_new_">
                       <div class="form-group">
-                      <label for="edit_mac" class="col-sm-2 control-label">MAC地址 *</label>
-                      <div class="col-sm-10">
-                          <input type="text" class="form-control" id="mac_addr" name="mac_addr" placeholder="必填字段">
-                      </div>
-                      </div>
-                      <div class="form-group">
-                      <label for="edit_ip" class="col-sm-2 control-label">IP地址 *</label>
-                      <div class="col-sm-10">
-                          <input type="text" class="form-control" id="static_ip" name="static_ip" placeholder="非必填字段">
+                      <label for="edit_mac" class="col-sm-4 control-label">MAC地址</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="mac_addr" name="mac_addr" value="mac">
                       </div>
                       </div>
                       <div class="form-group">
-                      <label for="edit_osd" class="col-sm-2 control-label">OSD文字 </label>
-                      <div class="col-sm-10">
-                          <input type="text" class="form-control" id="osd_text" name="osd_text" placeholder="可空">
+                      <label for="edit_ip" class="col-sm-4 control-label">IP地址</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="current_ip" name="current_ip" value="ip">
                       </div>
                       </div>
                       <div class="form-group">
-                      <label for="edit_people" class="col-sm-2 control-label">添加人 *</label>
-                      <div class="col-sm-10">
-                          <input type="text" class="form-control" id="editor_name" name="editor_name" placeholder="必填字段">
+                      <label for="edit_osd" class="col-sm-4 control-label">IPC类型</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="type_id" name="type_id" value="type">
                       </div>
                       </div>
-                      <!-- <input type="hidden" class="form-control" id="id" name="id" value="id"> -->
+                      <div class="form-group">
+                      <label for="edit_people" class="col-sm-4 control-label">设置分辨率</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="set_resolution" name="set_resolution" value="">
+                      </div>
+                      </div>
+                        <div class="form-group">
+                      <label for="edit_people" class="col-sm-4 control-label">设置帧率</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="set_framerate" name="set_framerate" value="">
+                      </div>
+                      </div>
+                        <div class="form-group">
+                      <label for="edit_people" class="col-sm-4 control-label">设置比特率</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="set_bitrate" name="set_bitrate" value="">
+                      </div>
+                      </div>
+                        <div class="form-group">
+                      <label for="edit_people" class="col-sm-4 control-label">同步OSD</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="operate_type" name="operate_type" value="">
+                      </div>
+                      </div>
+                        <div class="form-group">
+                      <label for="edit_people" class="col-sm-4 control-label">修改人</label>
+                      <div class="col-sm-6">
+                          <input type="text" class="form-control" id="editor_name" name="editor_name" value="">
+                      </div>
+                      </div>
                   </form>
               </div>
               <div class="modal-footer">
@@ -371,19 +412,25 @@
       })
       <!--编辑单条记录-->
       $('.btn-edit').on('click', function () {
-          $.getJSON('/ipcmanage/api/tables/'+this.name, function (data) {
-            console.log(data);
+          $.getJSON('/ipcset/api/settings/' + this.name, function (data) {
+              console.log(data);
               $('#edit_modal').find("form").find('#mac_addr').val(data.mac_addr);
-              $('#edit_modal').find("form").find('#static_ip').val(data.static_ip);
-              $('#edit_modal').find("form").find('#osd_text').val(data.osd_text);
+              $('#edit_modal').find("form").find('#current_ip').val(data.current_ip);
+              $('#edit_modal').find("form").find('#type_id').val(data.type_id);
+              $('#edit_modal').find("form").find('#set_resolution').val(data.set_resolution);
+              $('#edit_modal').find("form").find('#set_bitrate').val(data.set_bitrate);
+              $('#edit_modal').find("form").find('#set_framerate').val(data.set_framerate);
+              $('#edit_modal').find("form").find('#operate_type').val(data.operate_type);
               $('#edit_modal').find("form").find('#editor_name').val(data.editor_name);
-              $('#edit_modal').find("form").find('#id').val(data.id);})
+              $('#edit_modal').find("form").find('#id').val(data.id);
           });
+      })
+
       <!--删除记录-->
       $('.btn-del').on('click', function () {
         $.ajax({
               type:"DELETE",
-              url:"/ipcmanage/api/tables/"+this.name,
+              url:"/ipcset/api/settings/"+this.name,
               dataType:"json",
               contentType:"application/json",
               data: JSON.stringify({
@@ -405,7 +452,7 @@
         console.log(add_data)
         $.ajax({
               type:"POST",
-              url:"/ipcmanage/api/tables/",
+              url:"/ipcset/api/settings/",
               dataType:"json",
               contentType:"application/json",
               data: JSON.stringify(add_data),
@@ -427,7 +474,7 @@
           console.log(change_data);
           $.ajax({
               type:"PUT",
-              url:"/ipcmanage/api/tables/"+ $('#edit_modal').find("form").find('#id').val(),
+              url:"/ipcset/api/settings/"+ $('#edit_modal').find("form").find('#id').val(),
               dataType:"json",
               contentType:"application/json",
               data: JSON.stringify(change_data),
@@ -458,17 +505,21 @@
         var json = {
           "id":target.find("form").find('#id').val(),
           "mac_addr":edit_mac,
-          "static_ip":target.find("form").find('#static_ip').val(),
-          "osd_text":target.find("form").find('#osd_text').val(),
-          "editor_name":target.find("form").find('#editor_name').val()
+          "current_ip":target.find("form").find('#current_ip').val(),
+          "type_id":target.find("form").find('#type_id').val(),
+          "set_resolution":target.find("form").find('#set_resolution').val(),
+          "set_bitrate":target.find("form").find('#set_bitrate').val(),
+          "set_framerate":target.find("form").find('#set_framerate').val(),
+          "operate_type":target.find("form").find('#operate_type').val(),
+          "editor_name":target.find("form").find('#editor_name').val(),
         };
         return json;
-      }
+      };
 
       function getTimeId(){
         var time = new Date().getTime();
         return String(time);
-      }
+      };
 
       </script>
   {% endblock %}

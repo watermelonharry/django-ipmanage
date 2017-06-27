@@ -26,15 +26,16 @@ from rest_framework import routers
 urlpatterns = [
     url('^$', views.welcome),
     url('^basic/$',views.show_basic_info),
-    url('^iptables/download/$',views.download_iptables),
-    url('^mission_detail/(?P<operate_id>[0-9]+)/$',views.show_mission_datail),
-    url('^mission/$',views.show_mission_info),
+    url('^settings/$', views.show_settings_info),
 
+    # url('^iptables/download/$',views.download_iptables),
+    # url('^mission_detail/(?P<operate_id>[0-9]+)/$',views.show_mission_datail),
+    #
     ##api urls
-    url(r'^api/tables/$', views.api_ip_list),
-    url(r'^api/tables/(?P<id>[0-9]+)/$', views.api_ip_mac_detail),
-    url(r'^api/mission/$', views.api_start_set_ipc),
-    url(r'^api/mission/wait/$', views.api_plan_unfinished),
-    url(r'^api/mission/(?P<operate_id>[0-9]+)/$', views.api_operate_info),
-    url(r'^api/mission/detail/$', views.api_operate_detail),
+    url(r'^api/settings/$', views.api_add_or_get_videosetting),
+    url(r'^api/settings/(?P<id>[0-9]+)/$', views.api_edit_single_videosetting),
+    # url(r'^api/mission/$', views.api_start_set_ipc),
+    # url(r'^api/mission/wait/$', views.api_plan_unfinished),
+    # url(r'^api/mission/(?P<operate_id>[0-9]+)/$', views.api_operate_info),
+    # url(r'^api/mission/detail/$', views.api_operate_detail),
 ]
