@@ -4,7 +4,7 @@
       <!-- Three columns of text below the carousel -->
       <div class="row">
         <div class="col-lg-3">
-            <p><a class="btn btn-info" role="button" id="assign_ip_btn" data-toggle="modal" data-target="#assign_ip_modal" data-backdrop="static">开始设置&raquo;</a></p>
+            <p><a class="btn btn-info" role="button" id="start_set_btn" data-toggle="modal" data-target="#start_set_modal" data-backdrop="static">开始设置&raquo;</a></p>
             <p>针对选中的设备，开始批量设置。</p>
         </div>
         <div class="col-lg-3">
@@ -190,76 +190,40 @@
       </div>
       </div>
 
-      <!--批量分配IP窗口-->
-      <div class="modal fade" id="assign_ip_modal" >
-      <div class="modal-dialog" >
-          <div class="modal-content">
-              <div class="modal-header">
-              <h3>分配IP</h3>
-              <p>输入启示IP地址A、分配数量N后，系统会自动按照内部索引由小到大顺序，为IPC分配从地址A开始的、连续增长的IP地址，并保存到数据库中。</p>
-              </div>
-              <div class="modal-body">
-                  <form class="form-horizontal" role="form" id="assign_ip_form">
-                      <div class="form-group">
-                      <label for="edit_mac" class="col-sm-4 control-label">起始IP地址：</label>
-                      <div class="col-sm-6">
-                          <input type="text" class="form-control" id="ip_start_str" name="ip_start_str" placeholder="请输入以.分割的IPv4地址">
-                      </div>
-                      </div>
-                      <div class="form-group">
-                      <label for="edit_mac" class="col-sm-4 control-label">分配数量：</label>
-                      <div class="col-sm-6">
-                          <input type="text" class="form-control" id="ip_count_str" name="ip_count_str" placeholder="请填入数字">
-                      </div>
-                      </div>
-                  </form>
-                      <div class="progress">
-                        <div class="progress-bar progress-bar-striped active" role="progressbar" id = "assign_probar" style="width: 0%"></div>
-                      </div>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-sm btn-success" id="confirm_assign_ip_btn">确定</button>
-                  <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="confirm_assign_close_btn">关闭</button>
-              </div>
-          </div>
-      </div>
-      </div>
-
       <!--开始执行窗口-->
-      <div class="modal fade" id="start_scan_modal" >
+      <div class="modal fade" id="start_set_modal" >
       <div class="modal-dialog" >
           <div class="modal-content">
               <div class="modal-header">
               <h3>开始执行设置</h3>
-              <p>请输入需要设置的IPC当前所在局域网段的起始ip地址, 以及ip地址的升序增长数量。</p>
-              <p>输入起始IP地址A、增长值N后，系统会自动搜索该范围内所有IP对应的IPC，并根据其MAC地址设置相应的新IP、OSD文字。</p>
+              <p>确认需要执行的设备</p>
+              <p>点击确认后，系统会下发任务至终端，自动开始执行</p>
               </div>
               <div class="modal-body">
-                  <form class="form-horizontal" role="form" id="scan_ip_form">
-                      <div class="form-group">
-                      <label for="edit_mac" class="col-sm-4 control-label">扫描起始IP地址：</label>
-                      <div class="col-sm-6">
-                          <input type="text" class="form-control" id="scan_start_str" name="scan_start_str" placeholder="请输入以“.”分割的IPv4地址">
-                      </div>
-                      </div>
-                      <div class="form-group">
-                      <label for="edit_mac" class="col-sm-4 control-label">扫描数量：</label>
-                      <div class="col-sm-6">
-                          <input type="text" class="form-control" id="scan_count_str" name="scan_count_str" placeholder="请填入数字">
-                      </div>
-                      </div>
-                      <div class="form-group">
-                      <label for="edit_mac" class="col-sm-4 control-label">操作人：*</label>
-                      <div class="col-sm-6">
-                          <input type="text" class="form-control" id="scan_people_str" name="scan_people_str" placeholder="请填入你的名字">
-                      </div>
-                      </div>
-                  </form>
+                  <div class="table-responsive">
+            <table class="table table-striped" id="mac_table">
+              <thead>
+                <tr class=locktop>
+                  <th>MAC地址</th>
+                  <th>IP地址</th>
+                  <th>IPC型号</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ setting.mac_addr }}</td>
+                  <td>{{ setting.current_ip }}</td>
+                  <td>{{ setting.type_id.model_name }}</td>
+                </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-sm btn-success" id="confirm_scan_ip_btn">确定</button>
-                  <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="confirm_scan_close_btn">关闭</button>
-              </div>
+          </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-success" id="confirm_scan_ip_btn">确定</button>
+                <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="confirm_scan_close_btn">关闭</button>
+            </div>
           </div>
       </div>
       </div>
@@ -287,10 +251,28 @@
 
 
       <script>
-      $('#select_all').click(function(){
-          alert(this.checked);
-          $('input[class="checkbox-single"]').attr("checked",this.checked); 
+      $('#start_set_btn').click(function(){
+        var id_list = get_select_id();
+        $.ajax()
       })
+
+      $('#select_all').click(function(){
+          $(".checkbox-single").prop("checked", this.checked);
+          console.log(get_select_id());
+      })
+
+      function get_select_id(){
+        var id_list = [];
+        $(".checkbox-single").each(function(){  
+          if(this.checked){
+            id_list.push(this.name);
+          }
+        });
+        return id_list;
+      }
+
+
+
 
 
       <!--下载配置-->
@@ -337,7 +319,7 @@
           data: JSON.stringify(json_data),
           success:function(e){
             console.log("success", e);
-            $('#start_scan_modal').modal('toggle');
+            $('#start_set_modal').modal('toggle');
             $('#scanning_modal').modal('toggle');
             timer_id = window.setInterval(on_time_check,5000);
               console.log(timer_id);
