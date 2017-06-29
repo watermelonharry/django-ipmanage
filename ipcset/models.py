@@ -115,6 +115,8 @@ class VideoSettingTable(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 
+    status = models.IntegerField(max_length=1, default=0)
+
     def __unicode__(self):
         return unicode(self.mac_addr)
 
@@ -152,15 +154,22 @@ class MissionDetailTable(models.Model):
     任务明细表
     """
     mission_id = models.ForeignKey(MissionInfoTable)
-    mac_addr = models.CharField(max_length=16)
-    ip_addr = models.IPAddressField()
-    set_resolution = models.CharField(max_length=10)
-    set_bitrate = models.CharField(max_length=10)
-    set_framerate = models.CharField(max_length=10)
-    status = models.IntegerField(max_length=2)
+
+    mac_addr = models.CharField(max_length=16, unique=True)
+    current_ip = models.IPAddressField()
+    type_id = models.ForeignKey(BaseTypeTable)
+
+    set_resolution = models.CharField(max_length=20)
+    set_bitrate = models.IntegerField(max_length=10)
+    set_framerate = models.CharField(max_length=20)
+    #操作类型，1：设置码流参数   2：设置码流参数并同步OSD显示
+    operate_type = models.IntegerField(max_length=2, default=1)
+
 
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
+
+    status = models.IntegerField(max_length=1, default=0)
 
     def __unicode__(self):
         return unicode(self.ip_addr)

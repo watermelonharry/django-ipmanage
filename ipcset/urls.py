@@ -34,8 +34,9 @@ urlpatterns = [
     ##api urls
     url(r'^api/settings/$', views.api_add_or_get_videosetting),
     url(r'^api/settings/(?P<id>[0-9]+)/$', views.api_edit_single_videosetting),
-    # url(r'^api/mission/$', views.api_start_set_ipc),
+    url(r'^api/basic/model/$', views.api_get_model_type),
+    url(r'^api/mission/$', views.api_get_add_mission),
     # url(r'^api/mission/wait/$', views.api_plan_unfinished),
-    # url(r'^api/mission/(?P<operate_id>[0-9]+)/$', views.api_operate_info),
+    url(r'^api/mission/(?P<mid>[0-9]+)/$', views.api_get_add_put_mission_detail),
     # url(r'^api/mission/detail/$', views.api_operate_detail),
 ]
