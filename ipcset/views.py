@@ -55,12 +55,15 @@ apis
 # @csrf_exempt
 def api_add_or_get_videosetting(request):
     '''
-    展示所有的ip-mac映射，或者创建新的ip-mac映射关系
     '''
     if request.method == 'GET':
-        settings = VideoSettingTable.objects.all()
-        serializer = VideoSettingSerializer(settings, many=True)
-        return JSONResponse(serializer.data)
+        id_list = map(int, request.GET.getlist('id'))
+        if len(id_list) != 0:
+            model_list = VideoSettingTable.objects.filter(id__in=id_list)
+        else:
+            return JSONResponse(VideoSettingSerializer().errors, status=400)
+        serializer = VideoSettingSerializer(model_list, many=True)
+        return JSONResponse(serializer.data, status=200)
 
     elif request.method == 'POST':
         data = JSONParser().parse(request)

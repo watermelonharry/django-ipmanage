@@ -210,19 +210,14 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>{{ setting.mac_addr }}</td>
-                  <td>{{ setting.current_ip }}</td>
-                  <td>{{ setting.type_id.model_name }}</td>
-                </tr>
+                
                     </tbody>
                   </table>
                 </div>
               </div>
-          </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-success" id="confirm_scan_ip_btn">确定</button>
-                <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="confirm_scan_close_btn">关闭</button>
+                <button type="button" class="btn btn-sm btn-success" id="confirm_set_btn">确定</button>
+                <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_set_btn">关闭</button>
             </div>
           </div>
       </div>
@@ -251,9 +246,71 @@
 
 
       <script>
+      $.ajaxSettings.traditional = true;
+      var id_list=[];
       $('#start_set_btn').click(function(){
-        var id_list = get_select_id();
-        $.ajax()
+        id_list = get_select_id();
+        console.log(id_list);
+        $.ajax({
+          type:"GET",
+          url:"/ipcset/api/settings/",
+          // dataType:"json",
+          // contentType:"application/json",
+          data: {"id":id_list},
+          success:function(js_data){
+            console.log("success", js_data);
+            
+            $.each(js_data, function(){
+              $("#start_set_modal tbody").append("<tr></tr>");
+              var mac_addr = "<td>" + this.mac_addr + "</td>";
+              var current_ip = "<td>" + this.current_ip + "</td>";
+              var type_id = "<td>" + this.type_id + "</td>";
+              $("#start_set_modal tbody tr:last").append(mac_addr,current_ip,type_id);
+            });
+            
+
+          },
+          error:function(e){
+            console.log("failed", e);
+          }
+        });
+      })
+
+      <!--开始执行-->
+      $('#confirm_set_btn').on('click', function(){
+        var json_data = {
+          'operator_name':$('#scan_people_str').val(),
+          'operate_id':getTimeId(),
+          'operate_type':3,
+          'ip_start':$('#scan_start_str').val(),
+          'ip_count':$('#scan_count_str').val()
+        };
+          $('#show_detail_btn').attr("name", json_data.operate_id);
+        console.log(json_data);
+        
+        $.ajax({
+          type:"POST",
+          url:"/ipcmanage/api/mission/",
+          dataType:"json",
+          contentType:"application/json",
+          data: JSON.stringify(json_data),
+          success:function(e){
+            console.log("success", e);
+            $('#start_set_modal').modal('toggle');
+            $('#scanning_modal').modal('toggle');
+            timer_id = window.setInterval(on_time_check,5000);
+              console.log(timer_id);
+          },
+          error:function(e){
+            console.log("failed", e);
+          }
+        });
+      })
+      
+
+      $("#abort_set_btn").click(function(){
+        id_list = [];
+        $("#start_set_modal tbody").empty();
       })
 
       $('#select_all').click(function(){
@@ -262,14 +319,16 @@
       })
 
       function get_select_id(){
-        var id_list = [];
+        var ids = [];
         $(".checkbox-single").each(function(){  
           if(this.checked){
-            id_list.push(this.name);
+            ids.push(this.name);
           }
         });
-        return id_list;
+        return ids;
       }
+
+
 
 
 
