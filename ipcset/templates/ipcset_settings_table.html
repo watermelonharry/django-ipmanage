@@ -44,7 +44,11 @@
                   <td>{{ setting.set_resolution }}</td>
                   <td>{{ setting.set_framerate }}</td>
                   <td>{{ setting.set_bitrate }}</td>
-                  <td>{{ setting.operate_type }}</td>
+                  {% ifequal setting.operate_type 1 %}
+                    <td>不同步</td>
+                  {% else %}
+                    <td>同步</td>
+                  {% endifequal %}
                   <td>{{ setting.editor_name }}</td>
                   <td><a data-toggle="modal" data-target="#edit_modal" data-backdrop="static" class="btn-sm btn-primary btn-edit" name = {{setting.id}} role="button">修改</a>
                       <a class="btn-sm btn-danger btn-del" name={{ setting.id }} role="button">删除</a>
@@ -70,7 +74,7 @@
                       <div class="form-group">
                       <label for="edit_mac" class="col-sm-4 control-label">MAC地址</label>
                       <div class="col-sm-6">
-                          <input type="text" class="form-control" id="mac_addr" name="mac_addr" value="mac">
+                          <input type="text" class="form-control" id="mac_addr" name="mac_addr" value="MAC地址" disabled>
                       </div>
                       </div>
                       <div class="form-group">
@@ -82,31 +86,41 @@
                       <div class="form-group">
                       <label for="edit_osd" class="col-sm-4 control-label">IPC类型</label>
                       <div class="col-sm-6">
-                          <input type="text" class="form-control" id="type_id" name="type_id" value="type">
+                          <input type="text" class="form-control" id="type_id" name="type_id" value="IPC型号" disabled>
                       </div>
                       </div>
                       <div class="form-group">
                       <label for="edit_people" class="col-sm-4 control-label">设置分辨率</label>
                       <div class="col-sm-6">
-                          <input type="text" class="form-control" id="set_resolution" name="set_resolution" value="">
+                        <select class="form-control" id="set_resolution" name="set_resolution">
+                        </select>
                       </div>
                       </div>
                         <div class="form-group">
                       <label for="edit_people" class="col-sm-4 control-label">设置帧率</label>
                       <div class="col-sm-6">
-                          <input type="text" class="form-control" id="set_framerate" name="set_framerate" value="">
+                        <select class="form-control" id="set_framerate" name="set_framerate">
+                        </select>
                       </div>
                       </div>
                         <div class="form-group">
                       <label for="edit_people" class="col-sm-4 control-label">设置比特率</label>
                       <div class="col-sm-6">
-                          <input type="text" class="form-control" id="set_bitrate" name="set_bitrate" value="">
+                        <select class="form-control" id="set_bitrate" name="set_bitrate">
+                        </select>
                       </div>
                       </div>
                         <div class="form-group">
                       <label for="edit_people" class="col-sm-4 control-label">同步OSD</label>
                       <div class="col-sm-6">
-                          <input type="text" class="form-control" id="operate_type" name="operate_type" value="">
+                      <label class="radio-inline" id="operate_type">
+                        <label class="radio-inline">
+                          <input type="radio" name="edit_radio" value="2" >是
+                        </label>  
+                        <label class="radio-inline">
+                          <input type="radio" name="edit_radio" value="1" >否
+                        </label>
+                      </label>
                       </div>
                       </div>
                         <div class="form-group">
@@ -120,7 +134,7 @@
               </div>
               <div class="modal-footer">
                   <button type="button" class="btn btn-sm btn-success" id="save_edit">确定</button>
-                  <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">取消</button>
+                  <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="quit_edit">取消</button>
               </div>
           </div>
       </div>
@@ -131,11 +145,11 @@
           <div class="modal-content">
               <div class="modal-header">添加新的设备</div>
               <div class="modal-body">
-                  <form class="form-horizontal" role="form" id="add_new_">
+                  <form class="form-horizontal" role="form" id="edit_old_setting">
                       <div class="form-group">
                       <label for="edit_mac" class="col-sm-4 control-label">MAC地址</label>
                       <div class="col-sm-6">
-                          <input type="text" class="form-control" id="mac_addr" name="mac_addr" value="mac">
+                          <input type="text" class="form-control" id="mac_addr" name="mac_addr" value="MAC地址">
                       </div>
                       </div>
                       <div class="form-group">
@@ -145,33 +159,44 @@
                       </div>
                       </div>
                       <div class="form-group">
-                      <label for="edit_osd" class="col-sm-4 control-label">IPC类型</label>
+                      <label for="edit_type" class="col-sm-4 control-label" >IPC类型</label>
                       <div class="col-sm-6">
-                          <input type="text" class="form-control" id="type_id" name="type_id" value="type">
+                        <select class="form-control" id="type_id" name="type_id" value="请选择型号">
+                        </select>
                       </div>
                       </div>
                       <div class="form-group">
                       <label for="edit_people" class="col-sm-4 control-label">设置分辨率</label>
                       <div class="col-sm-6">
-                          <input type="text" class="form-control" id="set_resolution" name="set_resolution" value="">
+                        <select class="form-control" id="set_resolution" name="set_resolution">
+                        </select>
                       </div>
                       </div>
                         <div class="form-group">
                       <label for="edit_people" class="col-sm-4 control-label">设置帧率</label>
                       <div class="col-sm-6">
-                          <input type="text" class="form-control" id="set_framerate" name="set_framerate" value="">
+                        <select class="form-control" id="set_framerate" name="set_framerate">
+                        </select>
                       </div>
                       </div>
                         <div class="form-group">
                       <label for="edit_people" class="col-sm-4 control-label">设置比特率</label>
                       <div class="col-sm-6">
-                          <input type="text" class="form-control" id="set_bitrate" name="set_bitrate" value="">
+                        <select class="form-control" id="set_bitrate" name="set_bitrate">
+                        </select>
                       </div>
                       </div>
                         <div class="form-group">
                       <label for="edit_people" class="col-sm-4 control-label">同步OSD</label>
                       <div class="col-sm-6">
-                          <input type="text" class="form-control" id="operate_type" name="operate_type" value="">
+                      <label class="radio-inline" id="operate_type">
+                        <label class="radio-inline">
+                          <input type="radio" name="edit_radio" value="2" >是
+                        </label>  
+                        <label class="radio-inline">
+                          <input type="radio" name="edit_radio" value="1" >否
+                        </label>
+                      </label>
                       </div>
                       </div>
                         <div class="form-group">
@@ -180,11 +205,12 @@
                           <input type="text" class="form-control" id="editor_name" name="editor_name" value="">
                       </div>
                       </div>
+                      <input type="hidden" class="form-control" id="id" name="id">
                   </form>
               </div>
               <div class="modal-footer">
                   <button type="button" class="btn btn-sm btn-success" id="confirm_save_btn">确定</button>
-                  <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">取消</button>
+                  <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="quit_new_btn">取消</button>
               </div>
           </div>
       </div>
@@ -213,9 +239,18 @@
                 
                     </tbody>
                   </table>
+                  
                 </div>
               </div>
             <div class="modal-footer">
+            <form class="form-horizontal" role="form">
+                    <div class="form-group">  
+                      <label for="edit_people" class="col-sm-4 control-label">修改人*</label>
+                      <div class="col-sm-5">
+                          <input type="text" class="form-control" id="start_editor_name" value="">
+                      </div>
+                    </div>
+                  </form>
                 <button type="button" class="btn btn-sm btn-success" id="confirm_set_btn">确定</button>
                 <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_set_btn">关闭</button>
             </div>
@@ -248,6 +283,51 @@
       <script>
       $.ajaxSettings.traditional = true;
       var id_list=[];
+      var model_list=[];
+
+      <!--添加新设备-->
+      $('#add_new_btn').click(function(){
+        $.getJSON('/ipcset/api/basic/model/', function(json_data){
+          model_list=json_data;
+          $('#add_modal #type_id').append("<option name='nobody'>请选择型号</option>");
+          $.each(json_data, function(){
+            var choice = '<option value='+this.id+'>' + this.model_name + '</option>';
+            $('#add_modal #type_id').append(choice); 
+          })
+        });
+        // set_new_params();
+      })
+
+
+      $('#add_modal #type_id').change(function(){
+        $('#add_modal').find("option[name='nobody']").remove();
+        $('#add_modal #set_resolution option').remove();
+        $('#add_modal #set_bitrate option').remove();
+        $('#add_modal #set_framerate option').remove();
+        set_new_params();
+      })
+
+      function set_new_params(){
+        $.getJSON('/ipcset/api/basic/model/?id='+ $('#add_modal #type_id').val(), function(jd_data){
+          var params = jd_data[0];
+          console.log(params);
+          var target = $('#add_modal');
+          $.each(params.resolution_set, function(){
+            var choice = '<option>'+this.resolution+'</option>';
+            target.find('#set_resolution').append(choice);
+          });
+          $.each(params.bitrate_set, function(){
+            var choice = '<option>'+this.bitrate+'</option>';
+            target.find('#set_bitrate').append(choice);
+          });
+          $.each(params.framerate_set, function(){
+            var choice = '<option>'+this.framerate+'</option>';
+            target.find('#set_framerate').append(choice);
+          });  
+        })
+      }
+
+      <!--开始设置-->
       $('#start_set_btn').click(function(){
         id_list = get_select_id();
         console.log(id_list);
@@ -264,7 +344,7 @@
               $("#start_set_modal tbody").append("<tr></tr>");
               var mac_addr = "<td>" + this.mac_addr + "</td>";
               var current_ip = "<td>" + this.current_ip + "</td>";
-              var type_id = "<td>" + this.type_id + "</td>";
+              var type_id = "<td>" + this.type_id.id + "-"+this.type_id.model_name + "</td>";
               $("#start_set_modal tbody tr:last").append(mac_addr,current_ip,type_id);
             });
             
@@ -276,37 +356,40 @@
         });
       })
 
+      $('#quit_edit').click(function(){
+        $('#edit_modal option').remove();
+      })
+
       <!--开始执行-->
       $('#confirm_set_btn').on('click', function(){
         var json_data = {
-          'operator_name':$('#scan_people_str').val(),
-          'operate_id':getTimeId(),
-          'operate_type':3,
-          'ip_start':$('#scan_start_str').val(),
-          'ip_count':$('#scan_count_str').val()
+          'editor_name':$('#start_editor_name').val(),
+          'mission_id':getTimeId(),
+          'total_count':id_list.length,
+          'detail_id':id_list,
         };
-          $('#show_detail_btn').attr("name", json_data.operate_id);
+          $('#show_detail_btn').attr("name", json_data.mission_id);
         console.log(json_data);
         
         $.ajax({
           type:"POST",
-          url:"/ipcmanage/api/mission/",
+          url:"/ipcset/api/mission/",
           dataType:"json",
           contentType:"application/json",
           data: JSON.stringify(json_data),
-          success:function(e){
-            console.log("success", e);
-            $('#start_set_modal').modal('toggle');
-            $('#scanning_modal').modal('toggle');
-            timer_id = window.setInterval(on_time_check,5000);
-              console.log(timer_id);
+          success:function(msg){
+            console.log("success", msg);
+            // $('#start_set_modal').modal('toggle');
+            // $('#scanning_modal').modal('toggle');
+            // timer_id = window.setInterval(on_time_check,5000);
+            //   console.log(timer_id);
           },
           error:function(e){
             console.log("failed", e);
           }
         });
       })
-      
+
 
       $("#abort_set_btn").click(function(){
         id_list = [];
@@ -463,15 +546,31 @@
               console.log(data);
               $('#edit_modal').find("form").find('#mac_addr').val(data.mac_addr);
               $('#edit_modal').find("form").find('#current_ip').val(data.current_ip);
-              $('#edit_modal').find("form").find('#type_id').val(data.type_id);
-              $('#edit_modal').find("form").find('#set_resolution').val(data.set_resolution);
-              $('#edit_modal').find("form").find('#set_bitrate').val(data.set_bitrate);
-              $('#edit_modal').find("form").find('#set_framerate').val(data.set_framerate);
-              $('#edit_modal').find("form").find('#operate_type').val(data.operate_type);
+              $('#edit_modal').find("form").find('#type_id').val(data.type_id.model_name);
+              set_stream_params(data, $('#edit_modal'));
+              $('#edit_modal #operate_type').find("input[name='edit_radio']").eq(2-data.operate_type).attr("checked", true);
               $('#edit_modal').find("form").find('#editor_name').val(data.editor_name);
               $('#edit_modal').find("form").find('#id').val(data.id);
           });
       })
+
+      function set_stream_params(data, target) {
+        $.each(data.type_id.resolution_set, function(){
+          var choice = '<option>'+this.resolution+'</option>';
+          target.find('#set_resolution').append(choice);
+          target.find('#set_resolution').val(data.set_resolution);
+        });
+        $.each(data.type_id.bitrate_set, function(){
+          var choice = '<option>'+this.bitrate+'</option>';
+          target.find('#set_bitrate').append(choice);
+          target.find('#set_bitrate').val(data.set_bitrate);
+        });
+        $.each(data.type_id.framerate_set, function(){
+          var choice = '<option>'+this.framerate+'</option>';
+          target.find('#set_framerate').val(data.set_framerate);
+          target.find('#set_framerate').append(choice);
+        });
+      }
 
       <!--删除记录-->
       $('.btn-del').on('click', function () {
@@ -493,6 +592,7 @@
               }
           })
         });
+
       <!--增加记录-->
       $('#confirm_save_btn').on('click', function () {
         var add_data=getJsonForm($('#add_modal'));
@@ -515,6 +615,7 @@
               }
           })
         });
+
       <!--更改记录-->
       $('#save_edit').on('click', function () {
           var change_data = getJsonForm($('#edit_modal'));
@@ -557,7 +658,7 @@
           "set_resolution":target.find("form").find('#set_resolution').val(),
           "set_bitrate":target.find("form").find('#set_bitrate').val(),
           "set_framerate":target.find("form").find('#set_framerate').val(),
-          "operate_type":target.find("form").find('#operate_type').val(),
+          "operate_type":target.find("form").find("input[name='edit_radio']:checked").val(),
           "editor_name":target.find("form").find('#editor_name').val(),
         };
         return json;
@@ -567,6 +668,10 @@
         var time = new Date().getTime();
         return String(time);
       };
+
+      $("#quit_new_btn").click(function(){
+        $('#add_modal option').remove();
+      })
 
       </script>
   {% endblock %}

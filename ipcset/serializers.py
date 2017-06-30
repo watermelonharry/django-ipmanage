@@ -20,7 +20,7 @@ class BaseResolutionSerializer(serializers.ModelSerializer):
 
 class BaseTypeSerializer(serializers.ModelSerializer):
     resolution_set = BaseResolutionSerializer(many=True, read_only=True)
-    frametrate_set = BaseFrameSerializer(many=True, read_only=True)
+    framerate_set = BaseFrameSerializer(many=True, read_only=True)
     bitrate_set = BaseBitrateSerializer(many=True, read_only=True)
     class Meta:
         model = BaseTypeTable
@@ -30,6 +30,7 @@ class BaseTypeSerializer(serializers.ModelSerializer):
 
 
 class VideoSettingSerializer(serializers.ModelSerializer):
+    type_id = BaseTypeSerializer(read_only=True)
     class Meta:
         model = VideoSettingTable
         fields = ('id', 'mac_addr','current_ip', 'type_id',
@@ -49,4 +50,4 @@ class MissionDetailSerializer(serializers.HyperlinkedModelSerializer):
 class MissionInfoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = MissionInfoTable
-        fields = ('id','mission_id', 'total_count', 'progress')
+        fields = ('id','mission_id', 'total_count', 'progress', 'editor_name', 'remote_id')

@@ -71,30 +71,6 @@ class BaseTypeTable(models.Model):
     class Meta:
         ordering = ('id',)
 
-# class BaseMacTable(models.Model):
-#     """
-#     MAC-型号表
-#     """
-#     mac_addr = models.CharField(max_length=16,unique=True)
-#     type_id = models.ForeignKey(BaseTypeTable)
-#
-#     editor_name = models.CharField(max_length=20)
-#     create_time = models.DateTimeField(auto_now_add=True)
-#     edit_time = models.DateTimeField(auto_now=True)
-#
-#     def __unicode__(self):
-#         return unicode(self.mac_addr)
-#
-#     def get_mac(self):
-#         return unicode(self.mac_addr)
-#
-#     def get_content(self):
-#         #todo:
-#         pass
-#
-#     class Meta:
-#         ordering = ('id',)
-
 
 class VideoSettingTable(models.Model):
     """
@@ -133,8 +109,9 @@ class MissionInfoTable(models.Model):
     """
     mission_id = models.CharField(max_length=20,unique=True)
     total_count = models.IntegerField(max_length=5)
-    progress = models.IntegerField(max_length=5)
+    progress = models.IntegerField(max_length=5, default='0')
 
+    remote_id = models.CharField(max_length=20, default='0')
     editor_name = models.CharField(max_length=20)
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
@@ -153,9 +130,9 @@ class MissionDetailTable(models.Model):
     """
     任务明细表
     """
-    mission_id = models.ForeignKey(MissionInfoTable)
+    mission_id = models.CharField(max_length=20)
 
-    mac_addr = models.CharField(max_length=16, unique=True)
+    mac_addr = models.CharField(max_length=16)
     current_ip = models.IPAddressField()
     type_id = models.ForeignKey(BaseTypeTable)
 
@@ -172,7 +149,7 @@ class MissionDetailTable(models.Model):
     status = models.IntegerField(max_length=1, default=0)
 
     def __unicode__(self):
-        return unicode(self.ip_addr)
+        return unicode(self.current_ip)
 
     def get_content(self):
         # todo:

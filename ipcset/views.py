@@ -66,19 +66,21 @@ def api_add_or_get_videosetting(request):
         return JSONResponse(serializer.data, status=200)
 
     elif request.method == 'POST':
-        data = JSONParser().parse(request)
+        data = json.loads(request.body)
+        type_obj = BaseTypeTable.objects.get(id=data['type_id'])
+        # json_data = BaseTypeSerializer(type_obj).data
+        data['type_id'] = type_obj
+        data['id'] = None
         data['mac_addr'] = data['mac_addr'].replace('-', '', 4)
-        serializer = VideoSettingSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JSONResponse(serializer.data, status=201)
-        return JSONResponse(serializer.errors, status=400)
+        new_setting = VideoSettingTable(**data)
+        new_setting.save()
+        return JSONResponse({'success':0},status=201)
 
 
 # @csrf_exempt
 def api_edit_single_videosetting(request, id):
     '''
-    显示、更新、删除一个ip-mac
+    显示、更新、删除一个设备设置
     '''
     try:
         setting = VideoSettingTable.objects.get(id=id)
@@ -112,21 +114,35 @@ def api_get_model_type(request):
         serializer = BaseTypeSerializer(model_list, many=True)
         return JSONResponse(serializer.data, status=200)
 
-def api_get_add_mission(request):
+def api_get_add_put_mission(request):
     if request.method == 'GET':
         mid_list =map(int,request.GET.getlist('mission_id'))
         if len(mid_list) != 0:
-            model_list = MissionInfoTable.objects.filter(mission_id__in=mid_list)
+            mission_list = MissionInfoTable.objects.filter(mission_id__in=mid_list)
         else:
-            model_list = MissionInfoTable.objects.all()
-        serializer = MissionDetailSerializer(model_list, many=True)
+            mission_list = MissionInfoTable.objects.all()
+        serializer = MissionInfoSerializer(mission_list, many=True)
         return JSONResponse(serializer.data, status=200)
 
     data = JSONParser().parse(request)
     if request.method == 'POST':
         serializer = MissionInfoSerializer(data=data)
+        mission_id = data.get('mission_id')
         if serializer.is_valid():
             serializer.save()
+
+            video_id = data.get('detail_id')
+            setting_set = VideoSettingTable.objects.filter(id__in=video_id)
+            for single_setting in setting_set:
+                detail = MissionDetailTable(mission_id=mission_id,
+                                            mac_addr=single_setting.mac_addr,
+                                            current_ip=single_setting.current_ip,
+                                            type_id=single_setting.type_id,
+                                            set_resolution=single_setting.set_resolution,
+                                            set_bitrate=single_setting.set_bitrate,
+                                            set_framerate=single_setting.set_framerate,
+                                            operate_type=single_setting.operate_type)
+                detail.save()
             return JSONResponse(serializer.data, status=201)
         return JSONResponse(serializer.errors, status=400)
 
@@ -139,6 +155,15 @@ def api_get_add_mission(request):
             return JSONResponse(serializer.data, status=200)
         return JSONResponse(serializer.errors, status=400)
 
+def api_get_waiting_mission(request):
+    if request.method == 'GET':
+        try:
+            wait_plan_info = MissionInfoTable.objects.filter(progress=0)[0]
+            serializer = MissionInfoSerializer(wait_plan_info)
+            return JSONResponse(serializer.data)
+        except:
+            serializer = MissionInfoSerializer()
+            return JSONResponse(serializer.errors, status=400)
 
 def api_get_add_put_mission_detail(request, mid):
     """
