@@ -27,17 +27,13 @@ urlpatterns = [
     url('^$', views.welcome),
     url('^basic/$',views.show_basic_info),
     url('^settings/$', views.show_settings_info),
+    url('^missions/$', views.show_mission_info),
+    url('^missions/(?P<mid>[0-9]+)/$', views.show_mission_detail_info),
 
-    # url('^iptables/download/$',views.download_iptables),
-    # url('^mission_detail/(?P<operate_id>[0-9]+)/$',views.show_mission_datail),
-    #
-    ##api urls
     url(r'^api/settings/$', views.api_add_or_get_videosetting),
     url(r'^api/settings/(?P<id>[0-9]+)/$', views.api_edit_single_videosetting),
     url(r'^api/basic/model/$', views.api_get_model_type),
     url(r'^api/mission/$', views.api_get_add_put_mission),
     url(r'^api/mission/assign/$', views.api_get_waiting_mission),
-    # url(r'^api/mission/wait/$', views.api_plan_unfinished),
     url(r'^api/mission/(?P<mid>[0-9]+)/$', views.api_get_add_put_mission_detail),
-    # url(r'^api/mission/detail/$', views.api_operate_detail),
 ]
