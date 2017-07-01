@@ -268,6 +268,7 @@
           <div class="modal-content">
               <div class="modal-header">
               <h3>正在执行设置操作</h3>
+              <p>请确认执行终端已开启，等待设置完成</p>
               </div>
               <div class="modal-body">
                   <div class="progress">
@@ -383,13 +384,15 @@
           data: JSON.stringify(json_data),
           success:function(msg){
             console.log("success", msg);
-            // $('#start_set_modal').modal('toggle');
-            // $('#scanning_modal').modal('toggle');
-            // timer_id = window.setInterval(on_time_check,5000);
-            //   console.log(timer_id);
+            $('#start_set_modal').modal('toggle');
+            $('#start_set_modal tbody').empty();
+            $('#scanning_modal').modal('toggle');
+            timer_id = window.setInterval(on_time_check,5000);
+            console.log('start timer:'+timer_id);
           },
           error:function(e){
             console.log("failed", e);
+            alert("添加失败！ error-"+e.status)
           }
         });
       })
@@ -443,7 +446,7 @@
       <!--查看任务详细详细-->
       var timer_id;
       $('#show_detail_btn').on('click', function(){
-          window.open('../mission_detail/'+$('#show_detail_btn').attr("name"));
+          window.open('../missions/'+$('#show_detail_btn').attr("name"));
       })
       <!--开始执行-->
       $('#confirm_scan_ip_btn').on('click', function(){
@@ -480,16 +483,18 @@
           var op_id = $('#show_detail_btn').attr("name");
           $.ajax({
           type:"GET",
-          url:"/ipcmanage/api/mission/"+op_id,
+          url:"/ipcset/api/mission/",
+          data:{"mission_id":op_id},
           dataType:"json",
           contentType:"application/json",
           success:function(js_data){
+            js_data=js_data[0];
             console.log("success", js_data);
-              var total = Number(js_data.ip_count);
+              var total = Number(js_data.total_count);
               var fin = Number(js_data.progress);
               var progress = String(fin*100/total) + "%";
               console.log("request mission progress", progress, timer_id);
-            $('#scanning_probar').attr("style", "width: "+progress);
+              $('#scanning_probar').attr("style", "width: "+progress);
               if(total == fin){
                   window.clearInterval(timer_id);
                   console.log("clear interval")
@@ -497,53 +502,11 @@
               }
           },
           error:function(e){
-            console.log("failed", e);
+            console.log("failed to get misson progress", e);
           }
         });
       };
 
-      <!--关闭分配-->
-      $('#confirm_assign_close_btn').on('click', function(){
-        location.reload();
-      })
-      <!--分配IP-->
-      $('#confirm_assign_ip_btn').on('click', function(){
-        var start_ip_addr = $('#ip_start_str').val();
-        start_ip_addr = start_ip_addr.split('.');
-        var ip_diff_int = Number(start_ip_addr.pop());
-        start_ip_addr = start_ip_addr.join(".");
-        var count = $('#ip_count_str').val();
-        var successed=0;
-        var failed=0;
-        console.log(start_ip_addr, count,ip_diff_int);
-        $.getJSON('/ipcmanage/api/tables/', function(json_data){
-          if(count>json_data.length){count=json_data.length;};
-          for(var i=0; i<count; i++){
-            var change_item = json_data[i];
-            change_item.static_ip= start_ip_addr+'.'+String(ip_diff_int+i);
-            // console.log(i, change_item);
-            $.ajax({
-              type:"PUT",
-              url:"/ipcmanage/api/tables/"+ change_item.id,
-              dataType:"json",
-              contentType:"application/json",
-              data: JSON.stringify(change_item),
-              // async:false,
-              context:$('#assign_ip_modal'),
-              success:function(e){
-                console.log("success", change_item);
-                successed ++;
-                $('#assign_probar').attr("style", "width: "+String(100-(count-i-1)/count)+"%");
-              },
-              error:function(e){
-                failed++;
-                console.log("failed", change_item);
-              }
-            })
-          }
-        });
-        console.log(successed,failed);
-      })
       <!--编辑单条记录-->
       $('.btn-edit').on('click', function () {
           $.getJSON('/ipcset/api/settings/' + this.name, function (data) {
