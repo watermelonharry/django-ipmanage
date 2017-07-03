@@ -37,8 +37,11 @@
                       {% ifequal detail.status 0  %}
                       <td>等待设置</td>
                       {% endifequal %}
-                      {% ifequal ip.status 4 %}
+                      {% ifequal ip.status 5 %}
                       <td>设置完成</td>
+                      {% endifequal %}
+                      {% ifequal ip.status 3 %}
+                      <td>设置失败</td>
                       {% endifequal %}
                   </tr>
               {% endfor %}

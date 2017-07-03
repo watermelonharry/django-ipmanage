@@ -131,7 +131,7 @@ def api_get_model_type(request):
 		return JSONResponse(serializer.data, status=200)
 
 
-def api_get_add_put_mission(request):
+def api_get_add_put_delete_mission(request):
 	if request.method == 'GET':
 		mid_list = map(int, request.GET.getlist('mission_id'))
 		if len(mid_list) != 0:
@@ -140,6 +140,12 @@ def api_get_add_put_mission(request):
 			mission_list = MissionInfoTable.objects.all()
 		serializer = MissionInfoSerializer(mission_list, many=True)
 		return JSONResponse(serializer.data, status=200)
+
+	if request.method == 'DELETE':
+		mid = json.loads(request.body).get('mission_id')
+		minfo = MissionInfoTable.objects.get(mission_id=mid)
+		minfo.delete()
+		return JSONResponse({'error':0}, status = 204)
 
 	data = JSONParser().parse(request)
 	if request.method == 'POST':
