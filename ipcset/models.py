@@ -80,7 +80,6 @@ class VideoSettingTable(models.Model):
     current_ip = models.IPAddressField()
     type_id = models.ForeignKey(BaseTypeTable)
 
-
     set_resolution = models.CharField(max_length=20)
     set_bitrate = models.IntegerField(max_length=10)
     set_framerate = models.CharField(max_length=20)
@@ -102,6 +101,7 @@ class VideoSettingTable(models.Model):
 
     class Meta:
         ordering = ('id',)
+
 
 class MissionInfoTable(models.Model):
     """

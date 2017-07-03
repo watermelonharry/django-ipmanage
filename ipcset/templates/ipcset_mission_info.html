@@ -25,9 +25,7 @@
                   <td>{{ mission.editor_name }}</td>
                   <td>{{ mission.total_count }}</td>
                   <td>{{ mission.progress }}</td>
-                  <td>
-                    <a class="btn-sm btn-primary btn-show-detail" name = {{mission.mission_id}} role="button">查看</a>
-                    <a class="btn-sm btn-danger btn-delete-detail" name = {{mission.mission_id}} role="button">删除</a>
+                  <td><a class="btn-sm btn-primary btn-show-detail" name = {{mission.mission_id}} role="button">查看详细</a>
                   </td>
 
                   </tr>
@@ -44,21 +42,5 @@
       $('.btn-show-detail').on('click', function () {
           window.open('/ipcset/missions/'+this.name);
           });
-
-      $('.btn-delete-detail').click(function(){
-        $.ajax({
-          type:"DELETE",
-          url:"/ipcset/api/mission/",
-          data:JSON.stringify({"mission_id": this.name}),
-          success:function(e){
-            alert("删除成功");
-            console.log(e);
-            location.reload();
-          },
-          error:function(e){
-            alert("操作失败: "+ e.status);
-          }
-        })
-      })
       </script>
   {% endblock %}
