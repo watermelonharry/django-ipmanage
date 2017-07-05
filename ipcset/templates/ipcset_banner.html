@@ -23,6 +23,7 @@
         <title>码流参数设置</title>
     </head>
     <body>
+    {% csrf_token %}
         <div class="container">
 
             <!-- Static navbar -->
@@ -59,7 +60,7 @@
 
                 <ul class="nav navbar-nav navbar-right">
                   <!-- <li class="active"><a href="./">Default <span class="sr-only">(current)</span></a></li> -->
-                  <li><a href="#">快速入口</span></a></li>
+                  <li><a href="#"><span>快速入口</span></a></li>
                   <li><a href="#">A</a></li>
                   <li><a href="#">B</a></li>
                 </ul>
@@ -79,11 +80,27 @@
 
         {% block content %}
         {% endblock %}
-
+        <hr>
         <div id="footer">
             <div class="container">
                 <div class="copyright" align="center"><a href="#"> &copy; based on bootstrap </a>| 2017 TP@hy</div>
             </div>
         </div>
         </body>
+
+       <script>
+          $.ajaxSettings.traditional = true;
+          var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+          function csrfSafeMethod(method) {
+              // these HTTP methods do not require CSRF protection
+              return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+          }
+          $.ajaxSetup({
+              beforeSend: function(xhr, settings) {
+                  if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                  }
+              }
+          });
+        </script>
 </html>

@@ -1,6 +1,6 @@
 {% extends "ipcset_banner.html" %}
   {% block content %}
- 
+    {% csrf_token %}
       <div class="container">
        <p><h4><a href="/ipcset/settings/">码流参数设置</a> >> 任务信息查看</h4></p>
       <hr>
@@ -35,7 +35,6 @@
           </div>
         </div>
       </div>
-    <hr>
 
       <script>
       <!--查看明细-->

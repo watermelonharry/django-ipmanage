@@ -14,8 +14,9 @@ class UserModel(models.Model):
 
     creatTime = models.DateTimeField(auto_now_add= True)
     editTime = models.DateTimeField(auto_now=True)
+
     name = models.CharField(max_length=20)
-    gender = models.CharField(max_length=10)
+    gender = models.CharField(max_length=10, )
     cardNo = models.CharField(max_length=20)
     emailAddr = models.EmailField(null = True)
     auth = models.IntegerField(choices=AUTHORITY_CHOICES)

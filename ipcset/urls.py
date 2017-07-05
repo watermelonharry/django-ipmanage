@@ -26,6 +26,7 @@ from rest_framework import routers
 urlpatterns = [
     url('^$', views.welcome),
     url('^basic/$',views.show_basic_info),
+    url('^basic/model/$',views.show_basic_model_info),
     url('^settings/$', views.show_settings_info),
     url('^missions/$', views.show_mission_info),
     url('^missions/(?P<mid>[0-9]+)/$', views.show_mission_detail_info),

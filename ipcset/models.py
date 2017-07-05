@@ -76,7 +76,7 @@ class VideoSettingTable(models.Model):
     """
     设置表
     """
-    mac_addr = models.CharField(max_length=16, unique=True)
+    mac_addr = models.CharField(max_length=16)
     current_ip = models.IPAddressField()
     type_id = models.ForeignKey(BaseTypeTable)
 

@@ -3,9 +3,8 @@ from django.db.models.query import QuerySet
 
 from django.shortcuts import render
 
-# Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect, StreamingHttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, RequestContext
 from serializers import *
 from models import *
 from django.http import HttpResponse
@@ -41,12 +40,18 @@ def show_basic_info(request):
     return render_to_response('ipcset_basic.html', {'firstTitle': u'码流参数批量设置工具',
                                                     'firstTitle_content': u'批量设置指定IPC的码流参数，同步OSD显示'})
 
+def show_basic_model_info(request):
+    model_list = BaseTypeTable.objects.all()
+    return render_to_response('ipcset_basic_model.html',{'firstTitle': u'码流参数批量设置工具',
+                                                    'firstTitle_content': u'设备型号信息查看',
+                                                         'model_list':model_list})
 
 def show_settings_info(request):
     setting_list = VideoSettingTable.objects.all()
     return render_to_response('ipcset_settings_table.html', {'firstTitle': u'码流参数批量设置工具',
                                                              'firstTitle_content': u'查看详细参数设置',
-                                                             'setting_list': setting_list})
+                                                             'setting_list': setting_list},
+                              context_instance=RequestContext(request))
 
 
 def show_mission_info(request):
@@ -69,7 +74,6 @@ apis
 """
 
 
-# @csrf_exempt
 def api_add_or_get_videosetting(request):
     '''
     '''
@@ -94,7 +98,6 @@ def api_add_or_get_videosetting(request):
         return JSONResponse({'success': 0}, status=201)
 
 
-# @csrf_exempt
 def api_edit_single_videosetting(request, id):
     '''
     显示、更新、删除一个设备设置

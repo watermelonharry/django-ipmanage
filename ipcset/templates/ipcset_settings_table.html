@@ -1,5 +1,6 @@
-{% extends "ipc_banner.html" %}
+{% extends "ipcset_banner.html" %}
   {% block content %}
+      {% csrf_token %}
       <div class="container marketing">
       <!-- Three columns of text below the carousel -->
       <div class="row">
@@ -286,7 +287,20 @@
 
 
       <script>
-      $.ajaxSettings.traditional = true;
+{#      $.ajaxSettings.traditional = true;#}
+{#      var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();#}
+{#      function csrfSafeMethod(method) {#}
+{#          // these HTTP methods do not require CSRF protection#}
+{#          return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));#}
+{#      }#}
+{#      $.ajaxSetup({#}
+{#          beforeSend: function(xhr, settings) {#}
+{#              if (!csrfSafeMethod(settings.type) && !this.crossDomain) {#}
+{#                  xhr.setRequestHeader("X-CSRFToken", csrftoken);#}
+{#              }#}
+{#          }#}
+{#      });#}
+      
       var id_list=[];
       var model_list=[];
 
@@ -627,6 +641,7 @@
           "set_framerate":target.find("form").find('#set_framerate').val(),
           "operate_type":target.find("form").find("input[name='edit_radio']:checked").val(),
           "editor_name":target.find("form").find('#editor_name').val(),
+          // "csrfmiddlewaretoken":$("input[name='csrfmiddlewaretoken']").val(),
         };
         return json;
       };
