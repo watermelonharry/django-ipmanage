@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'dnstest',
     'ipcmanage',
     'ipcset',
+    'userManage',
     'rest_framework',
 )
 

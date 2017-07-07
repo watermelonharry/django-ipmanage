@@ -16,10 +16,13 @@ urlpatterns = patterns('',
 
     url('^time/$', time),
     url('^pretest/$', pre_test),
+    url('^login/$', user_login),
+
     url('^dnstest/', include('dnstest.urls')),
 
     url('^ipcmanage/', include('ipcmanage.urls')),
     url('^ipcset/', include('ipcset.urls')),
+    url('^user/', include('userManage.urls')),
 
     # url('^usermanage/', include('userManage.urls')),
 

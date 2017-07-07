@@ -1,16 +1,27 @@
 # -*- coding: utf-8 -*-
 
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response,render
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 import datetime
 from forms import UserFrom
+
 
 def hello(request):
     replyList =[{'name':u'DNS报文解析测试工具', 'url':'/dnstest/testsuitelist'},
                 ]
     firstTitle = u'WELCOME!! :D'
     firstTitle_content = u'这里集成了一些测试会用到的小工具。点击上方工具列表查看。'
-    return render_to_response('hello.html', locals())
+    return render(request, 'hello.html', locals())
+
+
+def user_login(request):
+    if request.method == 'GET':
+        return render(request, 'login.html')
+
+    if request.method =='POST':
+        return render(request, 'login.html')
 
 
 def time(request):

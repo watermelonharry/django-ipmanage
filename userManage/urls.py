@@ -19,12 +19,5 @@ from django.contrib import admin
 import views
 
 urlpatterns = [
-    # url('^caselist/$', views.case_list),
-    # url('^testerlist/$', views.tester_list),
-    # url('^subscribelist/$', views.subs_list),
-    # url('^subscribelist/new$', views.new_test_plan),
-    # url('^operateinfo/$', views.operate_list),
-    # url('^testsuitelist/(?P<suiteId>\d+)/$', views.testsuite_list),
-    # url('^testsuitelist/$', views.testsuite_list),
-
+    url('^login/$', views.user_login),
 ]
