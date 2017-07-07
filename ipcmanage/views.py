@@ -5,7 +5,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect,StreamingHttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, RequestContext
 from serializers import CnStaticIpTableSerializer, CnIpcLogDetailSerializer, CnOperateInfoSerializer
 from models import CnStaticIpcTable, CnIpcChangeLogDetail, CnIpcOperateInfo
 from django.http import HttpResponse
@@ -34,27 +34,31 @@ views
 
 def welcome(request):
     return render_to_response('ipc_hello.html', {'firstTitle': u'IPC批量IP设置工具',
-                                                 'firstTitle_content': u'批量管理IPC的IP地址'})
+                                                 'firstTitle_content': u'批量管理IPC的IP地址'},
+                              context_instance=RequestContext(request))
 
 
 def show_ip_table(request):
     ip_list = CnStaticIpcTable.objects.all()
     return render_to_response('ipc_mac_ip_table.html', {'firstTitle': u'IPC批量IP设置工具',
                                                         'firstTitle_content': u'批量管理IPC的IP地址',
-                                                        'ip_list': ip_list})
+                                                        'ip_list': ip_list},
+                              context_instance=RequestContext(request))
 
 def show_mission_datail(request, operate_id):
     detail_list = CnIpcChangeLogDetail.objects.filter(operate_id=operate_id)
     return render_to_response('mission_detail_table.html', {'firstTitle': u'IPC批量IP设置工具',
                                                             'firstTitle_content': u'查看任务明细',
                                                             'detail_list': detail_list,
-                                                            'operate_id': operate_id})
+                                                            'operate_id': operate_id},
+                              context_instance=RequestContext(request))
 
 def show_mission_info(request):
     mission_info_list = CnIpcOperateInfo.objects.all()
     return render_to_response('mission_info.html',{'firstTitle': u'IPC批量IP设置工具',
                                                     'firstTitle_content': u'查看历史任务',
-                                                    'info_list': mission_info_list})
+                                                    'info_list': mission_info_list},
+                              context_instance=RequestContext(request))
 
 def download_iptables(reqeust):
     ip_list = (k.get_content() for k in CnStaticIpcTable.objects.all())
@@ -65,6 +69,7 @@ def download_iptables(reqeust):
     # response['Content-Length'] = len(ip_list)
     return response
 
+@csrf_exempt
 def api_plan_unfinished(request):
     """
     显示未开始的任务
@@ -78,6 +83,7 @@ def api_plan_unfinished(request):
             serializer = CnOperateInfoSerializer()
             return JSONResponse(serializer.errors, status=400)
 
+@csrf_exempt
 def api_start_set_ipc(request):
     """
     接收开始任务的json
@@ -110,7 +116,7 @@ def api_start_set_ipc(request):
 
         return JSONResponse(serializer.errors, status=400)
 
-
+@csrf_exempt
 def api_operate_info(request, operate_id):
     """
     显示、更新任务信息
@@ -136,7 +142,11 @@ def api_operate_info(request, operate_id):
             return JSONResponse(serializer.data)
         return JSONResponse(serializer.errors, status=400)
 
+    elif request.method == 'DELETE':
+        op_info.delete()
+        return JSONResponse({'delete':'success'}, status=200)
 
+@csrf_exempt
 def api_operate_detail(request):
     """
     任务的详细条目，每个IP的状态
@@ -164,7 +174,7 @@ def api_operate_detail(request):
         return JSONResponse(serializer.errors, status=400)
 
 
-# @csrf_exempt
+@csrf_exempt
 def api_ip_list(request):
     '''
     展示所有的ip-mac映射，或者创建新的ip-mac映射关系
@@ -190,7 +200,7 @@ def api_ip_list(request):
         return JSONResponse(serializer.errors, status=400)
 
 
-# @csrf_exempt
+@csrf_exempt
 def api_ip_mac_detail(request, id):
     '''
     显示、更新、删除一个ip-mac

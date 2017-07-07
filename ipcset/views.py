@@ -58,7 +58,8 @@ def show_mission_info(request):
     mission_list = MissionInfoTable.objects.all()
     return render_to_response('ipcset_mission_info.html', {'firstTitle': u'码流参数批量设置工具',
                                                            'firstTitle_content': u'查看任务状态',
-                                                           'mission_list': mission_list})
+                                                           'mission_list': mission_list},
+                              context_instance=RequestContext(request))
 
 
 def show_mission_detail_info(request, mid):
@@ -73,7 +74,7 @@ def show_mission_detail_info(request, mid):
 apis
 """
 
-
+@csrf_exempt
 def api_add_or_get_videosetting(request):
     '''
     '''
@@ -97,7 +98,7 @@ def api_add_or_get_videosetting(request):
         new_setting.save()
         return JSONResponse({'success': 0}, status=201)
 
-
+@csrf_exempt
 def api_edit_single_videosetting(request, id):
     '''
     显示、更新、删除一个设备设置
@@ -135,8 +136,9 @@ def api_get_model_type(request):
         serializer = BaseTypeSerializer(model_list, many=True)
         return JSONResponse(serializer.data, status=200)
 
-
+@csrf_exempt
 def api_get_add_put_mission(request):
+
     if request.method == 'GET':
         mid_list = map(int, request.GET.getlist('mission_id'))
         if len(mid_list) != 0:
@@ -168,6 +170,19 @@ def api_get_add_put_mission(request):
             return JSONResponse(serializer.data, status=201)
         return JSONResponse(serializer.errors, status=400)
 
+    if request.method == 'DELETE':
+        mid = data.get('mission_id')
+        try:
+            mission_info = MissionInfoTable.objects.get(mission_id=mid)
+            mission_info.delete()
+            mission_detail_list = MissionDetailTable.objects.filter(mission_id=mid)
+            for detail in mission_detail_list:
+                detail.delete()
+            return JSONResponse({'delete':'success'}, status=200)
+        except:
+            return JSONResponse({'delete':'error'}, status=400)
+
+
     if request.method == 'PUT':
         mid = data.get('mission_id')
         minfo = MissionInfoTable.objects.get(mission_id=mid)
@@ -188,13 +203,24 @@ def api_get_waiting_mission(request):
             serializer = MissionInfoSerializer()
             return JSONResponse(serializer.errors, status=400)
 
-
+@csrf_exempt
 def api_get_add_put_mission_detail(request, mid):
     """
     任务的详细条目，每个IP的状态
     :param request:
     :return:
     """
+    if request.method == 'DELETE':
+        try:
+            mission_info = MissionInfoTable.objects.get(mission_id=mid)
+            mission_info.delete()
+            mission_detail_list = MissionDetailTable.objects.filter(mission_id=mid)
+            for detail in mission_detail_list:
+                detail.delete()
+            return JSONResponse({'delete':'success'}, status=200)
+        except:
+            return JSONResponse({'delete':'error'}, status=400)
+
     if request.method == 'GET':
         all_detail_info = MissionDetailTable.objects.filter(mission_id=mid)
         if type(all_detail_info) is QuerySet:
@@ -221,3 +247,4 @@ def api_get_add_put_mission_detail(request, mid):
             serializer.save()
             return JSONResponse(serializer.data, status=200)
         return JSONResponse(serializer.errors, status=400)
+

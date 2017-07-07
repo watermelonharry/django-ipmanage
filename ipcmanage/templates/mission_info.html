@@ -39,6 +39,7 @@
                   {% endifequal %}
 
                   <td><a class="btn-sm btn-primary btn-show-detail" name = {{mission.operate_id}} role="button">查看详细</a>
+                      <a class="btn-sm btn-danger btn-mission-del" name={{ mission.operate_id }} role="button">删除任务</a>
                   </td>
 
                   </tr>
@@ -55,5 +56,19 @@
       $('.btn-show-detail').on('click', function () {
           window.open('/ipcmanage/mission_detail/'+this.name);
           });
+
+      $('.btn-mission-del').click(function(){
+          $.ajax({
+              type:"DELETE",
+              url:"/ipcmanage/api/mission/"+this.name,
+              success:function(e){
+                  alert("删除成功!");
+                  location.reload();
+              },
+              error:function(e){
+                  alert("删除失败"+String(e));
+              }
+          })
+      })
       </script>
   {% endblock %}

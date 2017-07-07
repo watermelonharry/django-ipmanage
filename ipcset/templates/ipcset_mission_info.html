@@ -1,6 +1,5 @@
 {% extends "ipcset_banner.html" %}
   {% block content %}
-    {% csrf_token %}
       <div class="container">
        <p><h4><a href="/ipcset/settings/">码流参数设置</a> >> 任务信息查看</h4></p>
       <hr>
@@ -26,6 +25,7 @@
                   <td>{{ mission.total_count }}</td>
                   <td>{{ mission.progress }}</td>
                   <td><a class="btn-sm btn-primary btn-show-detail" name = {{mission.mission_id}} role="button">查看详细</a>
+                      <a class="btn-sm btn-danger btn-mission-del" name={{ mission.mission_id }} role="button">删除任务</a>
                   </td>
 
                   </tr>
@@ -41,5 +41,18 @@
       $('.btn-show-detail').on('click', function () {
           window.open('/ipcset/missions/'+this.name);
           });
+      $('.btn-mission-del').click(function(){
+          $.ajax({
+              type:"DELETE",
+              url:"/ipcset/api/mission/"+this.name,
+              success:function(e){
+                  alert("删除成功!");
+                  location.reload();
+              },
+              error:function(e){
+                  alert("删除失败"+String(e));
+              }
+          })
+      })
       </script>
   {% endblock %}

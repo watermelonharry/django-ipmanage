@@ -23,6 +23,7 @@
         <title>IPC批量管理</title>
     </head>
     <body>
+    {% csrf_token %}
         <div class="container">
 
             <!-- Static navbar -->
@@ -45,7 +46,7 @@
                   <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">工具列表<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                      <li><a href="/dnstest">-DNS解析测试</a></li>
+                      <li><a href="/dnstest" aria-disabled>-DNS解析测试</a></li>
                       <li><a href="/ipcmanage">-IP批量管理工具</a></li>
                       <li><a href="/ipcset">-码流参数批量设置</a></li>
                       <li><a href="#">-其他工具</a></li>
@@ -79,11 +80,26 @@
 
         {% block content %}
         {% endblock %}
-
+        <hr>
         <div id="footer">
             <div class="container">
                 <div class="copyright" align="center"><a href="#"> &copy; based on bootstrap </a>| 2017 TP@hy</div>
             </div>
         </div>
         </body>
+        <script>
+          $.ajaxSettings.traditional = true;
+          var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+          function csrfSafeMethod(method) {
+              // these HTTP methods do not require CSRF protection
+              return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+          }
+          $.ajaxSetup({
+              beforeSend: function(xhr, settings) {
+                  if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                  }
+              }
+          });
+        </script>
 </html>
