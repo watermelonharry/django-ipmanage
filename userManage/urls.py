@@ -20,4 +20,5 @@ import views
 
 urlpatterns = [
     url('^login/$', views.user_login),
+    url('^register/$', views.user_register),
 ]
