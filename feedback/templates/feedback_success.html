@@ -1,0 +1,8 @@
+{% extends "feedback_banner.html" %}
+  {% block content %}
+    {% if next_url %}
+    <script>
+    setTimeout(function(){location.href='{{ next_url }}'}, 2000);
+    {% endif %}
+    </script>
+  {% endblock %}
