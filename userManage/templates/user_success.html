@@ -21,7 +21,13 @@
      <div class="container">
       <form class="form-signin" action="" method="post">
         {% csrf_token %}
-        <h3 class="form-signin-heading">{{ notice }}</h3>
+        <h3 class="form-signin-heading">
+            {% if user.username %}
+            {{ user.username }}:{{ notice }}
+            {% else %}
+            {{ notice }}
+            {% endif %}
+        </h3>
       </form>
 
     </div> <!-- /container -->
@@ -33,7 +39,7 @@
         </body>
     {% if next_url %}
     <script>
-    setTimeout(function(){location.href='{{ next_url }}'}, 10);
+    setTimeout(function(){location.href='{{ next_url }}'}, 2000);
     {% endif %}
     </script>
 
