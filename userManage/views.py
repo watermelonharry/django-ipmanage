@@ -19,13 +19,14 @@ def user_login(request):
 	if request.method == 'POST':
 		user_name = request.POST.get('user_name')
 		password = request.POST.get('password')
+		next = request.GET.get('next', '/')
 		verified_user = authenticate(username=user_name, password=password)
 
 		if verified_user is not None:
 			if verified_user.is_active:
 				login(request, verified_user)
 
-				return render(request, 'user_success.html', {'notice': u'登陆成功！即将跳转...', 'next_url': u'/hello/'})
+				return render(request, 'user_success.html', {'notice': u'登陆成功！即将跳转...', 'next_url': next})
 			else:
 				pass
 		else:

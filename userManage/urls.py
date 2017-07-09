@@ -18,6 +18,7 @@ from django.conf.urls import url
 from django.contrib import admin
 import views
 
+app_name = 'user'
 urlpatterns = [
     url('^login/$', views.user_login, name='user_login'),
     url('^register/$', views.user_register, name='user_register'),
