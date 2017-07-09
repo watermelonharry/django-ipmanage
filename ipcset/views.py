@@ -32,19 +32,25 @@ views
 
 
 def welcome(request):
-    return render_to_response('ipcset_hello.html', {'firstTitle': u'码流参数批量设置工具',
-                                                    'firstTitle_content': u'批量设置指定IPC的码流参数，同步OSD显示'})
+	if request.user.is_authenticated():
+		return render(request,
+	                  'ipcset_hello.html',
+	                  {'firstTitle': u'码流参数批量设置工具',
+	                   'firstTitle_content': u'批量设置设备的各项参数',
+	                   })
+	return HttpResponseRedirect('/user/login/')
 
 
 def show_basic_info(request):
-    return render_to_response('ipcset_basic.html', {'firstTitle': u'码流参数批量设置工具',
+    return render(request, 'ipcset_basic.html', {'firstTitle': u'码流参数批量设置工具',
                                                     'firstTitle_content': u'批量设置指定IPC的码流参数，同步OSD显示'})
 
 def show_basic_model_info(request):
     model_list = BaseTypeTable.objects.all()
     return render_to_response('ipcset_basic_model.html',{'firstTitle': u'码流参数批量设置工具',
                                                     'firstTitle_content': u'设备型号信息查看',
-                                                         'model_list':model_list})
+                                                         'model_list':model_list},
+                              context_instance=RequestContext(request))
 
 def show_settings_info(request):
     setting_list = VideoSettingTable.objects.all()
@@ -67,7 +73,8 @@ def show_mission_detail_info(request, mid):
     return render_to_response('ipcset_mission_detail.html', {'firstTitle': u'码流参数批量设置工具',
                                                              'firstTitle_content': u'查看任务明细',
                                                              'detail_list': detail_list,
-                                                             'mission_id': mid})
+                                                             'mission_id': mid},
+                              context_instance=RequestContext(request))
 
 
 """

@@ -2,7 +2,7 @@
   {% block content %}
  
       <div class="container">
-       <p><h4><a href="/ipcset/settings/">码流参数设置</a> >> 基本型号查看</h4></p>
+       <p><h4><a href="/ipcset/">码流参数设置</a> >> 基本型号查看</h4></p>
       <hr>
       <h2 class="sub-header">设备型号列表</h2>
           <div class="table-responsive">
@@ -50,9 +50,5 @@
     <hr>
 
       <script>
-      <!--查看明细-->
-      $('.btn-show-detail').on('click', function () {
-          window.open('/ipcset/missions/'+this.name);
-          });
       </script>
   {% endblock %}

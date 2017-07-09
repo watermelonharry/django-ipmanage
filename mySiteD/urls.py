@@ -14,10 +14,6 @@ urlpatterns = patterns('',
     url('^hello/$', hello),
     url('^$', hello),
 
-    url('^time/$', time),
-    url('^pretest/$', pre_test),
-    url('^login/$', user_login),
-
     url('^dnstest/', include('dnstest.urls')),
 
     url('^ipcmanage/', include('ipcmanage.urls')),
@@ -27,5 +23,4 @@ urlpatterns = patterns('',
     # url('^usermanage/', include('userManage.urls')),
 
     url(r'^admin/', admin.site.urls),
-    url(r'^register/', register),
 )

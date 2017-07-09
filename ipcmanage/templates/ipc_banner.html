@@ -4,26 +4,18 @@
         {% load staticfiles %}
         <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.css">
         <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap-theme.css">
-{#        <script src="//upcdn.b0.upaiyun.com/libs/jqueryui/jquery.ui-1.9.0.min.js"></script>#}
-{#        <script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>#}
-        <!-- 引入 Bootstrap -->
-{#        <link href="http://apps.bdimg.com/libs/bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet">#}
-{#        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>#}
-{#        <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>#}
         <script type="text/javascript" src="{% static 'bootstrap/js/jquery.min.js' %}"></script>
         <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
-
         <!-- <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
         <meta name="description" content="">
         <meta name="author" content="">
-        <link rel="icon" href="../../favicon.ico">
-        <title>IPC批量管理</title>
+        <link rel="icon" href="/static/image/ip_ico.png">
+        <title>IP管理</title>
     </head>
     <body>
-    {% csrf_token %}
         <div class="container">
 
             <!-- Static navbar -->
@@ -46,23 +38,27 @@
                   <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">工具列表<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                      <li><a href="/dnstest" aria-disabled>-DNS解析测试</a></li>
+{#                      <li><a href="/dnstest">-DNS解析测试</a></li>#}
                       <li><a href="/ipcmanage">-IP批量管理工具</a></li>
                       <li><a href="/ipcset">-码流参数批量设置</a></li>
-                      <li><a href="#">-其他工具</a></li>
+{#                      <li><a href="#">-其他工具</a></li>#}
                       <li role="separator" class="divider"></li>
                       <li class="dropdown-header">分割线</li>
-                      <li><a href="#">tool1</a></li>
-                      <li><a href="#">tool2</a></li>
+                      <li><a href="#">待补充</a></li>
+{#                      <li><a href="#">tool2</a></li>#}
                     </ul>
                   </li>
                 </ul>
 
                 <ul class="nav navbar-nav navbar-right">
                   <!-- <li class="active"><a href="./">Default <span class="sr-only">(current)</span></a></li> -->
-                  <li><a href="#">快速入口</span></a></li>
-                  <li><a href="#">A</a></li>
-                  <li><a href="#">B</a></li>
+                  {% if user.is_authenticated %}
+                      <li><a href="#">欢迎: {{ user.username }}</a></li>
+                      <li><a href={% url 'user_logout' %}>注销</a></li>
+
+                  {% else %}
+                      <li><a href={% url 'user_login' %}>登陆</a></li>
+                  {% endif %}
                 </ul>
               </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->
@@ -72,9 +68,6 @@
         <div class="jumbotron">
         <h1>{{ firstTitle }}</h1>
         <p>{{ firstTitle_content }}</p>
-        <p><!-- 
-          <a class="btn btn btn-primary" role="button">点我试试</a>
-        </p> -->
         </div>
         </div> <!-- /container -->
 
@@ -83,23 +76,8 @@
         <hr>
         <div id="footer">
             <div class="container">
-                <div class="copyright" align="center"><a href="#"> &copy; based on bootstrap </a>| 2017 TP@hy</div>
+                <div class="copyright" align="center"><a href="#"> &copy; based on bootstrap </a>| 2017  </div>
             </div>
         </div>
         </body>
-        <script>
-          $.ajaxSettings.traditional = true;
-          var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-          function csrfSafeMethod(method) {
-              // these HTTP methods do not require CSRF protection
-              return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-          }
-          $.ajaxSetup({
-              beforeSend: function(xhr, settings) {
-                  if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                      xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                  }
-              }
-          });
-        </script>
 </html>
