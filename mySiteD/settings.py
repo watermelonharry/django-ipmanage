@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'ipcmanage',
     'ipcset',
     'userManage',
+    'feedback',
     'rest_framework',
 )
 

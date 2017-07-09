@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from django.http import HttpResponse
-from django.shortcuts import render_to_response,render
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
-from django.template import RequestContext
-import datetime
-from forms import UserFrom
+from django.shortcuts import render
+
+from feedback.forms import FeedBackForm
 
 
 def hello(request):
