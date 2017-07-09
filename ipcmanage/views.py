@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth.decorators import login_required
 from django.db.models.query import QuerySet
 
 from django.shortcuts import render
@@ -31,20 +32,20 @@ views
 
 """
 
-
+@login_required
 def welcome(request):
     return render_to_response('ipc_hello.html', {'firstTitle': u'IPC批量IP设置工具',
                                                  'firstTitle_content': u'批量管理IPC的IP地址'},
                               context_instance=RequestContext(request))
 
-
+@login_required
 def show_ip_table(request):
     ip_list = CnStaticIpcTable.objects.all()
     return render_to_response('ipc_mac_ip_table.html', {'firstTitle': u'IPC批量IP设置工具',
                                                         'firstTitle_content': u'批量管理IPC的IP地址',
                                                         'ip_list': ip_list},
                               context_instance=RequestContext(request))
-
+@login_required
 def show_mission_datail(request, operate_id):
     detail_list = CnIpcChangeLogDetail.objects.filter(operate_id=operate_id)
     return render_to_response('mission_detail_table.html', {'firstTitle': u'IPC批量IP设置工具',
@@ -52,14 +53,14 @@ def show_mission_datail(request, operate_id):
                                                             'detail_list': detail_list,
                                                             'operate_id': operate_id},
                               context_instance=RequestContext(request))
-
+@login_required
 def show_mission_info(request):
     mission_info_list = CnIpcOperateInfo.objects.all()
     return render_to_response('mission_info.html',{'firstTitle': u'IPC批量IP设置工具',
                                                     'firstTitle_content': u'查看历史任务',
                                                     'info_list': mission_info_list},
                               context_instance=RequestContext(request))
-
+@login_required
 def download_iptables(reqeust):
     ip_list = (k.get_content() for k in CnStaticIpcTable.objects.all())
     # ip_list = CnStaticIpTableSerializer(ip_list, many=True).data
