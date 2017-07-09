@@ -58,5 +58,5 @@ def user_logout(request):
 	logout(request)
 	return render(request,
 	              'user_success.html',
-	              {'notice': u'注销成功，即将跳转到主页...',
+	              {'notice': u'注销成功,即将跳转到主页...',
 	               'next_url': '/hello/'})
