@@ -53,6 +53,7 @@
                 <ul class="nav navbar-nav navbar-right">
                   <!-- <li class="active"><a href="./">Default <span class="sr-only">(current)</span></a></li> -->
                   {% if user.is_authenticated %}
+                      <input type="hidden" id="login_user_name" value={{ user.username }}>
                       <li><a href="#">欢迎: {{ user.username }}</a></li>
                       <li><a href={% url 'user_logout' %}>注销</a></li>
 
