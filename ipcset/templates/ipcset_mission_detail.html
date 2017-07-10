@@ -24,9 +24,16 @@
                   <td>{{ forloop.counter }}</td>
                   <td>{{ detail.mac_addr }}</td>
                   <td>{{ detail.current_ip }}</td>
-                  <td>{{ detail.set_resolution }}</td>
-                  <td>{{ detail.set_framerate }}</td>
-                  <td>{{ detail.set_bitrate }}</td>
+                  <td><span class="label label-warning">主</span> {{ detail.set_resolution }}
+                    <p><span class="label label-info">子</span> {{ detail.set_min_resolution }}</p>
+                  </td>
+                  <td>{{ detail.set_framerate }}
+                    <p>{{ detail.set_min_framerate }}</p>
+                  </td>
+                  <td>{{ detail.set_bitrate }}
+                    <p>{{ detail.set_min_bitrate }}</p>
+                  </td>
+
                       {% ifequal detail.operate_type 2  %}
                       <td>是</td>
                       {% endifequal %}
@@ -42,6 +49,12 @@
                       {% endifequal %}
                       {% ifequal detail.status 3 %}
                       <td>设置失败</td>
+                      {% endifequal %}
+                      {% ifequal detail.status 1  %}
+                      <td>更新完成</td>
+                      {% endifequal %}
+                      {% ifequal detail.status 2  %}
+                      <td>添加完成</td>
                       {% endifequal %}
                   </tr>
               {% endfor %}
