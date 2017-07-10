@@ -46,13 +46,17 @@ class BaseFramerateTable(models.Model):
 
 class BaseTypeTable(models.Model):
     """
-    IPC型号表
+    设备型号表
     """
     model_name = models.CharField(max_length=20,unique=True)
     alias_name = models.CharField(max_length=30, unique=True, blank=True)
     resolution_set = models.ManyToManyField(BaseResolutionTable)
     bitrate_set = models.ManyToManyField(BaseBitrateTable)
     framerate_set = models.ManyToManyField(BaseFramerateTable)
+
+    min_resolution_set = models.ManyToManyField(BaseResolutionTable, related_name='min_reso_set')
+    min_bitrate_set = models.ManyToManyField(BaseBitrateTable, related_name='min_bitrate_set')
+    min_framerate_set = models.ManyToManyField(BaseFramerateTable, related_name='min_framerate_set')
 
     editor_name = models.CharField(max_length=20)
     create_time = models.DateTimeField(auto_now_add=True)
@@ -83,6 +87,10 @@ class VideoSettingTable(models.Model):
     set_resolution = models.CharField(max_length=20)
     set_bitrate = models.IntegerField(max_length=10)
     set_framerate = models.CharField(max_length=20)
+
+    set_min_resolution = models.CharField(max_length=20)
+    set_min_bitrate = models.IntegerField(max_length=10)
+    set_min_framerate = models.CharField(max_length=20)
     #操作类型，1：设置码流参数   2：设置码流参数并同步OSD显示
     operate_type = models.IntegerField(max_length=2, default=1)
 
@@ -116,6 +124,9 @@ class MissionInfoTable(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 
+    ##任务类型，1：设置设备  2：发现设备
+    mission_type = models.IntegerField(max_length=2, default=1)
+
     def __unicode__(self):
         return unicode(self.mission_id)
 
@@ -139,6 +150,10 @@ class MissionDetailTable(models.Model):
     set_resolution = models.CharField(max_length=20)
     set_bitrate = models.IntegerField(max_length=10)
     set_framerate = models.CharField(max_length=20)
+
+    set_min_resolution = models.CharField(max_length=20)
+    set_min_bitrate = models.IntegerField(max_length=10)
+    set_min_framerate = models.CharField(max_length=20)
     #操作类型，1：设置码流参数   2：设置码流参数并同步OSD显示
     operate_type = models.IntegerField(max_length=2, default=1)
 
@@ -146,6 +161,7 @@ class MissionDetailTable(models.Model):
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 
+    ##0: 等待设置，  3：设置失败  5：设置成功     1：已更新 2：已添加
     status = models.IntegerField(max_length=1, default=0)
 
     def __unicode__(self):
@@ -156,4 +172,4 @@ class MissionDetailTable(models.Model):
         pass
 
     class Meta:
-        ordering = ('mac_addr',)
+        ordering = ('current_ip',)
