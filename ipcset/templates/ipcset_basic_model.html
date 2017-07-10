@@ -11,9 +11,12 @@
                 <tr>
                   <th>型号</th>
                   <th>别名</th>
-                  <th>支持分辨率</th>
-                  <th>支持帧率</th>
-                  <th>支持码率</th>
+                  <th>主分辨率</th>
+                  <th>主帧率</th>
+                  <th>主码率</th>
+                  <th>子分辨率</th>
+                  <th>子帧率</th>
+                  <th>子码率</th>
                   <th>添加者</th>
                 </tr>
               </thead>
@@ -35,8 +38,20 @@
                       <p>{{ bitrate.bitrate }}</p>
                       {% endfor %}
                   </td>
+                  <td>{% for resolution in model.min_resolution_set.all %}
+                      <p>{{ resolution.resolution }}</p>
+                      {% endfor %}
+                  </td>
+                  <td>{% for framerate in model.min_framerate_set.all %}
+                      <p>{{ framerate.framerate }}</p>
+                      {% endfor %}
+                  </td>
+                  <td>{% for bitrate in model.min_bitrate_set.all %}
+                      <p>{{ bitrate.bitrate }}</p>
+                      {% endfor %}
+                  </td>
                   <td>{{ model.editor_name }}</td>
-                  <td>{{ model.edit_time }}</td>
+                  <td>{{ model.edit_time|date:"Y-m-d,G:i"}}</td>
 {#                  <td><a class="btn-sm btn-primary btn-show-detail" name = {{mission.mission_id}} role="button">查看详细</a>#}
                   </td>
 
