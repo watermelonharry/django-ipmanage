@@ -10,7 +10,7 @@
           </div>
            <label class="col-sm-1 control-label">反馈类型</label>
           <div class="col-sm-2">
-            <select class="form-control" name="feedback_type" value={{ fb_form.feedback_type }}>
+            <select class="form-control" name="feedback_type" value=1>
                 <option value=1>提交BUG</option>
                 <option value=2>改进建议</option>
                 <option value=3>新需求</option>
@@ -21,18 +21,13 @@
           <div class="form-group">
           <label class="col-sm-1 control-label" >邮箱</label>
           <div class="col-sm-4">
-{#              {% if fb_form.errors %}#}
-{#              <input type="text" class="form-control" name="user_email" placeholder="请输入邮箱地址" value={{ fb_form.errors.user_email }}>#}
-{#              {% else %}#}
-              <input type="text" class="form-control" name="user_email" placeholder="请输入邮箱地址" value={{ fb_form.user_email }}>
-{#              {% endif %}#}
+              <input type="text" class="form-control" name="user_email" placeholder="请输入邮箱地址" required value="">
           </div>
           </div>
           <div class="form-group">
           <label class="col-sm-1 control-label">内容</label>
           <div class="col-sm-4">
-{#              <input type="text" class="form-control" id="editor_name" name="editor_name" value="" row=5 required>#}
-              <textarea class="form-control col-sm-4" rows="5" name="feedback_content" placeholder="请输入反馈内容"value={{ fb_form.feedback_content }}></textarea>
+              <textarea class="form-control col-sm-4" rows="5" name="feedback_content" placeholder="请输入反馈内容" required value=></textarea>
           </div>
           </div>
        <div class="form-group">
