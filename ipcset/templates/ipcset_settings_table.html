@@ -13,8 +13,12 @@
           <p>添加新的设备到数据库中。</p>
         </div>
         <div class="col-lg-3">
-          <p><a href="/ipcset/missions/" class="btn btn-info" role="button" id="_btn" data-toggle="modal">查看任务 &raquo;</a></p>
+          <p><a href="/ipcset/missions/" class="btn btn-info" role="button" data-toggle="modal">查看任务 &raquo;</a></p>
           <p>查看已保存的任务状态。</p>
+        </div>
+        <div class="col-lg-3">
+          <p><a class="btn btn-info" role="button" id="auto_scan_btn" data-toggle="modal" data-target="#scan_modal" data-backdrop="static">自动扫描 &raquo;</a></p>
+          <p>扫描局域网中的设备。</p>
         </div>
 
       </div>
@@ -46,9 +50,15 @@
                   <td>{{ setting.mac_addr }}</td>
                   <td>{{ setting.current_ip }}</td>
                   <td>{{ setting.type_id.model_name }}</td>
-                  <td>{{ setting.set_resolution }}</td>
-                  <td>{{ setting.set_framerate }}</td>
-                  <td>{{ setting.set_bitrate }}</td>
+                  <td><span class="label label-warning">主</span> {{ setting.set_resolution }}
+                    <p><span class="label label-info">子</span> {{ setting.set_min_resolution }}</p>
+                  </td>
+                  <td>{{ setting.set_framerate }}
+                    <p>{{ setting.set_min_framerate }}</p>
+                  </td>
+                  <td>{{ setting.set_bitrate }}
+                    <p>{{ setting.set_min_bitrate }}</p>
+                  </td>
                   {% ifequal setting.operate_type 1 %}
                     <td>不同步</td>
                   {% else %}
@@ -70,6 +80,50 @@
 
       </div>
     <hr>
+
+      <!--扫描窗口-->
+      <div class="modal fade" id="scan_modal" >
+      <div class="modal-dialog" >
+          <div class="modal-content">
+              <div class="modal-header">
+              <h3>扫描局域网</h3>
+              <p>自动扫描局域网内的在线设备，获取其信息并添加到数据库</p>
+              <p>点击确认后，系统会下发任务至终端，自动开始执行</p>
+              <p>已添加设备如下</p>
+              </div>
+              <div class="modal-body">
+                  <div class="table-responsive">
+            <table class="table table-striped" id="scaned_device">
+              <thead>
+                <tr class=locktop>
+                  <th>MAC地址</th>
+                  <th>IP地址</th>
+                  <th>IPC型号</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                </tbody>
+              </table>
+
+                </div>
+              </div>
+            <div class="modal-footer">
+                <div id="show_scan_progress" hidden>
+              <p>请确认执行终端已开启，等待扫描完成</p>
+                  <div class="progress">
+                      <div class="progress-bar progress-bar-striped active" role="progressbar" id = "auto_scan_probar" style="width: 0%"></div>
+                  </div>
+                    </div>
+                <button type="button" class="btn btn-sm btn-success" id="show_scan_detail_btn" name="">查看详细</button>
+                <button type="button" class="btn btn-sm btn-success" id="confirm_scan_btn">开始</button>
+                <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_scan_btn" name="">关闭</button>
+            </div>
+          </div>
+      </div>
+      </div>
+
+
       <div class="modal fade" id="edit_modal" >
       <div class="modal-dialog" >
           <div class="modal-content">
@@ -94,28 +148,47 @@
                           <input type="text" class="form-control" id="type_id" name="type_id" value="IPC型号" disabled>
                       </div>
                       </div>
+
                       <div class="form-group">
-                      <label for="edit_people" class="col-sm-4 control-label">设置分辨率</label>
-                      <div class="col-sm-6">
+                      <label for="edit_people" class="col-sm-3 control-label">主分辨率</label>
+                      <div class="col-sm-3">
                         <select class="form-control" id="set_resolution" name="set_resolution">
                         </select>
                       </div>
+                      <label for="edit_people" class="col-sm-2 control-label">子分辨率</label>
+                      <div class="col-sm-3">
+                        <select class="form-control" id="set_min_resolution" name="set_min_resolution">
+                        </select>
                       </div>
-                        <div class="form-group">
-                      <label for="edit_people" class="col-sm-4 control-label">设置帧率</label>
-                      <div class="col-sm-6">
+                        </div>
+
+                      <div class="form-group">
+                      <label class="col-sm-3 control-label">主帧率</label>
+                      <div class="col-sm-3">
                         <select class="form-control" id="set_framerate" name="set_framerate">
                         </select>
                       </div>
+                      <label class="col-sm-2 control-label">子帧率</label>
+                      <div class="col-sm-3">
+                        <select class="form-control" id="set_min_framerate" name="set_min_framerate">
+                        </select>
                       </div>
-                        <div class="form-group">
-                      <label for="edit_people" class="col-sm-4 control-label">设置比特率</label>
-                      <div class="col-sm-6">
+                        </div>
+
+                      <div class="form-group">
+                      <label class="col-sm-3 control-label">主比特率</label>
+                      <div class="col-sm-3">
                         <select class="form-control" id="set_bitrate" name="set_bitrate">
                         </select>
                       </div>
+                      <label class="col-sm-2 control-label">子比特率</label>
+                      <div class="col-sm-3">
+                        <select class="form-control" id="set_min_bitrate" name="set_min_bitrate">
+                        </select>
                       </div>
-                        <div class="form-group">
+                        </div>
+
+                      <div class="form-group">
                       <label for="edit_people" class="col-sm-4 control-label">同步OSD</label>
                       <div class="col-sm-6">
                       <label class="radio-inline" id="operate_type">
@@ -170,27 +243,46 @@
                         </select>
                       </div>
                       </div>
+
                       <div class="form-group">
-                      <label for="edit_people" class="col-sm-4 control-label">设置分辨率</label>
-                      <div class="col-sm-6">
+                      <label for="edit_people" class="col-sm-3 control-label">主分辨率</label>
+                      <div class="col-sm-3">
                         <select class="form-control" id="set_resolution" name="set_resolution">
                         </select>
                       </div>
+                      <label for="edit_people" class="col-sm-2 control-label">子分辨率</label>
+                      <div class="col-sm-3">
+                        <select class="form-control" id="set_min_resolution" name="set_min_resolution">
+                        </select>
                       </div>
-                        <div class="form-group">
-                      <label for="edit_people" class="col-sm-4 control-label">设置帧率</label>
-                      <div class="col-sm-6">
+                        </div>
+
+                      <div class="form-group">
+                      <label class="col-sm-3 control-label">主帧率</label>
+                      <div class="col-sm-3">
                         <select class="form-control" id="set_framerate" name="set_framerate">
                         </select>
                       </div>
+                      <label class="col-sm-2 control-label">子帧率</label>
+                      <div class="col-sm-3">
+                        <select class="form-control" id="set_min_framerate" name="set_min_framerate">
+                        </select>
                       </div>
-                        <div class="form-group">
-                      <label for="edit_people" class="col-sm-4 control-label">设置比特率</label>
-                      <div class="col-sm-6">
+                        </div>
+
+                      <div class="form-group">
+                      <label class="col-sm-3 control-label">主比特率</label>
+                      <div class="col-sm-3">
                         <select class="form-control" id="set_bitrate" name="set_bitrate">
                         </select>
                       </div>
+                      <label class="col-sm-2 control-label">子比特率</label>
+                      <div class="col-sm-3">
+                        <select class="form-control" id="set_min_bitrate" name="set_min_bitrate">
+                        </select>
                       </div>
+                        </div>
+
                         <div class="form-group">
                       <label for="edit_people" class="col-sm-4 control-label">同步OSD</label>
                       <div class="col-sm-6">
@@ -278,8 +370,8 @@
               </div>
               <div class="modal-footer">
                   <button type="button" class="btn btn-sm btn-success" id="show_detail_btn" name="">查看详细</button>
-                  <button type="button" class="btn btn-sm btn-success" id="scanning_confirm_btn" >确定</button>
-                  <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="scanning_abort_btn">退出</button>
+                  <button type="button" class="btn btn-sm btn-success" id="no_name_btn" >确定</button>
+                  <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_setting_btn">退出</button>
               </div>
           </div>
       </div>
@@ -287,22 +379,47 @@
 
 
       <script>
-{#      $.ajaxSettings.traditional = true;#}
-{#      var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();#}
-{#      function csrfSafeMethod(method) {#}
-{#          // these HTTP methods do not require CSRF protection#}
-{#          return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));#}
-{#      }#}
-{#      $.ajaxSetup({#}
-{#          beforeSend: function(xhr, settings) {#}
-{#              if (!csrfSafeMethod(settings.type) && !this.crossDomain) {#}
-{#                  xhr.setRequestHeader("X-CSRFToken", csrftoken);#}
-{#              }#}
-{#          }#}
-{#      });#}
-      
       var id_list=[];
       var model_list=[];
+      var timer_id;
+
+      <!--开始自动扫描-->
+      $('#confirm_scan_btn').click(function () {
+         var m_data={
+             'editor_name':$('#login_user_name').val(),
+             'mission_id':getTimeId(),
+             'total_count':254,
+             'mission_type':2};
+        $.ajax({
+          type:"POST",
+          url:"/ipcset/api/mission/",
+          dataType:"json",
+          contentType:"application/json",
+          data: JSON.stringify(m_data),
+          success:function(msg){
+            console.log("success", msg);
+            $('#show_scan_progress').show();
+              $('#show_scan_detail_btn').attr("name", m_data.mission_id);
+              $('#abort_scan_btn').attr("name", m_data.mission_id);
+            timer_id = window.setInterval(on_time_check_scan,5000);
+            console.log('start timer:'+timer_id);
+          },
+          error:function(e){
+            console.log("failed", e);
+            alert("添加失败！ error-"+e.status);
+          }
+        });
+      });
+
+      $('#show_scan_detail_btn').on('click', function(){
+          window.open('../missions/'+$('#show_scan_detail_btn').attr("name"));
+      })
+      $('#abort_scan_btn').click(function () {
+          $('#show_scan_progress').hide();
+          window.clearInterval(timer_id);
+          $('#suto_scan_probar').attr("style", "width: 0%");
+          location.reload();
+      });
 
       <!--添加新设备-->
       $('#add_new_btn').click(function(){
@@ -315,14 +432,18 @@
           })
         });
         // set_new_params();
-      })
+      });
 
 
+      <!--修改类型-->
       $('#add_modal #type_id').change(function(){
         $('#add_modal').find("option[name='nobody']").remove();
         $('#add_modal #set_resolution option').remove();
         $('#add_modal #set_bitrate option').remove();
         $('#add_modal #set_framerate option').remove();
+        $('#add_modal #set_min_resolution option').remove();
+        $('#add_modal #set_min_bitrate option').remove();
+        $('#add_modal #set_min_framerate option').remove();
         set_new_params();
       })
 
@@ -342,7 +463,20 @@
           $.each(params.framerate_set, function(){
             var choice = '<option>'+this.framerate+'</option>';
             target.find('#set_framerate').append(choice);
-          });  
+          });
+
+          $.each(params.min_resolution_set, function(){
+            var choice = '<option>'+this.resolution+'</option>';
+            target.find('#set_min_resolution').append(choice);
+          });
+          $.each(params.min_bitrate_set, function(){
+            var choice = '<option>'+this.bitrate+'</option>';
+            target.find('#set_min_bitrate').append(choice);
+          });
+          $.each(params.min_framerate_set, function(){
+            var choice = '<option>'+this.framerate+'</option>';
+            target.find('#set_min_framerate').append(choice);
+          });
         })
       }
 
@@ -386,6 +520,7 @@
           'mission_id':getTimeId(),
           'total_count':id_list.length,
           'detail_id':id_list,
+          'mission_type':1
         };
           $('#show_detail_btn').attr("name", json_data.mission_id);
         console.log(json_data);
@@ -435,9 +570,6 @@
 
 
 
-
-
-
       <!--下载配置-->
       $('#down_load_settings_btn').on('click',function(){
         location.href="./download";
@@ -446,7 +578,7 @@
       $('#show_mission_btn').on('click', function(){
           window.open('../mission');
       })
-      $('#scanning_abort_btn').on('click', function(){
+      $('#abort_setting_btn').on('click', function(){
           window.clearInterval(timer_id);
           $('#scanning_probar').attr("style", "width: 0%");
           location.reload();
@@ -458,7 +590,7 @@
       })
 
       <!--查看任务详细详细-->
-      var timer_id;
+
       $('#show_detail_btn').on('click', function(){
           window.open('../missions/'+$('#show_detail_btn').attr("name"));
       })
@@ -493,33 +625,7 @@
         });
       })
       
-      function on_time_check(){
-          var op_id = $('#show_detail_btn').attr("name");
-          $.ajax({
-          type:"GET",
-          url:"/ipcset/api/mission/",
-          data:{"mission_id":op_id},
-          dataType:"json",
-          contentType:"application/json",
-          success:function(js_data){
-            js_data=js_data[0];
-            console.log("success", js_data);
-              var total = Number(js_data.total_count);
-              var fin = Number(js_data.progress);
-              var progress = String(fin*100/total) + "%";
-              console.log("request mission progress", progress, timer_id);
-              $('#scanning_probar').attr("style", "width: "+progress);
-              if(total == fin){
-                  window.clearInterval(timer_id);
-                  console.log("clear interval")
-                  alert('设置完成！')
-              }
-          },
-          error:function(e){
-            console.log("failed to get misson progress", e);
-          }
-        });
-      };
+
 
       <!--编辑单条记录-->
       $('.btn-edit').on('click', function () {
@@ -550,6 +656,21 @@
           var choice = '<option>'+this.framerate+'</option>';
           target.find('#set_framerate').val(data.set_framerate);
           target.find('#set_framerate').append(choice);
+        });
+        $.each(data.type_id.min_resolution_set, function(){
+          var choice = '<option>'+this.resolution+'</option>';
+          target.find('#set_min_resolution').append(choice);
+          target.find('#set_min_resolution').val(data.set_min_resolution);
+        });
+        $.each(data.type_id.min_bitrate_set, function(){
+          var choice = '<option>'+this.bitrate+'</option>';
+          target.find('#set_min_bitrate').append(choice);
+          target.find('#set_min_bitrate').val(data.set_min_bitrate);
+        });
+        $.each(data.type_id.min_framerate_set, function(){
+          var choice = '<option>'+this.framerate+'</option>';
+          target.find('#set_min_framerate').val(data.set_min_framerate);
+          target.find('#set_min_framerate').append(choice);
         });
       }
 
@@ -639,6 +760,9 @@
           "set_resolution":target.find("form").find('#set_resolution').val(),
           "set_bitrate":target.find("form").find('#set_bitrate').val(),
           "set_framerate":target.find("form").find('#set_framerate').val(),
+          "set_min_resolution":target.find("form").find('#set_min_resolution').val(),
+          "set_min_bitrate":target.find("form").find('#set_min_bitrate').val(),
+          "set_min_framerate":target.find("form").find('#set_min_framerate').val(),
           "operate_type":target.find("form").find("input[name='edit_radio']:checked").val(),
           "editor_name":target.find("form").find('#editor_name').val(),
           // "csrfmiddlewaretoken":$("input[name='csrfmiddlewaretoken']").val(),
@@ -655,5 +779,61 @@
         $('#add_modal option').remove();
       })
 
+      function on_time_check(){
+          var op_id = $('#show_detail_btn').attr("name");
+          $.ajax({
+          type:"GET",
+          url:"/ipcset/api/mission/",
+          data:{"mission_id":op_id},
+          dataType:"json",
+          contentType:"application/json",
+          success:function(js_data){
+            js_data=js_data[0];
+            console.log("success", js_data);
+              var total = Number(js_data.total_count);
+              var fin = Number(js_data.progress);
+              var progress = String(fin*100/total) + "%";
+              console.log("request mission progress", progress, timer_id);
+              $('#scanning_probar').attr("style", "width: "+progress);
+              if(total == fin){
+                  window.clearInterval(timer_id);
+                  console.log("clear interval")
+                  alert('设置完成！')
+              }
+          },
+          error:function(e){
+            console.log("failed to get misson progress", e);
+          }
+        });
+      };
+
+      function on_time_check_scan(){
+          var op_id = $('#abort_scan_btn').attr("name");
+          $.ajax({
+          type:"GET",
+          url:"/ipcset/api/mission/",
+          data:{"mission_id":op_id},
+          dataType:"json",
+          contentType:"application/json",
+          success:function(js_data){
+            js_data=js_data[0];
+            console.log("success", js_data);
+              var total = Number(js_data.total_count);
+              var fin = Number(js_data.progress);
+              var progress = String(fin*100/total) + "%";
+              console.log("request mission progress", progress, timer_id);
+              $('#auto_scan_probar').attr("style", "width: "+progress);
+              if(total == fin){
+                  window.clearInterval(timer_id);
+                  console.log("clear interval")
+                  alert('设置完成！')
+              }
+          },
+          error:function(e){
+            console.log("failed to get misson progress", e);
+              alert("无法获取任务进度信息，请检查网络.error-"+ e.status);
+          }
+        });
+      };
       </script>
   {% endblock %}
