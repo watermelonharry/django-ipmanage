@@ -164,7 +164,7 @@ def api_get_add_put_mission(request):
         if serializer.is_valid():
             serializer.save()
 
-            video_id = data.get('detail_id')
+            video_id = data.get('detail_id', [])
             setting_set = VideoSettingTable.objects.filter(id__in=video_id)
             for single_setting in setting_set:
                 detail = MissionDetailTable(mission_id=mission_id,
@@ -174,6 +174,9 @@ def api_get_add_put_mission(request):
                                             set_resolution=single_setting.set_resolution,
                                             set_bitrate=single_setting.set_bitrate,
                                             set_framerate=single_setting.set_framerate,
+                                            set_min_resolution=single_setting.set_min_resolution,
+                                            set_min_bitrate=single_setting.set_min_bitrate,
+                                            set_min_framerate=single_setting.set_min_framerate,
                                             operate_type=single_setting.operate_type)
                 detail.save()
             return JSONResponse(serializer.data, status=201)
@@ -257,3 +260,40 @@ def api_get_add_put_mission_detail(request, mid):
             return JSONResponse(serializer.data, status=200)
         return JSONResponse(serializer.errors, status=400)
 
+@csrf_exempt
+def api_add_put_discover_mission_detail(request, mid):
+    if request.method == 'POST':
+        data = JSONParser().parse(request)
+
+        mac_addr=data.get('mac_addr')
+        model_name = data.pop('model_name')
+
+        try:
+            type_id = BaseTypeTable.objects.get(model_name__contains=model_name)
+        except Exception as e:
+            ##DoesNotExist 型号不存在
+            JSONResponse(VideoSettingSerializer().errors, status=501)
+
+        try:
+            ##查找旧的VideoSetting
+            old_setting = VideoSettingTable.objects.get(mac_addr=mac_addr)
+            data['status'] = 1
+            serializer = VideoSettingSerializer(old_setting, data=data)
+            if serializer.is_valid():
+                serializer.save()
+        except Exception as e:
+            ## add new video setting
+            data['status'] = 2
+            mission_id = data.pop('mission_id')
+            new_setting = VideoSettingTable(type_id=type_id, **data)
+            new_setting.save()
+            data['mission_id'] = mission_id
+
+        try:
+            editor_name = data.pop('editor_name')
+            detail_obj = MissionDetailTable(type_id=type_id, **data)
+            detail_obj.save()
+        except Exception as e:
+            pass
+
+        return JSONResponse(data, status=201)
