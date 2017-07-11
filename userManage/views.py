@@ -4,7 +4,7 @@ from django.http import HttpResponseNotAllowed, HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
-
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -54,6 +54,7 @@ def user_register(request):
 				return render(request, 'user_register.html', {'notice': u'注册失败:用户名已存在'})
 
 
+@login_required
 def user_logout(request):
 	logout(request)
 	return render(request,
