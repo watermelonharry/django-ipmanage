@@ -46,7 +46,7 @@
 
               {% for setting in setting_list %}
                   <tr>
-                  <td><input type="checkbox" class="checkbox-single" name={{setting.id}} value={{setting.id}}></td>
+                  <td><input type="checkbox" class="checkbox-single main_page" name={{setting.id}} value={{setting.id}}></td>
                   <td>{{ setting.mac_addr }}</td>
                   <td>{{ setting.current_ip }}</td>
                   <td>{{ setting.type_id.model_name }}</td>
@@ -67,6 +67,7 @@
                   <td>{{ setting.editor_name }}</td>
                   <td><a data-toggle="modal" data-target="#edit_modal" data-backdrop="static" class="btn-sm btn-primary btn-edit" name = {{setting.id}} role="button">修改</a>
                       <a class="btn-sm btn-danger btn-del" name={{ setting.id }} role="button">删除</a>
+                      <a data-toggle="modal" data-target="#copy_modal" data-backdrop="static" class="btn-sm btn-info btn-copy" name={{ setting.id }} role="button">复制</a>
                   </td>
 
                   </tr>
@@ -80,6 +81,50 @@
 
       </div>
     <hr>
+
+      <!--同步窗口-->
+      <div class="modal fade" id="copy_modal" >
+      <div class="modal-dialog" >
+          <div class="modal-content">
+              <div class="modal-header">
+              <h3>同步设置</h3>
+              <p>同步该设备的参数至相同型号的其他设备。</p>
+              </div>
+              <div class="modal-body">
+                  <div class="table-responsive">
+            <table class="table table-striped" id="mac_table">
+              <thead>
+                <tr class=locktop>
+                  <th><label class="checkbox-inline"><input type="checkbox" id="copy_select_all">全选</label></th>
+                  <th>MAC地址</th>
+                  <th>IP地址</th>
+                </tr>
+              </thead>
+              <tbody>
+{#              <td><input type="checkbox" class="checkbox-single sync_page" name={{setting.id}} value={{setting.id}}></td>#}
+{#                  <td>{{ setting.mac_addr }}</td>#}
+{#                  <td>{{ setting.current_ip }}</td>#}
+              </tbody>
+            </table>
+
+                </div>
+              </div>
+            <div class="modal-footer">
+{#            <form class="form-horizontal" role="form">#}
+{#                    <div class="form-group">#}
+{#                      <label for="edit_people" class="col-sm-4 control-label">修改人*</label>#}
+{#                      <div class="col-sm-5">#}
+{#                          <input type="text" class="form-control" id="start_editor_name" value="">#}
+{#                      </div>#}
+{#                    </div>#}
+{#                  </form>#}
+                <input type="hidden" name="src_id" id="copy_src_id" value="">
+                <button type="button" class="btn btn-sm btn-success" id="confirm_copy_btn" name="">确定</button>
+                <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_copy_btn">关闭</button>
+            </div>
+          </div>
+      </div>
+      </div>
 
       <!--扫描窗口-->
       <div class="modal fade" id="scan_modal" >
@@ -204,7 +249,7 @@
                         <div class="form-group">
                       <label for="edit_people" class="col-sm-4 control-label">修改人</label>
                       <div class="col-sm-6">
-                          <input type="text" class="form-control" id="editor_name" name="editor_name" value="">
+                          <input type="text" class="form-control" id="editor_name" name="editor_name" value={{ user.username }}>
                       </div>
                       </div>
                       <input type="hidden" class="form-control" id="id" name="id" value="id">
@@ -299,7 +344,7 @@
                         <div class="form-group">
                       <label for="edit_people" class="col-sm-4 control-label">修改人</label>
                       <div class="col-sm-6">
-                          <input type="text" class="form-control" id="editor_name" name="editor_name" value="">
+                          <input type="text" class="form-control" id="editor_name" name="editor_name" value={{ user.username }}>
                       </div>
                       </div>
                       <input type="hidden" class="form-control" id="id" name="id">
@@ -382,6 +427,77 @@
       var id_list=[];
       var model_list=[];
       var timer_id;
+
+      <!--同步窗口设置-->
+      <!--关闭同步窗口-->
+
+      <!--确定同步-->
+      $('#confirm_copy_btn').click(function(){
+          var up_data = {
+              "src_id":$('#copy_src_id').val(),
+              "dst_id":get_sync_select_id(),
+              "editor_name":$('#login_user_name').val()
+          };
+          $.ajax({
+              type:"POST",
+              url:"/ipcset/api/settings/sync/",
+              dataType:"json",
+              contentType:"application/json",
+              data: JSON.stringify(up_data),
+              success:function(json_data){
+                  console.log("sync setting success", json_data);
+                  alert("同步成功");},
+              error: function (e) {
+                  alert("同步失败-"+ e.status +"-"+e.error);
+              }
+          });
+      })
+
+      <!--全选-->
+      $('#copy_select_all').click(function() {
+          $(".checkbox-single.sync_page").prop("checked", this.checked);
+          console.log(get_main_select_id());
+      });
+
+      function get_sync_select_id(){
+        var ids = [];
+        $(".checkbox-single.sync_page").each(function(){
+          if(this.checked){
+            ids.push(this.name);
+          }
+        });
+        return ids;
+      }
+
+      <!--退出同步窗口-->
+      $('#abort_copy_btn').click(function(){
+          $('#copy_modal tbody').empty();
+          location.reload();
+      });
+
+      <!--获取同型号设备-->
+      $('.btn-copy').click(function(){
+          $('#copy_src_id').val(this.name);
+          $.ajax({
+              type:"GET",
+              url:"/ipcset/api/settings/sametype/",
+              dataType:"json",
+              contentType:"application/json",
+              data: {"id":this.name},
+              success:function(json_data){
+                  console.log("get same type success", json_data);
+                  $.each(json_data, function(){
+                      $("#copy_modal tbody").append("<tr></tr>");
+                      var check_box = "<td><input type='checkbox' class='checkbox-single sync_page' name="+this.id+"></td>";
+                      var mac_addr = "<td>" + this.mac_addr + "</td>";
+                      var current_ip = "<td>" + this.current_ip + "</td>";
+                      $("#copy_modal tbody tr:last").append(check_box,mac_addr,current_ip);});
+              },
+              error: function (e) {
+                  alert("获取失败-"+ e.status +"-"+e.error);
+              }
+          })
+      });
 
       <!--开始自动扫描-->
       $('#confirm_scan_btn').click(function () {
@@ -482,7 +598,7 @@
 
       <!--开始设置-->
       $('#start_set_btn').click(function(){
-        id_list = get_select_id();
+        id_list = get_main_select_id();
         console.log(id_list);
         $.ajax({
           type:"GET",
@@ -511,7 +627,7 @@
 
       $('#quit_edit').click(function(){
         $('#edit_modal option').remove();
-      })
+      });
 
       <!--开始执行-->
       $('#confirm_set_btn').on('click', function(){
@@ -553,13 +669,13 @@
       })
 
       $('#select_all').click(function(){
-          $(".checkbox-single").prop("checked", this.checked);
-          console.log(get_select_id());
-      })
+          $(".checkbox-single.main_page").prop("checked", this.checked);
+          console.log(get_main_select_id());
+      });
 
-      function get_select_id(){
+      function get_main_select_id(){
         var ids = [];
-        $(".checkbox-single").each(function(){  
+        $(".checkbox-single.main_page").each(function(){
           if(this.checked){
             ids.push(this.name);
           }
@@ -573,7 +689,7 @@
       <!--下载配置-->
       $('#down_load_settings_btn').on('click',function(){
         location.href="./download";
-      })
+      });
       <!--查看任务信息-->
       $('#show_mission_btn').on('click', function(){
           window.open('../mission');
@@ -582,49 +698,12 @@
           window.clearInterval(timer_id);
           $('#scanning_probar').attr("style", "width: 0%");
           location.reload();
-      })
-
-      $('#batch_upload_btn').on('click', function(){
-{#          timer_id = window.setInterval(alert,1000);#}
-          alert("这个功能还在开发中")
-      })
+      });
 
       <!--查看任务详细详细-->
-
       $('#show_detail_btn').on('click', function(){
           window.open('../missions/'+$('#show_detail_btn').attr("name"));
-      })
-      <!--开始执行-->
-      $('#confirm_scan_ip_btn').on('click', function(){
-        var json_data = {
-          'operator_name':$('#scan_people_str').val(),
-          'operate_id':getTimeId(),
-          'operate_type':3,
-          'ip_start':$('#scan_start_str').val(),
-          'ip_count':$('#scan_count_str').val()
-        };
-          $('#show_detail_btn').attr("name", json_data.operate_id);
-        console.log(json_data);
-        
-        $.ajax({
-          type:"POST",
-          url:"/ipcmanage/api/mission/",
-          dataType:"json",
-          contentType:"application/json",
-          data: JSON.stringify(json_data),
-          success:function(e){
-            console.log("success", e);
-            $('#start_set_modal').modal('toggle');
-            $('#scanning_modal').modal('toggle');
-            timer_id = window.setInterval(on_time_check,5000);
-              console.log(timer_id);
-          },
-          error:function(e){
-            console.log("failed", e);
-          }
-        });
-      })
-      
+      });
 
 
       <!--编辑单条记录-->
@@ -636,7 +715,7 @@
               $('#edit_modal').find("form").find('#type_id').val(data.type_id.model_name);
               set_stream_params(data, $('#edit_modal'));
               $('#edit_modal #operate_type').find("input[name='edit_radio']").eq(2-data.operate_type).attr("checked", true);
-              $('#edit_modal').find("form").find('#editor_name').val(data.editor_name);
+              $('#edit_modal').find("form").find('#editor_name').val($('#login_user_name').val());
               $('#edit_modal').find("form").find('#id').val(data.id);
           });
       })
