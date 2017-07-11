@@ -262,6 +262,9 @@ def api_get_add_put_mission_detail(request, mid):
 
 @csrf_exempt
 def api_add_put_discover_mission_detail(request, mid):
+    """
+    发现设备任务-添加发现的条目至数据表
+    """
     if request.method == 'POST':
         data = JSONParser().parse(request)
 
@@ -272,24 +275,29 @@ def api_add_put_discover_mission_detail(request, mid):
             type_id = BaseTypeTable.objects.get(model_name__contains=model_name)
         except Exception as e:
             ##DoesNotExist 型号不存在
-            JSONResponse(VideoSettingSerializer().errors, status=501)
+            type_id = BaseTypeTable.objects.get(model_name=u'未知型号')
+
+        if type_id.model_name != u'未知型号':
+            #未索引型号不添加至VideoSetting
+            try:
+                ##查找旧的VideoSetting
+                old_setting = VideoSettingTable.objects.get(mac_addr=mac_addr)
+                data['status'] = 1
+                serializer = VideoSettingSerializer(old_setting, data=data)
+                if serializer.is_valid():
+                    serializer.save()
+            except Exception as e:
+                ## add new video setting
+                data['status'] = 2
+                mission_id = data.pop('mission_id')
+                new_setting = VideoSettingTable(type_id=type_id, **data)
+                new_setting.save()
+                data['mission_id'] = mission_id
+        else:
+            data['status'] = 6
 
         try:
-            ##查找旧的VideoSetting
-            old_setting = VideoSettingTable.objects.get(mac_addr=mac_addr)
-            data['status'] = 1
-            serializer = VideoSettingSerializer(old_setting, data=data)
-            if serializer.is_valid():
-                serializer.save()
-        except Exception as e:
-            ## add new video setting
-            data['status'] = 2
-            mission_id = data.pop('mission_id')
-            new_setting = VideoSettingTable(type_id=type_id, **data)
-            new_setting.save()
-            data['mission_id'] = mission_id
-
-        try:
+            ##增加MissionDetail
             editor_name = data.pop('editor_name')
             detail_obj = MissionDetailTable(type_id=type_id, **data)
             detail_obj.save()
@@ -297,3 +305,47 @@ def api_add_put_discover_mission_detail(request, mid):
             pass
 
         return JSONResponse(data, status=201)
+
+
+def api_get_same_type_by_id(request):
+    """
+    query the devices which have the same type
+    input: {'id':1}
+    return: {setting_dict1, setting_dict2...}
+    """
+
+    if request.method == 'GET':
+        src_id = request.GET.get('id')
+        try:
+            src_setting = VideoSettingTable.objects.get(id=src_id)
+            query_set = VideoSettingTable.objects.filter(type_id=src_setting.type_id).exclude(id=src_id)
+            serializer = VideoSettingSerializer(query_set, many=True)
+            return JSONResponse(serializer.data, status=200)
+        except Exception as e:
+            return JSONResponse({'error':e.message}, status=501)
+
+def api_sync_stream_setting(request):
+    """
+    sync settings from source device to dst device
+    input: src device id dict, eg. {'id':1}
+    return: {'error':xxxx}, status = 501/200
+    """
+    if request.method == 'POST':
+        data = JSONParser().parse(request)
+        src_id = data.get('src_id')
+        dst_id_list = data.get('dst_id')
+        editor_name = data.get('editor_name')
+        try:
+            src_setting = VideoSettingTable.objects.get(id=src_id)
+            src_dict = VideoSettingPartSerializer(src_setting).data
+            src_dict['editor_name']=editor_name
+            VideoSettingTable.objects.filter(id__in=dst_id_list).update(**src_dict)
+            # dst_setting_list.save()
+            # or target in dst_setting_list:
+            #
+            #     serializer = VideoSettingSerializer(target, data=src_dict)
+            #     if serializer.is_valid():
+            #         serializer.save()
+            return JSONResponse({'success':0}, status=200)
+        except Exception as e:
+            return JSONResponse({'error':e.message}, status=501)
