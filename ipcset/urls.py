@@ -32,6 +32,8 @@ urlpatterns = [
     url('^missions/(?P<mid>[0-9]+)/$', views.show_mission_detail_info),
 
     url(r'^api/settings/$', views.api_add_or_get_videosetting),
+    url(r'^api/settings/sync/$', views.api_sync_stream_setting),
+    url(r'^api/settings/sametype/$', views.api_get_same_type_by_id),
     url(r'^api/settings/(?P<id>[0-9]+)/$', views.api_edit_single_videosetting),
     url(r'^api/basic/model/$', views.api_get_model_type),
     url(r'^api/mission/$', views.api_get_add_put_mission),
