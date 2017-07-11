@@ -44,6 +44,9 @@
                       {% ifequal detail.status 0  %}
                       <td>等待设置</td>
                       {% endifequal %}
+                      {% ifequal detail.status 4  %}
+                      <td>同步OSD失败</td>
+                      {% endifequal %}
                       {% ifequal detail.status 5 %}
                       <td>设置完成</td>
                       {% endifequal %}
@@ -55,6 +58,9 @@
                       {% endifequal %}
                       {% ifequal detail.status 2  %}
                       <td>添加完成</td>
+                      {% endifequal %}
+                      {% ifequal detail.status 6  %}
+                      <td>未添加</td>
                       {% endifequal %}
                   </tr>
               {% endfor %}
