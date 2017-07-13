@@ -53,6 +53,9 @@
                       {% ifequal detail.status 3 %}
                       <td>设置失败</td>
                       {% endifequal %}
+                      {% ifequal detail.status 9 %}
+                      <td>连接失败</td>
+                      {% endifequal %}
                       {% ifequal detail.status 1  %}
                       <td>更新完成</td>
                       {% endifequal %}
@@ -60,7 +63,7 @@
                       <td>添加完成</td>
                       {% endifequal %}
                       {% ifequal detail.status 6  %}
-                      <td>未添加</td>
+                      <td>未记录型号</td>
                       {% endifequal %}
                   </tr>
               {% endfor %}
