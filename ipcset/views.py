@@ -328,7 +328,10 @@ def api_sync_stream_setting(request):
     """
     sync settings from source device to dst device
     input: src device id dict, eg. {'id':1}
-    return: {'error':xxxx}, status = 501/200
+    method: POST
+    return:
+        success:    {'success':'0'}, status_code = 200
+        fail:   {'error': error_msg}, status_code = 501
     """
     if request.method == 'POST':
         data = JSONParser().parse(request)
@@ -340,12 +343,25 @@ def api_sync_stream_setting(request):
             src_dict = VideoSettingPartSerializer(src_setting).data
             src_dict['editor_name']=editor_name
             VideoSettingTable.objects.filter(id__in=dst_id_list).update(**src_dict)
-            # dst_setting_list.save()
-            # or target in dst_setting_list:
-            #
-            #     serializer = VideoSettingSerializer(target, data=src_dict)
-            #     if serializer.is_valid():
-            #         serializer.save()
-            return JSONResponse({'success':0}, status=200)
+            return JSONResponse({'success': 0}, status=200)
         except Exception as e:
-            return JSONResponse({'error':e.message}, status=501)
+	        return JSONResponse({'error': e.message}, status=501)
+
+
+def api_batch_detele_videosetting(request):
+	"""
+	delete videosettings by id list
+	input: id list in json dict form, eg. {'id': [1,2,3,4,5]}
+	method: POST
+	return:
+		success   {'success':0},  status_code=204
+	    fail {'error': error_msg}, status_code=501
+	"""
+	if request.method == 'POST':
+		data = JSONParser().parse(request)
+		delete_id_list = data.get('id')
+		try:
+			setting_list = VideoSettingTable.objects.filter(id__in=delete_id_list)
+			setting_list.delete()
+		except Exception as e:
+			return JSONResponse({'error':e.message}, status=501)
