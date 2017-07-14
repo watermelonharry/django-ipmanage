@@ -34,9 +34,10 @@ views
 
 @login_required
 def welcome(request):
-    return render_to_response('ipc_hello.html', {'firstTitle': u'IPC批量IP设置工具',
-                                                 'firstTitle_content': u'批量管理IPC的IP地址'},
-                              context_instance=RequestContext(request))
+    return HttpResponseRedirect('/ipcmanage/iptables/')
+    # return render_to_response('ipc_hello.html', {'firstTitle': u'IPC批量IP设置工具',
+    #                                              'firstTitle_content': u'批量管理IPC的IP地址'},
+    #                           context_instance=RequestContext(request))
 
 @login_required
 def show_ip_table(request):
@@ -63,11 +64,8 @@ def show_mission_info(request):
 @login_required
 def download_iptables(reqeust):
     ip_list = (k.get_content() for k in CnStaticIpcTable.objects.all())
-    # ip_list = CnStaticIpTableSerializer(ip_list, many=True).data
-    # content_json = unicode(JSONRenderer().render(ip_list))
     response = StreamingHttpResponse(ip_list, content_type = 'APPLICATION/OCTET=STREAM')
-    response['Content-Disposition'] = 'attachment; filename=ip_mac.txt'
-    # response['Content-Length'] = len(ip_list)
+    response['Content-Disposition'] = 'attachment; filename=ip_mac.dat'
     return response
 
 @csrf_exempt
