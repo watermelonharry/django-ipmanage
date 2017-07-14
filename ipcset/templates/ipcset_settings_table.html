@@ -187,14 +187,14 @@
                             <label class="col-sm-4 control-label">起始IP</label>
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="auto_start_ip" name="start_ip" value=""
-                                       placeholder="192.168.1.2" required>
+                                       placeholder="eg: 192.168.1.2" required>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="col-sm-4 control-label">扫描数量</label>
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="auto_total_count" name="total_count" value=""
-                                       placeholder="254" required>
+                                       placeholder="eg: 254" required>
                             </div>
                         </div>
                     </form>
@@ -209,6 +209,7 @@
                     </div>
                     <button type="button" class="btn btn-sm btn-success" id="show_scan_detail_btn" name="">查看详细</button>
                     <button type="button" class="btn btn-sm btn-success" id="confirm_scan_btn">开始</button>
+                    <button type="button" class="btn btn-sm btn-danger btn_terminate" id="scan_terminate_btn">终止</button>
                     <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_scan_btn"
                             name="">关闭
                     </button>
@@ -473,7 +474,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-success" id="show_detail_btn" name="">查看详细</button>
-                    <button type="button" class="btn btn-sm btn-success" id="no_name_btn">确定</button>
+                    <button type="button" class="btn btn-sm btn-danger btn_terminate" id="terminate_set_btn">终止</button>
                     <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_setting_btn">退出
                     </button>
                 </div>
@@ -486,6 +487,7 @@
         var id_list = [];
         var model_list = [];
         var timer_id;
+        $('.btn_terminate').hide();
 
 {#              <!--下载配置-->#}
 {#      $('#down_load_settings_btn').on('click',function(){#}
@@ -519,6 +521,7 @@
         $('#batch_delete_btn').click(function () {
             id_list = get_main_select_id();
             console.log(id_list);
+            if(id_list.length == 0){return;};
             $.ajax({
                 type: "GET",
                 url: "/ipcset/api/settings/",
@@ -624,6 +627,38 @@
             })
         });
 
+        <!--终止自动扫描-->
+        $('#scan_terminate_btn').click(function () {
+            var js_data={
+                'mission_id':$('#show_scan_detail_btn').attr('name'),
+                'editor_name':$('#login_user_name').val(),
+                'run_status':0
+            }
+            console.log("terminate_btn.",js_data);
+            $.ajax({
+                type: "PUT",
+                url: "/ipcset/api/mission/",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(js_data),
+                success: function (msg) {
+                    console.log("success", msg);
+                    if(msg.run_status==0){
+                        alert("任务已终止！");
+                        location.reload();
+                    }else{
+                        alert("终止失败！");
+                    }
+
+                    $('#scan_terminate_btn').show();
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                    alert("连接失败！ error-" + e.status);
+                }
+            });
+        });
+
         <!--开始自动扫描-->
         $('#confirm_scan_btn').click(function () {
             var m_data = {
@@ -631,7 +666,8 @@
                 'mission_id': getTimeId(),
                 'start_ip': $('#auto_start_ip').val(),
                 'total_count': $('#auto_total_count').val(),
-                'mission_type': 2
+                'mission_type':2,
+                'run_status':1,
             };
             if(m_data.start_ip.split('.').length != 4){
                 alert("error:请输入合法IP地址！");
@@ -657,6 +693,8 @@
                     console.log('start timer:' + timer_id);
                     $('#confirm_scan_btn').attr({'disabled':"disabled"});
                     $('#scan_modal_body').hide();
+                    $('#confirm_scan_btn').hide();
+                    $('#scan_terminate_btn').show();
                 },
                 error: function (e) {
                     console.log("failed", e);
@@ -774,7 +812,8 @@
                 'mission_id': getTimeId(),
                 'total_count': id_list.length,
                 'detail_id': id_list,
-                'mission_type': 1
+                'mission_type': 1,
+                'run_status':1
             };
             $('#show_detail_btn').attr("name", json_data.mission_id);
             console.log(json_data);
@@ -792,6 +831,7 @@
                         $('#scanning_modal').modal('toggle');
                         timer_id = window.setInterval(on_time_check, 5000);
                         console.log('start timer:' + timer_id);
+                        $('#terminate_set_btn').show();
                     },
                     error: function (e) {
                         console.log("failed", e);
@@ -803,6 +843,36 @@
                 alert("请选择执行目标！")
             }
 
+        });
+
+        <!--取消设置-->
+        $('#terminate_set_btn').click(function () {
+            var js_data={
+                'mission_id':$('#show_detail_btn').attr('name'),
+                'editor_name':$('#login_user_name').val(),
+                'run_status':0
+            }
+            console.log("terminate_btn.",js_data);
+            $.ajax({
+                type: "PUT",
+                url: "/ipcset/api/mission/",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(js_data),
+                success: function (msg) {
+                    console.log("success", msg);
+                    if(msg.run_status==0){
+                        alert("任务已终止！");
+                        location.reload();
+                    }else{
+                        alert("终止失败！");
+                    };
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                    alert("连接失败！ error-" + e.status);
+                }
+            });
         })
 
 
