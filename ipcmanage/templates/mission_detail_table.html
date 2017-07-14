@@ -40,7 +40,7 @@
                       {% ifequal ip.status 4 %}
                       <td>设置完成</td>
                       {% endifequal %}
-                  <td>{{ ip.edit_time }}</td>
+                  <td>{{ ip.edit_time|date:"Y-m-d,G:i" }}</td>
                   </td>
 
                   </tr>
