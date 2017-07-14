@@ -24,7 +24,16 @@
                       data-target="#scan_modal" data-backdrop="static">自动扫描 &raquo;</a></p>
                 <p>扫描局域网中的设备。</p>
             </div>
-
+        </div>
+        <div class="row">
+            <div class="col-lg-3">
+                <p><a class="btn btn-info" role="button" id="down_load_settings_btn" href={% url 'download_video_setting' %}>下载配置&raquo;</a></p>
+                <p>保存已有的设置到本地文件中</p>
+            </div>
+            <div class="col-lg-3">
+                <p><a class="btn btn-info" href="/ipcset/basic/model/" role="button">查看信息&raquo;</a></p>
+                <p>查看已保存的设备基础信息</p>
+            </div>
         </div>
     </div>
     <hr>
@@ -408,7 +417,7 @@
                         <div class="form-group">
                             <label for="edit_people" class="col-sm-4 control-label">修改人*</label>
                             <div class="col-sm-5">
-                                <input type="text" class="form-control" id="start_editor_name" value="">
+                                <input type="text" class="form-control" id="start_editor_name" value="" required>
                             </div>
                         </div>
                     </form>
@@ -450,6 +459,10 @@
         var model_list = [];
         var timer_id;
 
+{#              <!--下载配置-->#}
+{#      $('#down_load_settings_btn').on('click',function(){#}
+{#        location.href={% url 'download_video_setting' %};#}
+{#      });#}
         <!--同步窗口设置-->
         <!--关闭同步窗口-->
 
