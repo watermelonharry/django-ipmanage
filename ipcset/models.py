@@ -128,6 +128,8 @@ class MissionInfoTable(models.Model):
     edit_time = models.DateTimeField(auto_now=True)
 
     start_ip = models.IPAddressField(default='192.168.1.2')
+    # running flag, 1: run,  0: terminate
+    run_status = models.IntegerField(max_length=1, null=True)
 
 
     ##任务类型，1：设置设备  2：发现设备
