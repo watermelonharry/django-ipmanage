@@ -34,6 +34,11 @@
                 <p><a class="btn btn-info" href="/ipcset/basic/model/" role="button">查看信息&raquo;</a></p>
                 <p>查看已保存的设备基础信息</p>
             </div>
+            <div class="col-lg-3">
+                <p><a class="btn btn-warning"  role="button" id="batch_delete_btn" data-toggle="modal"
+                      data-target="#batch_delete_modal" data-backdrop="static">批量删除&raquo;</a></p>
+                <p>批量删除已勾选的条目</p>
+            </div>
         </div>
     </div>
     <hr>
@@ -98,6 +103,40 @@
     </div>
     <hr>
 
+    <!--批量删除窗口-->
+    <div class="modal fade" id="batch_delete_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>批量删除</h3>
+                    <p>确认删除以下条目？</p>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="batch_delete_table">
+                            <thead>
+                            <tr class=locktop>
+                                <th>MAC地址</th>
+                                <th>IP地址</th>
+                                <th>IPC型号</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-success" id="confirm_batch_delete_btn">确定</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_batch_delete_btn">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!--同步窗口-->
     <div class="modal fade" id="copy_modal">
         <div class="modal-dialog">
@@ -118,23 +157,12 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {#              <td><input type="checkbox" class="checkbox-single sync_page" name={{setting.id}} value={{setting.id}}></td>#}
-                            {#                  <td>{{ setting.mac_addr }}</td>#}
-                            {#                  <td>{{ setting.current_ip }}</td>#}
                             </tbody>
                         </table>
 
                     </div>
                 </div>
                 <div class="modal-footer">
-                    {#            <form class="form-horizontal" role="form">#}
-                    {#                    <div class="form-group">#}
-                    {#                      <label for="edit_people" class="col-sm-4 control-label">修改人*</label>#}
-                    {#                      <div class="col-sm-5">#}
-                    {#                          <input type="text" class="form-control" id="start_editor_name" value="">#}
-                    {#                      </div>#}
-                    {#                    </div>#}
-                    {#                  </form>#}
                     <input type="hidden" name="src_id" id="copy_src_id" value="">
                     <button type="button" class="btn btn-sm btn-success" id="confirm_copy_btn" name="">确定</button>
                     <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_copy_btn">关闭
@@ -152,25 +180,7 @@
                     <h3>扫描局域网</h3>
                     <p>自动扫描局域网内的在线设备，获取其信息并添加到数据库</p>
                     <p>点击“开始”后，系统会下发任务至终端，自动开始执行</p>
-                    {#              <p>已添加设备如下</p>#}
                 </div>
-                {#              <div class="modal-body">#}
-                {#                  <div class="table-responsive">#}
-                {#            <table class="table table-striped" id="scaned_device">#}
-                {#              <thead>#}
-                {#                <tr class=locktop>#}
-                {#                  <th>MAC地址</th>#}
-                {#                  <th>IP地址</th>#}
-                {#                  <th>IPC型号</th>#}
-                {#                </tr>#}
-                {#              </thead>#}
-                {#              <tbody>#}
-                {##}
-                {#                </tbody>#}
-                {#              </table>#}
-
-                {#                </div>#}
-                {#              </div>#}
                 <div class="modal-footer">
                     <div id="show_scan_progress" hidden>
                         <p>请确认执行终端已开启，等待扫描完成</p>
@@ -189,7 +199,7 @@
         </div>
     </div>
 
-
+    <!--编辑单条记录-->
     <div class="modal fade" id="edit_modal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -297,14 +307,14 @@
                             <label for="edit_mac" class="col-sm-4 control-label">MAC地址</label>
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="mac_addr" name="mac_addr"
-                                       placeholder="请输入MAC地址">
+                                       placeholder="请输入MAC地址" required>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="edit_ip" class="col-sm-4 control-label">IP地址</label>
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="current_ip" name="current_ip"
-                                       placeholder="请输入IP地址">
+                                       placeholder="请输入IP地址" required>
                             </div>
                         </div>
                         <div class="form-group">
@@ -371,7 +381,7 @@
                             <label for="edit_people" class="col-sm-4 control-label">修改人</label>
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="editor_name" name="editor_name"
-                                       value={{ user.username }}>
+                                       value={{ user.username }} required>
                             </div>
                         </div>
                         <input type="hidden" class="form-control" id="id" name="id">
@@ -417,7 +427,7 @@
                         <div class="form-group">
                             <label for="edit_people" class="col-sm-4 control-label">修改人*</label>
                             <div class="col-sm-5">
-                                <input type="text" class="form-control" id="start_editor_name" value="" required>
+                                <input type="text" class="form-control" id="start_editor_name" value={{ user.username }} required>
                             </div>
                         </div>
                     </form>
@@ -463,9 +473,69 @@
 {#      $('#down_load_settings_btn').on('click',function(){#}
 {#        location.href={% url 'download_video_setting' %};#}
 {#      });#}
+        <!--批量删除-->
+        <!--确定删除-->
+        $('#confirm_batch_delete_btn').click(function () {
+            var js_data = {
+                'id':id_list
+            };
+            console.log("batch delete.", js_data.id);
+            $.ajax({
+                type:"POST",
+                url: "/ipcset/api/settings/batch/",
+                data: JSON.stringify(js_data),
+                success: function (js_data) {
+                    console.log("success", js_data);
+                    alert("操作成功");
+                    $('#batch_delete_modal').hide();
+                    location.reload();
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                    alert("删除失败。error code:"+e.error);
+                }
+            })
+        });
+
+        <!--显示modal-->
+        $('#batch_delete_btn').click(function () {
+            id_list = get_main_select_id();
+            console.log(id_list);
+            $.ajax({
+                type: "GET",
+                url: "/ipcset/api/settings/",
+                // dataType:"json",
+                // contentType:"application/json",
+                data: {"id": id_list},
+                success: function (js_data) {
+                    console.log("success", js_data);
+
+                    $.each(js_data, function () {
+                        $("#batch_delete_modal tbody").append("<tr></tr>");
+                        var mac_addr = "<td>" + this.mac_addr + "</td>";
+                        var current_ip = "<td>" + this.current_ip + "</td>";
+                        var type_id = "<td>" +  this.type_id.model_name + "</td>";
+                        $("#batch_delete_modal tbody tr:last").append(mac_addr, current_ip, type_id);
+                    });
+
+
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                    alert("获取信息失败，请检查网络设置。error code:"+e.status);
+                }
+            });
+        });
+
+        $('#abort_batch_delete_btn').click(function () {
+            $('#batch_delete_modal tbody').empty();
+            $('#batch_delete_modal').hide();
+            id_list=[];
+        });
+
+
         <!--同步窗口设置-->
         <!--关闭同步窗口-->
-
         <!--确定同步-->
         $('#confirm_copy_btn').click(function () {
             var up_data = {
