@@ -74,4 +74,4 @@ class MissionInfoSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
 		model = MissionInfoTable
 		##任务类型，1：设置设备  2：发现设备
-		fields = ('id', 'mission_id', 'total_count', 'progress', 'editor_name', 'remote_id', 'mission_type')
+		fields = ('id', 'mission_id', 'total_count', 'progress', 'start_ip', 'editor_name', 'remote_id', 'mission_type')
