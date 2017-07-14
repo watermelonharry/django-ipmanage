@@ -218,9 +218,9 @@ def api_get_add_put_mission(request):
 		mid = data.get('mission_id')
 		minfo = MissionInfoTable.objects.get(mission_id=mid)
 		serializer = MissionInfoSerializer(minfo, data=data)
-	if serializer.is_valid():
-		serializer.save()
-		return JSONResponse(serializer.data, status=200)
+		if serializer.is_valid():
+			serializer.save()
+			return JSONResponse(serializer.data, status=200)
 	return JSONResponse(serializer.errors, status=400)
 
 
