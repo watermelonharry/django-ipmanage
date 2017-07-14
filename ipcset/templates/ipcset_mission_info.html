@@ -1,60 +1,68 @@
 {% extends "ipcset_banner.html" %}
-  {% block content %}
-      <div class="container">
-       <p><h4><a href="/ipcset/settings/">码流参数设置</a> >> 任务信息查看</h4></p>
-      <hr>
-      <h2 class="sub-header">任务列表</h2>
-          <div class="table-responsive">
+{% block content %}
+    <div class="container">
+        <p><h4><a href="/ipcset/settings/">码流参数设置</a> >> 任务信息查看</h4></p>
+        <hr>
+        <h2 class="sub-header">任务列表</h2>
+        <div class="table-responsive">
             <table class="table table-striped" id="mission_table">
-              <thead>
+                <thead>
                 <tr>
-                  <th>序号</th>
-                  <th>任务ID</th>
-                  <th>操作人</th>
-                  <th>设置数量</th>
-                  <th>进度</th>
-                  <th>执行终端</th>
-                  <th>#</th>
+                    <th>序号</th>
+                    <th>创建时间</th>
+                    <th>操作人</th>
+                    <th>设置数量</th>
+                    <th>进度</th>
+                    <th>执行终端</th>
+                    <th>任务类型</th>
+                    <th>#</th>
                 </tr>
-              </thead>
-              <tbody>
-              {% for mission in mission_list %}
-                  <tr>
-                  <td>{{ forloop.counter }}</td>
-                  <td>{{ mission.mission_id }}</td>
-                  <td>{{ mission.editor_name }}</td>
-                  <td>{{ mission.total_count }}</td>
-                  <td>{{ mission.progress }}</td>
-                  <td>{{ mission.remote_id }}</td>
-                  <td><a class="btn-sm btn-primary btn-show-detail" name = {{mission.mission_id}} role="button">查看详细</a>
-                      <a class="btn-sm btn-danger btn-mission-del" name={{ mission.mission_id }} role="button">删除任务</a>
-                  </td>
+                </thead>
+                <tbody>
+                {% for mission in mission_list %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ mission.create_time|date:"Y-m-d,G:i" }}</td>
+                        <td>{{ mission.editor_name }}</td>
+                        <td>{{ mission.total_count }}</td>
+                        <td>{{ mission.progress }}</td>
+                        <td>{{ mission.remote_id }}</td>
+                        {% ifequal mission.mission_type 1 %}
+                            <td>批量设置</td>
+                        {% endifequal %}
+                        {% ifequal mission.mission_type 2 %}
+                            <td>自动扫描</td>
+                        {% endifequal %}
 
-                  </tr>
-              {% endfor %}
-              </tbody>
+                        <td><a class="btn-sm btn-info btn-show-detail" name={{ mission.mission_id }} role="button">查看</a>
+                            <a class="btn-sm btn-danger btn-mission-del" name={{ mission.mission_id }} role="button">删除</a>
+                        </td>
+
+                    </tr>
+                {% endfor %}
+                </tbody>
             </table>
-          </div>
         </div>
-      </div>
+    </div>
+    </div>
 
-      <script>
-      <!--查看明细-->
-      $('.btn-show-detail').on('click', function () {
-          window.open('/ipcset/missions/'+this.name);
-          });
-      $('.btn-mission-del').click(function(){
-          $.ajax({
-              type:"DELETE",
-              url:"/ipcset/api/mission/"+this.name,
-              success:function(e){
-                  alert("删除成功!");
-                  location.reload();
-              },
-              error:function(e){
-                  alert("删除失败"+String(e));
-              }
-          })
-      })
-      </script>
-  {% endblock %}
+    <script>
+        <!--查看明细-->
+        $('.btn-show-detail').on('click', function () {
+            window.open('/ipcset/missions/' + this.name);
+        });
+        $('.btn-mission-del').click(function () {
+            $.ajax({
+                type: "DELETE",
+                url: "/ipcset/api/mission/" + this.name,
+                success: function (e) {
+                    alert("删除成功!");
+                    location.reload();
+                },
+                error: function (e) {
+                    alert("删除失败" + String(e));
+                }
+            })
+        })
+    </script>
+{% endblock %}
