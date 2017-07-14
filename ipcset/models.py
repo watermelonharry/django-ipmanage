@@ -103,9 +103,12 @@ class VideoSettingTable(models.Model):
     def __unicode__(self):
         return unicode(self.mac_addr)
 
-    def get_content(self):
-        # todo:
-        pass
+    def get_download_content(self):
+        return u','.join(map(unicode, [self.edit_time.strftime('%Y-%m-%d %H:%M:%S'),
+                                       self.mac_addr, self.current_ip, self.type_id.model_name,
+                                       self.set_resolution, self.set_bitrate, self.set_framerate,
+                                       self.set_min_resolution, self.set_min_bitrate, self.set_min_framerate,
+                                       self.editor_name])) + u'\n'
 
     class Meta:
         ordering = ('id',)
