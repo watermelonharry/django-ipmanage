@@ -385,5 +385,6 @@ def api_batch_detele_videosetting(request):
 		try:
 			setting_list = VideoSettingTable.objects.filter(id__in=delete_id_list)
 			setting_list.delete()
+			return JSONResponse({'success':0}, status=200)
 		except Exception as e:
 			return JSONResponse({'error': e.message}, status=501)
