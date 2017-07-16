@@ -3,6 +3,7 @@
 from rest_framework import serializers
 from models import *
 
+
 # class CnStaticIpTableSerializer(serializers.Serializer):
 #     mac_addr = serializers.CharField(required=True, max_length=16)
 #     static_ip = serializers.IPAddressField(required=True)
@@ -32,16 +33,18 @@ from models import *
 
 
 class CnStaticIpTableSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = CnStaticIpcTable
-        fields = ('id','mac_addr','static_ip','osd_text','editor_name')
+	class Meta:
+		model = CnStaticIpcTable
+		fields = ('id', 'mac_addr', 'static_ip', 'osd_text', 'editor_name')
+
 
 class CnOperateInfoSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = CnIpcOperateInfo
-        fields = ('id','operate_id','operator_name','operate_type', 'ip_start', 'ip_count', 'progress')
+	class Meta:
+		model = CnIpcOperateInfo
+		fields = ('id', 'operate_id', 'operator_name', 'operate_type', 'run_status', 'ip_start', 'ip_count', 'progress')
+
 
 class CnIpcLogDetailSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = CnIpcChangeLogDetail
-        fields = ('id','operate_id','ipc_id', 'mac_addr', 'static_ip', 'osd_text', 'ori_ip', 'status', 'edit_time')
+	class Meta:
+		model = CnIpcChangeLogDetail
+		fields = ('id', 'operate_id', 'ipc_id', 'mac_addr', 'static_ip', 'osd_text', 'ori_ip', 'status', 'edit_time')
