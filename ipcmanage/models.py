@@ -72,13 +72,15 @@ class CnIpcOperateInfo(models.Model):
 	操作记录表格
 	"""
 	operator_name = models.CharField(max_length=20)
-	operate_type = models.IntegerField(max_length=2)
+	operate_type = models.IntegerField(max_length=2, blank=True)
 	create_time = models.DateTimeField(auto_now_add=True)
 	# 操作批次ID,以time.time()整数位为id
-	operate_id = models.CharField(max_length=20, )
-	ip_start = models.IPAddressField()
-	ip_count = models.IntegerField(max_length=3)
-	progress = models.IntegerField(max_length=3, default=0)
+	operate_id = models.CharField(max_length=20, blank=True)
+	ip_start = models.IPAddressField(blank=True)
+	ip_count = models.IntegerField(max_length=3, blank=True)
+	progress = models.IntegerField(max_length=3, blank=True)
+
+	run_status = models.IntegerField(max_length=1, blank=True)
 
 	def __unicode__(self):
 		return self.operate_id + u'|' + self.operator_name
