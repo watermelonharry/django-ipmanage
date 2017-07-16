@@ -29,22 +29,12 @@ urlpatterns = [
     url('^iptables/download/$',views.download_iptables),
     url('^mission_detail/(?P<operate_id>[0-9]+)/$',views.show_mission_datail),
     url('^mission/$',views.show_mission_info),
-    # url('^caselist/$', views.case_list),
-    # url('^testerlist/$', views.tester_list),
-    # url('^subscribelist/$', views.subs_list),
-    # url('^subscribelist/new$', views.new_test_plan),
-    # url('^operateinfo/$', views.operate_list),
-    # url('^testsuitelist/(?P<suiteId>\d+)/$', views.testsuite_list),
-    # url('^testsuitelist/$', views.testsuite_list),
-    # url('^static/assets/css/main.css/$', views.returncss),
 
     ##api urls
-    # url(r'^api/', include(router.urls)),
-    # url(r'^api/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/tables/$', views.api_ip_list),
     url(r'^api/tables/(?P<id>[0-9]+)/$', views.api_ip_mac_detail),
     url(r'^api/mission/$', views.api_start_set_ipc),
     url(r'^api/mission/wait/$', views.api_plan_unfinished),
-    url(r'^api/mission/(?P<operate_id>[0-9]+)/$', views.api_operate_info),
+    url(r'^api/mission/(?P<operate_id>[0-9]+)/$', views.api_put_get_delete_operate_info),
     url(r'^api/mission/detail/$', views.api_operate_detail),
 ]
