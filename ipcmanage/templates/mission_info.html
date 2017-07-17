@@ -1,74 +1,84 @@
 {% extends "ipc_banner.html" %}
-  {% block content %}
-      <hr>
-      <div class="container">
-      <h2 class="sub-header">任务列表</h2>
-          <div class="table-responsive">
+{% block content %}
+    <hr>
+    <div class="container">
+        <h2 class="sub-header">任务列表</h2>
+        <div class="table-responsive">
             <table class="table table-striped" id="mission_table">
-              <thead>
+                <thead>
                 <tr>
-                  <th>序号</th>
-                  <th>任务ID</th>
-                  <th>操作人</th>
-                  <th>起始IP</th>
-                  <th>设置数量</th>
-                  <th>进度</th>
-                  <th>操作类型</th>
-                  <th>#</th>
+                    <th>序号</th>
+                    <th>创建时间</th>
+                    <th>操作人</th>
+                    <th>起始IP</th>
+                    <th>设置数量</th>
+                    <th>进度</th>
+                    <th>操作类型</th>
+                    <th>任务状态</th>
+                    <th>#</th>
                 </tr>
-              </thead>
-              <tbody>
-              {% for mission in info_list %}
-                  <tr>
-                  <td>{{ forloop.counter }}</td>
-                  <td>{{ mission.operate_id }}</td>
-                  <td>{{ mission.operator_name }}</td>
-                  <td>{{ mission.ip_start }}</td>
-                  <td>{{ mission.ip_count }}</td>
-                  <td>{{ mission.progress }}</td>
-                  {% ifequal mission.operate_type 1 %}
-                  <td>增加IPC</td>
-                  {% endifequal %}
+                </thead>
+                <tbody>
+                {% for mission in info_list %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ mission.create_time|date:"Y-m-d,G:i" }}</td>
+                        <td>{{ mission.operator_name }}</td>
+                        <td>{{ mission.ip_start }}</td>
+                        <td>{{ mission.ip_count }}</td>
+                        <td>{{ mission.progress }}</td>
+                        {% ifequal mission.operate_type 1 %}
+                            <td>增加IPC</td>
+                        {% endifequal %}
 
-                  {% ifequal mission.operate_type 2 %}
-                  <td>删除IPC</td>
-                  {% endifequal %}
+                        {% ifequal mission.operate_type 2 %}
+                            <td>删除IPC</td>
+                        {% endifequal %}
 
-                  {% ifequal mission.operate_type 3 %}
-                  <td>修改IPC地址</td>
-                  {% endifequal %}
+                        {% ifequal mission.operate_type 3 %}
+                            <td>修改IPC地址</td>
+                        {% endifequal %}
 
-                  <td><a class="btn-sm btn-primary btn-show-detail" name = {{mission.operate_id}} role="button">查看详细</a>
-                      <a class="btn-sm btn-danger btn-mission-del" name={{ mission.operate_id }} role="button">删除任务</a>
-                  </td>
+                        {% ifequal mission.run_status 1 %}
+                            <td><span class="label label-info">正常</span></td>
+                        {% endifequal %}
+                        {% ifequal mission.run_status 0 %}
+                            <td><span class="label label-danger">终止</span></td>
+                        {% endifequal %}
 
-                  </tr>
-              {% endfor %}
-              </tbody>
+                        <td><a class="btn-sm btn-primary btn-show-detail"
+                               name={{ mission.operate_id }} role="button">查看</a>
+                            <a class="btn-sm btn-danger btn-mission-del"
+                               name={{ mission.operate_id }} role="button">删除</a>
+                        </td>
+
+                    </tr>
+                {% endfor %}
+                </tbody>
             </table>
-          </div>
         </div>
-      </div>
+    </div>
+    </div>
     <hr>
 
-      <script>
-      <!--查看明细-->
-      $('.btn-show-detail').on('click', function () {
-          window.open('/ipcmanage/mission_detail/'+this.name);
-          });
+    <script>
+        <!--查看明细-->
+        $('.btn-show-detail').on('click', function () {
+            window.open('/ipcmanage/mission_detail/' + this.name);
+        });
 
-      $('.btn-mission-del').click(function(){
-          $.ajax({
-              type:"DELETE",
-              url:"/ipcmanage/api/mission/"+this.name,
-              success:function(e){
-                  alert("删除成功!");
-                  location.reload();
-              },
-              error:function(e){
-                  alert("删除失败"+String(e));
-              }
-          })
-      })
-      </script>
-  {% endblock %}
+        $('.btn-mission-del').click(function () {
+            $.ajax({
+                type: "DELETE",
+                url: "/ipcmanage/api/mission/" + this.name,
+                success: function (e) {
+                    alert("删除成功!");
+                    location.reload();
+                },
+                error: function (e) {
+                    alert("删除失败" + String(e));
+                }
+            })
+        })
+    </script>
+{% endblock %}

@@ -47,7 +47,7 @@ def welcome(request):
 def show_ip_table(request):
 	ip_list = CnStaticIpcTable.objects.all()
 	return render_to_response('ipc_mac_ip_table.html',
-	                          {'firstTitle': u'批量IP设置',
+	                          {'firstTitle': u'IP批量设置',
 	                           'firstTitle_content': u'开始设置后，系统会自动连接指定IP，查找其对应的IP，随后对设备进行“恢复出厂-设置至指定IP-更新OSD”的操作',
 	                           'ip_list': ip_list},
 	                          context_instance=RequestContext(request))
@@ -56,18 +56,19 @@ def show_ip_table(request):
 @login_required
 def show_mission_datail(request, operate_id):
 	detail_list = CnIpcChangeLogDetail.objects.filter(operate_id=operate_id)
-	return render_to_response('mission_detail_table.html', {'firstTitle': u'IPC批量IP设置工具',
+	create_time = CnIpcOperateInfo.objects.get(operate_id=operate_id).create_time
+	return render_to_response('mission_detail_table.html', {'firstTitle': u'IP批量设置',
 	                                                        'firstTitle_content': u'查看任务明细',
 	                                                        'detail_list': detail_list,
-	                                                        'operate_id': operate_id},
+	                                                        'create_time': create_time},
 	                          context_instance=RequestContext(request))
 
 
 @login_required
 def show_mission_info(request):
 	mission_info_list = CnIpcOperateInfo.objects.all()
-	return render_to_response('mission_info.html', {'firstTitle': u'IPC批量IP设置工具',
-	                                                'firstTitle_content': u'查看历史任务',
+	return render_to_response('mission_info.html', {'firstTitle': u'IP批量设置',
+	                                                'firstTitle_content': u'查看任务信息',
 	                                                'info_list': mission_info_list},
 	                          context_instance=RequestContext(request))
 

@@ -1,7 +1,7 @@
 {% extends "ipc_banner.html" %}
   {% block content %}
       <div class="container">
-      <h2 class="sub-header">任务详细状态 | 任务ID：{{ operate_id }}</h2>
+      <h2 class="sub-header">任务详细状态 | 创建时间：{{ create_time|date:'Y-m-d,G:i' }}</h2>
           <div class="table-responsive">
             <table class="table table-striped" id="mac_table">
               <thead>
