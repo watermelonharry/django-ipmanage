@@ -47,14 +47,14 @@ def welcome(request):
 
 @login_required
 def show_basic_info(request):
-	return render(request, 'ipcset_basic.html', {'firstTitle': u'码流参数批量设置工具',
+	return render(request, 'ipcset_basic.html', {'firstTitle': u'码流参数批量设置',
 	                                             'firstTitle_content': u'批量设置指定IPC的码流参数，同步OSD显示'})
 
 
 @login_required
 def show_basic_model_info(request):
 	model_list = BaseTypeTable.objects.all()
-	return render_to_response('ipcset_basic_model.html', {'firstTitle': u'码流参数批量设置工具',
+	return render_to_response('ipcset_basic_model.html', {'firstTitle': u'码流参数批量设置',
 	                                                      'firstTitle_content': u'设备型号信息查看',
 	                                                      'model_list': model_list},
 	                          context_instance=RequestContext(request))
@@ -63,7 +63,7 @@ def show_basic_model_info(request):
 @login_required
 def show_settings_info(request):
 	setting_list = VideoSettingTable.objects.all()
-	return render_to_response('ipcset_settings_table.html', {'firstTitle': u'码流参数批量设置工具',
+	return render_to_response('ipcset_settings_table.html', {'firstTitle': u'码流参数批量设置',
 	                                                         'firstTitle_content': u'查看详细参数设置',
 	                                                         'setting_list': setting_list},
 	                          context_instance=RequestContext(request))
@@ -72,7 +72,7 @@ def show_settings_info(request):
 @login_required
 def show_mission_info(request):
 	mission_list = MissionInfoTable.objects.all()
-	return render_to_response('ipcset_mission_info.html', {'firstTitle': u'码流参数批量设置工具',
+	return render_to_response('ipcset_mission_info.html', {'firstTitle': u'码流参数批量设置',
 	                                                       'firstTitle_content': u'查看任务状态',
 	                                                       'mission_list': mission_list},
 	                          context_instance=RequestContext(request))
@@ -82,7 +82,7 @@ def show_mission_info(request):
 def show_mission_detail_info(request, mid):
 	mission = MissionInfoTable.objects.get(mission_id=mid)
 	detail_list = MissionDetailTable.objects.filter(mission_id=mid)
-	return render_to_response('ipcset_mission_detail.html', {'firstTitle': u'码流参数批量设置工具',
+	return render_to_response('ipcset_mission_detail.html', {'firstTitle': u'码流参数批量设置',
 	                                                         'firstTitle_content': u'查看任务明细',
 	                                                         'detail_list': detail_list,
 	                                                         'mission_create_time': mission.create_time},
