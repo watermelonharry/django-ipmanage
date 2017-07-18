@@ -118,22 +118,23 @@ class MissionInfoTable(models.Model):
     """
     任务简表
     """
-    mission_id = models.CharField(max_length=20,unique=True)
-    total_count = models.IntegerField(max_length=5, default=254)
-    progress = models.IntegerField(max_length=5, default='0')
+    #todo: progress的default = 0会被终止的post(不带progress)影响
+    mission_id = models.CharField(max_length=20, unique=True)
+    total_count = models.IntegerField(max_length=5, blank=True)
+    progress = models.IntegerField(max_length=5, blank=True)
 
-    remote_id = models.CharField(max_length=20, default='0')
-    editor_name = models.CharField(max_length=20)
+    remote_id = models.CharField(max_length=20, blank=True)
+    editor_name = models.CharField(max_length=20, blank=True)
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 
-    start_ip = models.IPAddressField(default='192.168.1.2')
+    start_ip = models.IPAddressField(blank=True)
     # running flag, 1: run,  0: terminate
-    run_status = models.IntegerField(max_length=1, null=True)
+    run_status = models.IntegerField(max_length=1, blank=True)
 
 
     ##任务类型，1：设置设备  2：发现设备
-    mission_type = models.IntegerField(max_length=2, default=1)
+    mission_type = models.IntegerField(max_length=2, blank=True)
 
     def __unicode__(self):
         return unicode(self.mission_id)
