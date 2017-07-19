@@ -811,9 +811,11 @@
             var json_data = {
                 'editor_name': $('#start_editor_name').val(),
                 'mission_id': getTimeId(),
+                'start_ip':'0.0.0.0',
                 'total_count': id_list.length,
                 'detail_id': id_list,
                 'mission_type': 1,
+                'progress':0,
                 'run_status':1
             };
             $('#show_detail_btn').attr("name", json_data.mission_id);
