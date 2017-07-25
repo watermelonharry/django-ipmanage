@@ -5,6 +5,10 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
+from django.views.generic.detail import DetailView
+from django.utils.decorators import method_decorator
+from userManage.models import ApiKeyModel
+
 
 # Create your views here.
 
@@ -61,3 +65,15 @@ def user_logout(request):
 	              'user_success.html',
 	              {'notice': u'注销成功,即将跳转到主页...',
 	               'next_url': '/hello/'})
+
+
+class ProfileView(DetailView):
+	template_name = "user_profile.html"
+	model = ApiKeyModel
+	content = {'firstTile':None,
+	           'firstTitle_content':u'用户详情'}
+
+	@method_decorator(login_required)
+	def get(self, request):
+		user = request.user.username
+		return render(request,self.template_name, self.content)

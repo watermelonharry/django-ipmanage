@@ -23,4 +23,5 @@ urlpatterns = [
     url('^login/$', views.user_login, name='user_login'),
     url('^register/$', views.user_register, name='user_register'),
     url('^logout/$', views.user_logout, name='user_logout'),
+    url('^profile/$', views.ProfileView.as_view(), name='user_profile'),
 ]
