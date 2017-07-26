@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
 from django.http import HttpResponseNotAllowed, HttpResponseRedirect
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.views.generic.detail import DetailView
 from django.utils.decorators import method_decorator
-from userManage.models import ApiKeyModel
+from userManage.models import ApiKeyModel, UserApiModel
 
 
-# Create your views here.
+# from django.contrib.auth.models import User
+
+
 
 
 def user_login(request):
@@ -46,11 +47,13 @@ def user_register(request):
 		email_addr = request.POST.get('inputEmail')
 		real_name = request.POST.get('real_name')
 		try:
-			new_user = User.objects.create_user(username=user_name,
-			                                    password=password,
-			                                    email=email_addr,
-			                                    first_name=real_name)
+			new_user = UserApiModel.objects.create_user(username=user_name,
+			                                            password=password,
+			                                            email=email_addr,
+			                                            first_name=real_name)
 			new_user.is_staff = True
+			# new_user.save()
+			new_user.generate_api_key()
 			new_user.save()
 			return render(request, 'user_success.html', {'notice': u'注册成功！即将跳转...', 'next_url': '/user/login/'})
 		except Exception as e:
@@ -69,11 +72,12 @@ def user_logout(request):
 
 class ProfileView(DetailView):
 	template_name = "user_profile.html"
-	model = ApiKeyModel
-	content = {'firstTile':None,
-	           'firstTitle_content':u'用户详情'}
+	model = UserApiModel
+	content = {'firstTile': None,
+	           'firstTitle_content': u'用户详情'}
 
 	@method_decorator(login_required)
 	def get(self, request):
 		user = request.user.username
-		return render(request,self.template_name, self.content)
+		return render(request, self.template_name, self.content)
+
