@@ -9,6 +9,11 @@ from django.utils.decorators import method_decorator
 from userManage.models import ApiKeyModel, UserApiModel
 
 
+# from django.db.models.fields.related
+
+
+
+
 # from django.contrib.auth.models import User
 
 
@@ -73,11 +78,25 @@ def user_logout(request):
 class ProfileView(DetailView):
 	template_name = "user_profile.html"
 	model = UserApiModel
-	content = {'firstTile': None,
-	           'firstTitle_content': u'用户详情'}
+	content = {'firstTitle': u'查看用户详情',
+	           'firstTitle_content': u''}
 
 	@method_decorator(login_required)
 	def get(self, request):
 		user = request.user.username
+		api_key_list = self.get_queryset()
+		api_key = api_key_list.get(username=user).api_key_model
+		self.content['api_key'] = api_key
 		return render(request, self.template_name, self.content)
 
+	@method_decorator(login_required)
+	def post(self, request):
+		user = request.user.username
+		user_model = self.get_queryset().get(username=user)
+		if user_model.update_api_key():
+			self.content['firstTitle_content'] = u''
+			self.content['api_key'] = user_model.api_key_model
+			return render(request, self.template_name, self.content)
+		else:
+			self.content['firstTitle_content'] = u'error:更新失败，请检查网络连接'
+			return render(request, self.template_name, self.content)

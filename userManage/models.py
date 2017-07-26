@@ -38,13 +38,19 @@ class UserApiModel(User):
 	def __unicode__(self):
 		return self.username
 
-	def validate_api_key(self, input_api_key):
+	def validate_api_key(self, input_api_key, **kwargs):
+		"""
+		validate api key by input key string
+		:param input_api_key:
+		:param kwargs:
+		:return:
+		"""
 		try:
 			if self.api_key.key_chain == input_api_key:
 				return True
+			else:
+				return False
 		except Exception as e:
-			pass
-		finally:
 			return False
 
 	def generate_api_key(self):
@@ -58,7 +64,7 @@ class UserApiModel(User):
 			gene_hash = lambda x: hashlib.sha1(unicode(x)).hexdigest()
 
 			salt = gene_hash(random.random())[:20]
-			sha_key = gene_hash(self.username[:10] + salt + self.password[:10])[:15]
+			sha_key = gene_hash(self.username[:10] + salt + self.password[:10])[:20]
 
 			new_api_key_model = ApiKeyModel(user_id=self.id,
 			                                key_chain=sha_key)
@@ -68,3 +74,35 @@ class UserApiModel(User):
 			return sha_key
 		except Exception as e:
 			return None
+
+	def update_api_key(self):
+		"""
+		generate new api_key for the user
+		:return:
+		"""
+		try:
+			self.api_key_model.delete()
+			if self.generate_api_key():
+				self.save()
+				return True
+			else:
+				return None
+		except Exception as e:
+			return None
+
+
+def validate_api_key(username, api_key):
+	"""
+	validate api key by input username and api_key
+	:param username:
+	:param api_key:
+	:return: True or False
+	"""
+	try:
+		user = UserApiModel.objects.get(username=username)
+		if user.api_key_model.key_chain == api_key:
+			return True
+		else:
+			return False
+	except Exception as e:
+		return False
