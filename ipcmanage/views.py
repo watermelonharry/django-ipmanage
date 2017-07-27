@@ -35,12 +35,10 @@ views
 
 @login_required
 def welcome(request):
-	return HttpResponseRedirect('/ipcmanage/iptables/')
-
-
-# return render_to_response('ipc_hello.html', {'firstTitle': u'IPC批量IP设置工具',
-#                                              'firstTitle_content': u'批量管理IPC的IP地址'},
-#                           context_instance=RequestContext(request))
+	# return HttpResponseRedirect('/ipcmanage/iptables/')
+	return render_to_response('ipc_hello.html', {'firstTitle': u'批量IP设置工具',
+	                                             'firstTitle_content': u'将设备恢复到出厂设置，随后将其设置到指定IP'},
+	                          context_instance=RequestContext(request))
 
 
 @login_required
