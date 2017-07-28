@@ -1,0 +1,1132 @@
+{% extends "teminal_banner.html" %}
+{% block content %}
+    {% csrf_token %}
+    <div class="container marketing">
+        <!-- Three columns of text below the carousel -->
+        <div class="row">
+            <div class="col-lg-3">
+                <p><a class="btn btn-info" role="button" id="start_set_btn" data-toggle="modal"
+                      data-target="#start_set_modal" data-backdrop="static">开始设置&raquo;</a></p>
+                <p>针对选中的设备，开始批量设置。</p>
+            </div>
+            <div class="col-lg-3">
+                <p><a class="btn btn-info" role="button" id="add_new_btn" data-toggle="modal" data-target="#add_modal"
+                      data-backdrop="static">添加设备 &raquo;</a></p>
+                <p>添加新的设备到数据库中。</p>
+            </div>
+            <div class="col-lg-3">
+                <p><a href="/ipcset/missions/" class="btn btn-info" role="button" data-toggle="modal">查看任务 &raquo;</a>
+                </p>
+                <p>查看已保存的任务状态。</p>
+            </div>
+            <div class="col-lg-3">
+                <p><a class="btn btn-info" role="button" id="auto_scan_btn" data-toggle="modal"
+                      data-target="#scan_modal" data-backdrop="static">自动扫描 &raquo;</a></p>
+                <p>扫描局域网中的设备。</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-3">
+                <p><a class="btn btn-info" role="button" id="down_load_settings_btn" href={% url 'download_video_setting' %}>下载配置&raquo;</a></p>
+                <p>保存已有的设置到本地文件中</p>
+            </div>
+            <div class="col-lg-3">
+                <p><a class="btn btn-info" href="/ipcset/basic/model/" role="button">查看信息&raquo;</a></p>
+                <p>查看已保存的设备基础信息</p>
+            </div>
+            <div class="col-lg-3">
+                <p><a class="btn btn-warning"  role="button" id="batch_delete_btn" data-toggle="modal"
+                      data-target="#batch_delete_modal" data-backdrop="static">批量删除&raquo;</a></p>
+                <p>批量删除已勾选的条目</p>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="container">
+        <h2 class="sub-header">查看详细设置信息</h2>
+        <div class="table-responsive">
+            <table class="table table-striped" id="mac_table">
+                <thead>
+                <tr class=locktop>
+                    <th><label class="checkbox-inline"><input type="checkbox" id="select_all">全选</label></th>
+                    <th>MAC地址</th>
+                    <th>IP地址</th>
+                    <th>IPC型号</th>
+                    <th>分辨率</th>
+                    <th>帧率</th>
+                    <th>比特率</th>
+                    <th>同步OSD</th>
+                    <th>修改人</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                {% for setting in setting_list %}
+                    <tr>
+                        <td><input type="checkbox" class="checkbox-single main_page"
+                                   name={{ setting.id }} value={{ setting.id }}></td>
+                        <td>{{ setting.mac_addr }}</td>
+                        <td>{{ setting.current_ip }}</td>
+                        <td>{{ setting.type_id.model_name }}</td>
+                        <td><span class="label label-warning">主</span> {{ setting.set_resolution }}
+                            <p><span class="label label-info">子</span> {{ setting.set_min_resolution }}</p>
+                        </td>
+                        <td>{{ setting.set_framerate }}
+                            <p>{{ setting.set_min_framerate }}</p>
+                        </td>
+                        <td>{{ setting.set_bitrate }}
+                            <p>{{ setting.set_min_bitrate }}</p>
+                        </td>
+                        {% ifequal setting.operate_type 1 %}
+                            <td>不同步</td>
+                        {% else %}
+                            <td>同步</td>
+                        {% endifequal %}
+                        <td>{{ setting.editor_name }}</td>
+                        <td><a data-toggle="modal" data-target="#edit_modal" data-backdrop="static"
+                               class="btn-sm btn-primary btn-edit" name={{ setting.id }} role="button">修改</a>
+                            <a class="btn-sm btn-danger btn-del" name={{ setting.id }} role="button">删除</a>
+                            <a data-toggle="modal" data-target="#copy_modal" data-backdrop="static"
+                               class="btn-sm btn-info btn-copy" name={{ setting.id }} role="button">复制</a>
+                        </td>
+
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+    </div>
+    <hr>
+
+    <!--批量删除窗口-->
+    <div class="modal fade" id="batch_delete_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>批量删除</h3>
+                    <p>确认删除以下条目？</p>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="batch_delete_table">
+                            <thead>
+                            <tr class=locktop>
+                                <th>MAC地址</th>
+                                <th>IP地址</th>
+                                <th>IPC型号</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-success" id="confirm_batch_delete_btn">确定</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_batch_delete_btn">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--同步窗口-->
+    <div class="modal fade" id="copy_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>同步设置</h3>
+                    <p>同步该设备的参数至相同型号的其他设备。</p>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="mac_table">
+                            <thead>
+                            <tr class=locktop>
+                                <th><label class="checkbox-inline"><input type="checkbox"
+                                                                          id="copy_select_all">全选</label></th>
+                                <th>MAC地址</th>
+                                <th>IP地址</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" name="src_id" id="copy_src_id" value="">
+                    <button type="button" class="btn btn-sm btn-success" id="confirm_copy_btn" name="">确定</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_copy_btn">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--扫描窗口-->
+    <div class="modal fade" id="scan_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>扫描局域网</h3>
+                    <p>自动扫描局域网内的在线设备，获取其信息并添加到数据库</p>
+                    <p>点击“开始”后，系统会下发任务至终端，自动开始执行</p>
+                </div>
+                <div class="modal-body" id="scan_modal_body">
+                    <form class="form-horizontal" role="form" id="auto_scan_form" action="../api/mission/" method="post">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">起始IP</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="auto_start_ip" name="start_ip" value=""
+                                       placeholder="eg: 192.168.1.2" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">扫描数量</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="auto_total_count" name="total_count" value=""
+                                       placeholder="eg: 254" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div id="show_scan_progress" hidden>
+                        <p>请确认执行终端已开启，等待扫描完成</p>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped active" role="progressbar"
+                                 id="auto_scan_probar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-success" id="show_scan_detail_btn" name="">查看详细</button>
+                    <button type="button" class="btn btn-sm btn-success" id="confirm_scan_btn">开始</button>
+                    <button type="button" class="btn btn-sm btn-danger btn_terminate" id="scan_terminate_btn">终止</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_scan_btn"
+                            name="">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--编辑单条记录-->
+    <div class="modal fade" id="edit_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">修改单条设置</div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form" id="edit_old_setting">
+                        <div class="form-group">
+                            <label for="edit_mac" class="col-sm-4 control-label">MAC地址</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="mac_addr" name="mac_addr" value="MAC地址"
+                                       disabled>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_ip" class="col-sm-4 control-label">IP地址</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="current_ip" name="current_ip" value="ip">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_osd" class="col-sm-4 control-label">IPC类型</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="type_id" name="type_id" value="IPC型号"
+                                       disabled>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit_people" class="col-sm-3 control-label">主分辨率</label>
+                            <div class="col-sm-3">
+                                <select class="form-control" id="set_resolution" name="set_resolution">
+                                </select>
+                            </div>
+                            <label for="edit_people" class="col-sm-2 control-label">子分辨率</label>
+                            <div class="col-sm-3">
+                                <select class="form-control" id="set_min_resolution" name="set_min_resolution">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">主帧率</label>
+                            <div class="col-sm-3">
+                                <select class="form-control" id="set_framerate" name="set_framerate">
+                                </select>
+                            </div>
+                            <label class="col-sm-2 control-label">子帧率</label>
+                            <div class="col-sm-3">
+                                <select class="form-control" id="set_min_framerate" name="set_min_framerate">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">主比特率</label>
+                            <div class="col-sm-3">
+                                <select class="form-control" id="set_bitrate" name="set_bitrate">
+                                </select>
+                            </div>
+                            <label class="col-sm-2 control-label">子比特率</label>
+                            <div class="col-sm-3">
+                                <select class="form-control" id="set_min_bitrate" name="set_min_bitrate">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit_people" class="col-sm-4 control-label">同步OSD</label>
+                            <div class="col-sm-6">
+                                <label class="radio-inline" id="operate_type">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="edit_radio" value="2">是
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="edit_radio" value="1">否
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_people" class="col-sm-4 control-label">修改人</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="editor_name" name="editor_name"
+                                       value={{ user.username }}>
+                            </div>
+                        </div>
+                        <input type="hidden" class="form-control" id="id" name="id" value="id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-success" id="save_edit">确定</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="quit_edit">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--添加IPC窗口-->
+    <div class="modal fade" id="add_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">添加新的设备</div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form" id="edit_old_setting">
+                        <div class="form-group">
+                            <label for="edit_mac" class="col-sm-4 control-label">MAC地址</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="mac_addr" name="mac_addr"
+                                       placeholder="请输入MAC地址" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_ip" class="col-sm-4 control-label">IP地址</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="current_ip" name="current_ip"
+                                       placeholder="请输入IP地址" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_type" class="col-sm-4 control-label">IPC类型</label>
+                            <div class="col-sm-6">
+                                <select class="form-control" id="type_id" name="type_id" value="请选择型号">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit_people" class="col-sm-3 control-label">主分辨率</label>
+                            <div class="col-sm-3">
+                                <select class="form-control" id="set_resolution" name="set_resolution">
+                                </select>
+                            </div>
+                            <label for="edit_people" class="col-sm-2 control-label">子分辨率</label>
+                            <div class="col-sm-3">
+                                <select class="form-control" id="set_min_resolution" name="set_min_resolution">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">主帧率</label>
+                            <div class="col-sm-3">
+                                <select class="form-control" id="set_framerate" name="set_framerate">
+                                </select>
+                            </div>
+                            <label class="col-sm-2 control-label">子帧率</label>
+                            <div class="col-sm-3">
+                                <select class="form-control" id="set_min_framerate" name="set_min_framerate">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">主比特率</label>
+                            <div class="col-sm-3">
+                                <select class="form-control" id="set_bitrate" name="set_bitrate">
+                                </select>
+                            </div>
+                            <label class="col-sm-2 control-label">子比特率</label>
+                            <div class="col-sm-3">
+                                <select class="form-control" id="set_min_bitrate" name="set_min_bitrate">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="edit_people" class="col-sm-4 control-label">同步OSD</label>
+                            <div class="col-sm-6">
+                                <label class="radio-inline" id="operate_type">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="edit_radio" value="2" checked>是
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="edit_radio" value="1">否
+                                    </label>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_people" class="col-sm-4 control-label">修改人</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="editor_name" name="editor_name"
+                                       value={{ user.username }} required>
+                            </div>
+                        </div>
+                        <input type="hidden" class="form-control" id="id" name="id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-success" id="confirm_save_btn">确定</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="quit_new_btn">取消
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--开始执行窗口-->
+    <div class="modal fade" id="start_set_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>开始执行设置</h3>
+                    <p>确认需要执行的设备</p>
+                    <p>点击确认后，系统会下发任务至终端，自动开始执行</p>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="mac_table">
+                            <thead>
+                            <tr class=locktop>
+                                <th>MAC地址</th>
+                                <th>IP地址</th>
+                                <th>IPC型号</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label for="edit_people" class="col-sm-4 control-label">修改人*</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="start_editor_name" value={{ user.username }} required>
+                            </div>
+                        </div>
+                    </form>
+                    <button type="button" class="btn btn-sm btn-success" id="confirm_set_btn">确定</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_set_btn">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--执行中窗口-->
+    <div class="modal fade" id="scanning_modal" data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>正在执行设置操作</h3>
+                    <p>请确认执行终端已开启，等待设置完成</p>
+                </div>
+                <div class="modal-body">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped active" role="progressbar" id="scanning_probar"
+                             style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-success" id="show_detail_btn" name="">查看详细</button>
+                    <button type="button" class="btn btn-sm btn-danger btn_terminate" id="terminate_set_btn">终止</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_setting_btn">退出
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        var id_list = [];
+        var model_list = [];
+        var timer_id;
+        $('.btn_terminate').hide();
+
+{#              <!--下载配置-->#}
+{#      $('#down_load_settings_btn').on('click',function(){#}
+{#        location.href={% url 'download_video_setting' %};#}
+{#      });#}
+        <!--批量删除-->
+        <!--确定删除-->
+        $('#confirm_batch_delete_btn').click(function () {
+            var js_data = {
+                'id':id_list
+            };
+            console.log("batch delete.", js_data.id);
+            $.ajax({
+                type:"POST",
+                url: "/ipcset/api/settings/batch/",
+                data: JSON.stringify(js_data),
+                success: function (js_data) {
+                    console.log("success", js_data);
+                    alert("操作成功");
+                    $('#batch_delete_modal').hide();
+                    location.reload();
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                    alert("删除失败。error code:"+e.error);
+                }
+            })
+        });
+
+        <!--显示modal-->
+        $('#batch_delete_btn').click(function () {
+            id_list = get_main_select_id();
+            console.log(id_list);
+            if(id_list.length == 0){return;};
+            $.ajax({
+                type: "GET",
+                url: "/ipcset/api/settings/",
+                // dataType:"json",
+                // contentType:"application/json",
+                data: {"id": id_list},
+                success: function (js_data) {
+                    console.log("success", js_data);
+
+                    $.each(js_data, function () {
+                        $("#batch_delete_modal tbody").append("<tr></tr>");
+                        var mac_addr = "<td>" + this.mac_addr + "</td>";
+                        var current_ip = "<td>" + this.current_ip + "</td>";
+                        var type_id = "<td>" +  this.type_id.model_name + "</td>";
+                        $("#batch_delete_modal tbody tr:last").append(mac_addr, current_ip, type_id);
+                    });
+
+
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                    alert("获取信息失败，请检查网络设置。error code:"+e.status);
+                }
+            });
+        });
+
+        $('#abort_batch_delete_btn').click(function () {
+            $('#batch_delete_modal tbody').empty();
+            $('#batch_delete_modal').hide();
+            id_list=[];
+        });
+
+
+        <!--同步窗口设置-->
+        <!--关闭同步窗口-->
+        <!--确定同步-->
+        $('#confirm_copy_btn').click(function () {
+            var up_data = {
+                "src_id": $('#copy_src_id').val(),
+                "dst_id": get_sync_select_id(),
+                "editor_name": $('#login_user_name').val()
+            };
+            $.ajax({
+                type: "POST",
+                url: "/ipcset/api/settings/sync/",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(up_data),
+                success: function (json_data) {
+                    console.log("sync setting success", json_data);
+                    alert("同步成功");
+                },
+                error: function (e) {
+                    alert("同步失败-" + e.status + "-" + e.error);
+                }
+            });
+        })
+
+        <!--全选-->
+        $('#copy_select_all').click(function () {
+            $(".checkbox-single.sync_page").prop("checked", this.checked);
+            console.log(get_main_select_id());
+        });
+
+        function get_sync_select_id() {
+            var ids = [];
+            $(".checkbox-single.sync_page").each(function () {
+                if (this.checked) {
+                    ids.push(this.name);
+                }
+            });
+            return ids;
+        }
+
+        <!--退出同步窗口-->
+        $('#abort_copy_btn').click(function () {
+            $('#copy_modal tbody').empty();
+            location.reload();
+        });
+
+        <!--获取同型号设备-->
+        $('.btn-copy').click(function () {
+            $('#copy_src_id').val(this.name);
+            $.ajax({
+                type: "GET",
+                url: "/ipcset/api/settings/sametype/",
+                dataType: "json",
+                contentType: "application/json",
+                data: {"id": this.name},
+                success: function (json_data) {
+                    console.log("get same type success", json_data);
+                    $.each(json_data, function () {
+                        $("#copy_modal tbody").append("<tr></tr>");
+                        var check_box = "<td><input type='checkbox' class='checkbox-single sync_page' name=" + this.id + "></td>";
+                        var mac_addr = "<td>" + this.mac_addr + "</td>";
+                        var current_ip = "<td>" + this.current_ip + "</td>";
+                        $("#copy_modal tbody tr:last").append(check_box, mac_addr, current_ip);
+                    });
+                },
+                error: function (e) {
+                    alert("获取失败-" + e.status + "-" + e.error);
+                }
+            })
+        });
+
+        <!--终止自动扫描-->
+        $('#scan_terminate_btn').click(function () {
+            var js_data={
+                'mission_id':$('#show_scan_detail_btn').attr('name'),
+                'editor_name':$('#login_user_name').val(),
+                'run_status':0
+            }
+            console.log("terminate_btn.",js_data);
+            $.ajax({
+                type: "PUT",
+                url: "/ipcset/api/mission/",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(js_data),
+                success: function (msg) {
+                    console.log("success", msg);
+                    if(msg.run_status==0){
+                        alert("任务已终止！");
+                        location.reload();
+                    }else{
+                        alert("终止失败！");
+                    }
+
+                    $('#scan_terminate_btn').show();
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                    alert("连接失败！ error-" + e.status);
+                }
+            });
+        });
+
+        <!--开始自动扫描-->
+        $('#confirm_scan_btn').click(function () {
+            var m_data = {
+                'editor_name': $('#login_user_name').val(),
+                'mission_id': getTimeId(),
+                'start_ip': $('#auto_start_ip').val(),
+                'total_count': $('#auto_total_count').val(),
+                'mission_type':2,
+                'progress':0,
+                'run_status':1,
+            };
+            if(m_data.start_ip.split('.').length != 4){
+                alert("error:请输入合法IP地址！");
+                return;
+            };
+            if(m_data.total_count == ''){
+                alert("error:请输入扫描数量");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/ipcset/api/mission/",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(m_data),
+                success: function (msg) {
+                    console.log("success", msg);
+                    $('#show_scan_progress').show();
+                    $('#show_scan_detail_btn').attr("name", m_data.mission_id);
+                    $('#abort_scan_btn').attr("name", m_data.mission_id);
+                    timer_id = window.setInterval(on_time_check_scan, 5000);
+                    console.log('start timer:' + timer_id);
+                    $('#confirm_scan_btn').attr({'disabled':"disabled"});
+                    $('#scan_modal_body').hide();
+                    $('#confirm_scan_btn').hide();
+                    $('#scan_terminate_btn').show();
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                    alert("添加失败！ error-" + e.status);
+                }
+            });
+        });
+
+        $('#show_scan_detail_btn').on('click', function () {
+            window.open('../missions/' + $('#show_scan_detail_btn').attr("name"));
+        })
+        $('#abort_scan_btn').click(function () {
+            $('#show_scan_progress').hide();
+            window.clearInterval(timer_id);
+            $('#suto_scan_probar').attr("style", "width: 0%");
+            location.reload();
+        });
+
+        <!--添加新设备-->
+        $('#add_new_btn').click(function () {
+            $.getJSON('/ipcset/api/basic/model/', function (json_data) {
+                model_list = json_data;
+                $('#add_modal #type_id').append("<option name='nobody'>请选择型号</option>");
+                $.each(json_data, function () {
+                    var choice = '<option value=' + this.id + '>' + this.model_name + '</option>';
+                    $('#add_modal #type_id').append(choice);
+                })
+            });
+            // set_new_params();
+        });
+
+
+        <!--修改类型-->
+        $('#add_modal #type_id').change(function () {
+            $('#add_modal').find("option[name='nobody']").remove();
+            $('#add_modal #set_resolution option').remove();
+            $('#add_modal #set_bitrate option').remove();
+            $('#add_modal #set_framerate option').remove();
+            $('#add_modal #set_min_resolution option').remove();
+            $('#add_modal #set_min_bitrate option').remove();
+            $('#add_modal #set_min_framerate option').remove();
+            set_new_params();
+        })
+
+        function set_new_params() {
+            $.getJSON('/ipcset/api/basic/model/?id=' + $('#add_modal #type_id').val(), function (jd_data) {
+                var params = jd_data[0];
+                console.log(params);
+                var target = $('#add_modal');
+                $.each(params.resolution_set, function () {
+                    var choice = '<option>' + this.resolution + '</option>';
+                    target.find('#set_resolution').append(choice);
+                });
+                $.each(params.bitrate_set, function () {
+                    var choice = '<option>' + this.bitrate + '</option>';
+                    target.find('#set_bitrate').append(choice);
+                });
+                $.each(params.framerate_set, function () {
+                    var choice = '<option>' + this.framerate + '</option>';
+                    target.find('#set_framerate').append(choice);
+                });
+
+                $.each(params.min_resolution_set, function () {
+                    var choice = '<option>' + this.resolution + '</option>';
+                    target.find('#set_min_resolution').append(choice);
+                });
+                $.each(params.min_bitrate_set, function () {
+                    var choice = '<option>' + this.bitrate + '</option>';
+                    target.find('#set_min_bitrate').append(choice);
+                });
+                $.each(params.min_framerate_set, function () {
+                    var choice = '<option>' + this.framerate + '</option>';
+                    target.find('#set_min_framerate').append(choice);
+                });
+            })
+        }
+
+        <!--开始设置-->
+        $('#start_set_btn').click(function () {
+            id_list = get_main_select_id();
+            console.log(id_list);
+            $.ajax({
+                type: "GET",
+                url: "/ipcset/api/settings/",
+                // dataType:"json",
+                // contentType:"application/json",
+                data: {"id": id_list},
+                success: function (js_data) {
+                    console.log("success", js_data);
+
+                    $.each(js_data, function () {
+                        $("#start_set_modal tbody").append("<tr></tr>");
+                        var mac_addr = "<td>" + this.mac_addr + "</td>";
+                        var current_ip = "<td>" + this.current_ip + "</td>";
+                        var type_id = "<td>" + this.type_id.id + "-" + this.type_id.model_name + "</td>";
+                        $("#start_set_modal tbody tr:last").append(mac_addr, current_ip, type_id);
+                    });
+
+
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                }
+            });
+        })
+
+        $('#quit_edit').click(function () {
+            $('#edit_modal option').remove();
+        });
+
+        <!--开始执行-->
+        $('#confirm_set_btn').on('click', function () {
+            var json_data = {
+                'editor_name': $('#start_editor_name').val(),
+                'mission_id': getTimeId(),
+                'start_ip':'0.0.0.0',
+                'total_count': id_list.length,
+                'detail_id': id_list,
+                'mission_type': 1,
+                'progress':0,
+                'run_status':1
+            };
+            $('#show_detail_btn').attr("name", json_data.mission_id);
+            console.log(json_data);
+            if (json_data.total_count != 0) {
+                $.ajax({
+                    type: "POST",
+                    url: "/ipcset/api/mission/",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify(json_data),
+                    success: function (msg) {
+                        console.log("success", msg);
+                        $('#start_set_modal').modal('toggle');
+                        $('#start_set_modal tbody').empty();
+                        $('#scanning_modal').modal('toggle');
+                        timer_id = window.setInterval(on_time_check, 5000);
+                        console.log('start timer:' + timer_id);
+                        $('#terminate_set_btn').show();
+                    },
+                    error: function (e) {
+                        console.log("failed", e);
+                        alert("添加失败！ error-" + e.status)
+                    }
+                });
+            }
+            else {
+                alert("请选择执行目标！")
+            }
+
+        });
+
+        <!--取消设置-->
+        $('#terminate_set_btn').click(function () {
+            var js_data={
+                'mission_id':$('#show_detail_btn').attr('name'),
+                'editor_name':$('#login_user_name').val(),
+                'run_status':0
+            }
+            console.log("terminate_btn.",js_data);
+            $.ajax({
+                type: "PUT",
+                url: "/ipcset/api/mission/",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(js_data),
+                success: function (msg) {
+                    console.log("success", msg);
+                    if(msg.run_status==0){
+                        alert("任务已终止！");
+                        location.reload();
+                    }else{
+                        alert("终止失败！");
+                    };
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                    alert("连接失败！ error-" + e.status);
+                }
+            });
+        })
+
+
+        $("#abort_set_btn").click(function () {
+            id_list = [];
+            $("#start_set_modal tbody").empty();
+        })
+
+        $('#select_all').click(function () {
+            $(".checkbox-single.main_page").prop("checked", this.checked);
+            console.log(get_main_select_id());
+        });
+
+        function get_main_select_id() {
+            var ids = [];
+            $(".checkbox-single.main_page").each(function () {
+                if (this.checked) {
+                    ids.push(this.name);
+                }
+            });
+            return ids;
+        }
+
+
+        <!--下载配置-->
+        $('#down_load_settings_btn').on('click', function () {
+            location.href = "./download";
+        });
+        <!--查看任务信息-->
+        $('#show_mission_btn').on('click', function () {
+            window.open('../mission');
+        })
+        $('#abort_setting_btn').on('click', function () {
+            window.clearInterval(timer_id);
+            $('#scanning_probar').attr("style", "width: 0%");
+            location.reload();
+        });
+
+        <!--查看任务详细详细-->
+        $('#show_detail_btn').on('click', function () {
+            window.open('../missions/' + $('#show_detail_btn').attr("name"));
+        });
+
+
+        <!--编辑单条记录-->
+        $('.btn-edit').on('click', function () {
+            $.getJSON('/ipcset/api/settings/' + this.name, function (data) {
+                console.log(data);
+                $('#edit_modal').find("form").find('#mac_addr').val(data.mac_addr);
+                $('#edit_modal').find("form").find('#current_ip').val(data.current_ip);
+                $('#edit_modal').find("form").find('#type_id').val(data.type_id.model_name);
+                set_stream_params(data, $('#edit_modal'));
+                $('#edit_modal #operate_type').find("input[name='edit_radio']").eq(2 - data.operate_type).attr("checked", true);
+                $('#edit_modal').find("form").find('#editor_name').val($('#login_user_name').val());
+                $('#edit_modal').find("form").find('#id').val(data.id);
+            });
+        })
+
+        function set_stream_params(data, target) {
+            $.each(data.type_id.resolution_set, function () {
+                var choice = '<option>' + this.resolution + '</option>';
+                target.find('#set_resolution').append(choice);
+                target.find('#set_resolution').val(data.set_resolution);
+            });
+            $.each(data.type_id.bitrate_set, function () {
+                var choice = '<option>' + this.bitrate + '</option>';
+                target.find('#set_bitrate').append(choice);
+                target.find('#set_bitrate').val(data.set_bitrate);
+            });
+            $.each(data.type_id.framerate_set, function () {
+                var choice = '<option>' + this.framerate + '</option>';
+                target.find('#set_framerate').val(data.set_framerate);
+                target.find('#set_framerate').append(choice);
+            });
+            $.each(data.type_id.min_resolution_set, function () {
+                var choice = '<option>' + this.resolution + '</option>';
+                target.find('#set_min_resolution').append(choice);
+                target.find('#set_min_resolution').val(data.set_min_resolution);
+            });
+            $.each(data.type_id.min_bitrate_set, function () {
+                var choice = '<option>' + this.bitrate + '</option>';
+                target.find('#set_min_bitrate').append(choice);
+                target.find('#set_min_bitrate').val(data.set_min_bitrate);
+            });
+            $.each(data.type_id.min_framerate_set, function () {
+                var choice = '<option>' + this.framerate + '</option>';
+                target.find('#set_min_framerate').val(data.set_min_framerate);
+                target.find('#set_min_framerate').append(choice);
+            });
+        }
+
+        <!--删除记录-->
+        $('.btn-del').on('click', function () {
+            $.ajax({
+                type: "DELETE",
+                url: "/ipcset/api/settings/" + this.name,
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    "id": this.name
+                }),
+                context: $(document),
+                success: function (e) {
+                    alert("删除成功!");
+                    location.reload();
+                },
+                error: function (e) {
+                    alert("删除失败" + String(e));
+                }
+            })
+        });
+
+        <!--增加记录-->
+        $('#confirm_save_btn').on('click', function () {
+            var add_data = getJsonForm($('#add_modal'));
+            console.log(add_data)
+            $.ajax({
+                type: "POST",
+                url: "/ipcset/api/settings/",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(add_data),
+                context: $(document),
+                success: function (e) {
+                    alert("添加成功!");
+                    location.reload();
+                    this.modal('hide');
+                },
+                error: function (e) {
+                    alert("添加失败" + String(e));
+                    console.log(e);
+                }
+            })
+        });
+
+        <!--更改记录-->
+        $('#save_edit').on('click', function () {
+            var change_data = getJsonForm($('#edit_modal'));
+            console.log(change_data);
+            $.ajax({
+                type: "PUT",
+                url: "/ipcset/api/settings/" + $('#edit_modal').find("form").find('#id').val(),
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(change_data),
+                context: $('#edit_modal'),
+                success: function (e) {
+                    alert("修改成功!");
+                    location.reload();
+                    this.modal('hide');
+                },
+                error: function (e) {
+                    alert("修改失败" + String(e));
+                }
+
+            })
+        });
+
+
+        $('#edit_modal').on('hide.bs.modal', function (e) {
+            {#          location.reload();#}
+        });
+        $('#edit_modal').on('show.bs.modal', function (e) {
+
+        });
+
+        function getJsonForm(target) {
+            var mac = target.find("form").find('#mac_addr').val();
+            var edit_mac = (mac.split("-")).join("");
+            var json = {
+                "id": target.find("form").find('#id').val(),
+                "mac_addr": edit_mac,
+                "current_ip": target.find("form").find('#current_ip').val(),
+                "type_id": target.find("form").find('#type_id').val(),
+                "set_resolution": target.find("form").find('#set_resolution').val(),
+                "set_bitrate": target.find("form").find('#set_bitrate').val(),
+                "set_framerate": target.find("form").find('#set_framerate').val(),
+                "set_min_resolution": target.find("form").find('#set_min_resolution').val(),
+                "set_min_bitrate": target.find("form").find('#set_min_bitrate').val(),
+                "set_min_framerate": target.find("form").find('#set_min_framerate').val(),
+                "operate_type": target.find("form").find("input[name='edit_radio']:checked").val(),
+                "editor_name": target.find("form").find('#editor_name').val(),
+                // "csrfmiddlewaretoken":$("input[name='csrfmiddlewaretoken']").val(),
+            };
+            return json;
+        };
+
+        function getTimeId() {
+            var time = new Date().getTime();
+            return String(time);
+        };
+
+        $("#quit_new_btn").click(function () {
+            $('#add_modal option').remove();
+        })
+
+        function on_time_check() {
+            var op_id = $('#show_detail_btn').attr("name");
+            $.ajax({
+                type: "GET",
+                url: "/ipcset/api/mission/",
+                data: {"mission_id": op_id},
+                dataType: "json",
+                contentType: "application/json",
+                success: function (js_data) {
+                    js_data = js_data[0];
+                    console.log("success", js_data);
+                    var total = Number(js_data.total_count);
+                    var fin = Number(js_data.progress);
+                    var progress = String(fin * 100 / total) + "%";
+                    console.log("request mission progress", progress, timer_id);
+                    $('#scanning_probar').attr("style", "width: " + progress);
+                    if (total == fin) {
+                        window.clearInterval(timer_id);
+                        console.log("clear interval")
+                        alert('设置完成！')
+                    }
+                },
+                error: function (e) {
+                    console.log("failed to get misson progress", e);
+                }
+            });
+        };
+
+        function on_time_check_scan() {
+            var op_id = $('#abort_scan_btn').attr("name");
+            $.ajax({
+                type: "GET",
+                url: "/ipcset/api/mission/",
+                data: {"mission_id": op_id},
+                dataType: "json",
+                contentType: "application/json",
+                success: function (js_data) {
+                    js_data = js_data[0];
+                    console.log("success", js_data);
+                    var total = Number(js_data.total_count);
+                    var fin = Number(js_data.progress);
+                    var progress = String(fin * 100 / total) + "%";
+                    console.log("request mission progress", progress, timer_id);
+                    $('#auto_scan_probar').attr("style", "width: " + progress);
+                    if (total == fin) {
+                        window.clearInterval(timer_id);
+                        console.log("clear interval")
+                        alert('设置完成！')
+                    }
+                },
+                error: function (e) {
+                    console.log("failed to get misson progress", e);
+                    alert("无法获取任务进度信息，请检查网络.error-" + e.status);
+                }
+            });
+        };
+    </script>
+{% endblock %}
