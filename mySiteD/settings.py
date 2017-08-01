@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'ipcset',
     'userManage',
     'feedback',
+    'terminalReg',
     'rest_framework',
 )
 

@@ -20,6 +20,7 @@ urlpatterns = patterns('',
     url('^ipcmanage/', include('ipcmanage.urls')),
     url('^ipcset/', include('ipcset.urls')),
     url('^user/', include('userManage.urls')),
+    url('^terminal/', include('terminalReg.urls')),
 
     url(r'^admin/', admin.site.urls),
 )

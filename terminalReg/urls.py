@@ -24,7 +24,7 @@ from rest_framework import routers
 # router.register(r'^tables/(?P<id>[0-9]+)/$',views.api_ip_mac_detail)
 
 urlpatterns = [
-    # url('^$', views.welcome),
+    url('^$', views.TerminalListView.as_view(), name='show_terminal_list'),
     # url('^basic/$',views.show_basic_info),
     #
     # url(r'^api/settings/$', views.api_add_or_get_videosetting),
