@@ -30,7 +30,7 @@ class TerminalModel(models.Model):
     edit_time = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['id', 'create_time']
+        ordering = ['-edit_time', 'id']
 
     def __unicode__(self):
         return self.terminal_name

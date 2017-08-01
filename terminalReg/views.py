@@ -20,7 +20,7 @@ class TerminalListView(ListView):
 		show terminals
 		"""
 		terminal_list = TerminalModel.objects.all()
-		return render(self.template_name, {'firstTitle':u'在线终端查看',
+		return render(request, self.template_name, {'firstTitle':u'终端管理',
 										   'firstTitle_content':u'',
 										   'terminal_list':terminal_list})
 
