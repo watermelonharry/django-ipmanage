@@ -1,0 +1,78 @@
+{% extends "ipcset_banner.html" %}
+  {% block content %}
+      <div class="container">
+      <h2 class="sub-header">任务详细状态 | 创建时间：{{ mission_create_time|date:'Y-m-d,G:i' }}</h2>
+          <div class="table-responsive">
+            <table class="table table-striped" id="mac_table">
+              <thead>
+                <tr>
+                  <th>序号</th>
+                  <th>MAC</th>
+                  <th>IP地址</th>
+                  <th>分辨率</th>
+                  <th>帧率</th>
+                  <th>码率</th>
+                  <th>同步OSD</th>
+                  <th>状态</th>
+                </tr>
+              </thead>
+
+
+              <tbody>
+              {% for detail in detail_list %}
+                  <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ detail.mac_addr }}</td>
+                  <td>{{ detail.current_ip }}</td>
+                  <td><span class="label label-warning">主</span> {{ detail.set_resolution }}
+                    <p><span class="label label-info">子</span> {{ detail.set_min_resolution }}</p>
+                  </td>
+                  <td>{{ detail.set_framerate }}
+                    <p>{{ detail.set_min_framerate }}</p>
+                  </td>
+                  <td>{{ detail.set_bitrate }}
+                    <p>{{ detail.set_min_bitrate }}</p>
+                  </td>
+
+                      {% ifequal detail.operate_type 2  %}
+                      <td>是</td>
+                      {% endifequal %}
+                      {% ifequal detail.operate_type 1  %}
+                      <td>否</td>
+                      {% endifequal %}
+
+                      {% ifequal detail.status 0  %}
+                      <td>等待设置</td>
+                      {% endifequal %}
+                      {% ifequal detail.status 4  %}
+                      <td>同步OSD失败</td>
+                      {% endifequal %}
+                      {% ifequal detail.status 5 %}
+                      <td>设置完成</td>
+                      {% endifequal %}
+                      {% ifequal detail.status 3 %}
+                      <td>设置失败</td>
+                      {% endifequal %}
+                      {% ifequal detail.status 9 %}
+                      <td>连接失败</td>
+                      {% endifequal %}
+                      {% ifequal detail.status 1  %}
+                      <td>更新完成</td>
+                      {% endifequal %}
+                      {% ifequal detail.status 2  %}
+                      <td>添加完成</td>
+                      {% endifequal %}
+                      {% ifequal detail.status 6  %}
+                      <td>未记录型号</td>
+                      {% endifequal %}
+                  </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+
+
+      </div>
+  {% endblock %}

@@ -30,6 +30,12 @@ class ApiKeyModel(models.Model):
 		else:
 			return False
 
+	@classmethod
+	def has_record(cls, input_key_chain):
+		try:
+			return cls.objects.get(key_chain=input_key_chain)
+		except:
+			return None
 
 class UserApiModel(User):
 	other_info = models.TextField(blank=True)
