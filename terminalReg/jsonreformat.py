@@ -2,6 +2,7 @@ from django.http import HttpResponse
 
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
 
 
 class BaseResponse(HttpResponse):
@@ -49,3 +50,19 @@ class ErrorJsonResponse(BaseResponse):
         content_dict['errors'] = data
         content_dict['result'] = u'error'
         return JSONRenderer().render(content_dict)
+
+
+class FormatJsonParser(JSONParser):
+    """
+    specific parser for post data
+    """
+
+    def __init__(self, stream, *args, **kwargs):
+        super(FormatJsonParser, self).__init__()
+        self.json_content = super(FormatJsonParser, self).parse(stream)
+
+    def get_ak(self):
+        return self.json_content.get('ak', None)
+
+    def get_terminal_name(self):
+        return self.json_content.get('terminal_name', None)
