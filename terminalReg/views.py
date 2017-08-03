@@ -45,47 +45,52 @@ class TerminalRegister(DetailView):
 
 		return SuccessJsonResponse(data={'user': 'user_model.username', 'ak': terminal_ak}, status=200)
 
+
 @csrf_exempt
 def api_temrinal_register_post(request):
-    """
-    terminal register by POST to this url with{ak, terminal_name}
-    """
-    # todo: register with ak,terminal_name,and so on
-    data = JSONParser().parse(request)
-    terminal_ak = data.get('ak', '')
-    api_model = ApiKeyModel.has_record(terminal_ak)
-    if api_model is None:
-        return ErrorJsonResponse(data={'ak':'un verified ak'}, status=400)
+	"""
+	terminal register by POST to this url with{ak, terminal_name}
+	"""
+	# todo: register with ak,terminal_name,and so on
+	data = JSONParser().parse(request)
+	terminal_ak = data.get('ak', '')
+	api_model = ApiKeyModel.has_record(terminal_ak)
+	if api_model is None:
+		return ErrorJsonResponse(data={'ak': 'un verified ak'}, status=400)
 
-    user_model = UserApiModel.objects.get(id=api_model.user_id)
-    terminal_name = data.get('terminal_name', None)
-    if terminal_name is None:
-        return ErrorJsonResponse(data={'teminal_name':'is null'},status=400)
+	user_model = UserApiModel.objects.get(id=api_model.user_id)
+	terminal_name = data.get('terminal_name', None)
+	if terminal_name is None:
+		return ErrorJsonResponse(data={'teminal_name': 'is null'}, status=400)
 
-    try:
-        old_terminal = TerminalModel.objects.get(terminal_name=terminal_name)
-        new_terminal = TerminalModelSerializer(old_terminal,data=data)
-    except Exception as e:
-        new_terminal = TerminalModelSerializer(data=data)
+	try:
+		old_terminal = TerminalModel.objects.get(terminal_name=terminal_name)
+		new_terminal = TerminalModelSerializer(old_terminal, data=data)
+	except Exception as e:
+		new_terminal = TerminalModelSerializer(data=data)
 
-    if new_terminal.is_valid():
-        new_terminal.save()
-        return SuccessJsonResponse(data={'user': user_model.username, 'ak': terminal_ak}, status=200)
-    else:
-        return ErrorJsonResponse(data=new_terminal.errors)
+	if new_terminal.is_valid():
+		new_terminal.save()
+		return SuccessJsonResponse(data={'user': user_model.username, 'ak': terminal_ak}, status=200)
+	else:
+		return ErrorJsonResponse(data=new_terminal.errors)
 
 
 class InnerApiBindMissionTerminal(DetailView):
-    @method_decorator(login_required)
-    def post(self, request):
-        """
-        api to bind the mission with terminal
-        """
-        data = FormatJsonParser(request).get_content()
-        new_bind = TerminalWaitingMissionSerializer(data)
-        if new_bind.is_valid() is True:
-            ##todo: success response
-            pass
-        else:
-            ##todo: fail response
-            pass
+
+	@method_decorator(csrf_exempt)
+	def post(self, request):
+		"""
+		api to bind the mission with terminal
+		"""
+		format_data = FormatJsonParser(request)
+		if TerminalModel.has_terminal(format_data.get_terminal_name()) is False:
+			return ErrorJsonResponse(data={"terminal_name": "terminal not found"}, status=406)
+
+		data = format_data.get_content()
+		new_bind = TerminalWaitingMissionSerializer(data)
+		if new_bind.is_valid() is True:
+			new_bind.save()
+			return SuccessJsonResponse(data=data, status=200)
+		else:
+			return ErrorJsonResponse(data=new_bind.errors, status=406)
