@@ -41,8 +41,20 @@ class TerminalModel(models.Model):
         2 min
         :return:
         """
-
         # todo: compare edit time with localtime
+        pass
+
+    @classmethod
+    def has_terminal(cls, input_name):
+        """
+        :param input_name:
+        :return:
+        """
+        try:
+            terminal = cls.objects.get(terminal_name=input_name)
+            return True
+        except Exception as e:
+            return False
 
 
 class TerminalHistoryModel(models.Model):
