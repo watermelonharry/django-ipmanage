@@ -30,6 +30,8 @@ urlpatterns = [
     ## api urls
     # url('^api/register/$', views.TerminalRegister.as_view(), name='api_terminal_register'),
     url('^api/register/$', views.api_temrinal_register_post, name='api_terminal_register'),
+    url('^api/inner/bindterminal/$', views.InnerApiBindMissionTerminal.as_view(), name='api_inner_bind_terminal'),
+
 
     # url('^basic/$',views.show_basic_info),
     #
