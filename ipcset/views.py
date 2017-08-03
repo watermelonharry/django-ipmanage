@@ -31,18 +31,18 @@ views
 """
 
 
+# @login_required
+# def welcome(request):
+	# return HttpResponseRedirect('/ipcset/settings/')
+
 @login_required
 def welcome(request):
-	return HttpResponseRedirect('/ipcset/settings/')
-
-
-#
-# if request.user.is_authenticated():
-# 	return render(request,
-#                   'ipcset_hello.html',
-#                   {'firstTitle': u'码流参数批量设置工具',
-#                    'firstTitle_content': u'批量设置设备的各项参数',
-#                    })
+    if request.user.is_authenticated():
+	    return render(request,
+                  'ipcset_hello.html',
+                  {'firstTitle': u'码流参数批量设置工具',
+                   'firstTitle_content': u'批量设置设备的各项参数',
+                   })
 
 
 @login_required

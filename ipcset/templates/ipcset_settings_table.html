@@ -1,49 +1,58 @@
 {% extends "ipcset_banner.html" %}
 {% block content %}
     {% csrf_token %}
+    <div class="container">
+    <div class="well">
+            <h4><b>操作指导：</b></h4>
+            <p>批量设置：在列表中勾选需要设置的设备，点击“开始设置”按钮，进行设置操作。</p>
+            <p>添加设备：点击“添加设备”按钮，手动添加一个设备条目到列表中。</p>
+            <p>修改配置：点击列表-条目的“修改”按钮对单个设备的配置进行修改。</p>
+            <p>同步配置：点击列表-源条目的“复制”按钮，在对话框中选择需要同步配置的<b>同型号设备</b>，进行配置同步。</p>
+        </div>
+        <h4>当前位置: <a href="/ipcset/">码流参数设置</a> >> 开始设置</h4>
+        <hr>
+    </div>
     <div class="container marketing">
         <!-- Three columns of text below the carousel -->
         <div class="row">
-            <div class="col-lg-3">
-                <p><a class="btn btn-info" role="button" id="start_set_btn" data-toggle="modal"
+            <div class="col-lg-4">
+                <p><a class="btn btn-success" role="button" id="start_set_btn" data-toggle="modal"
                       data-target="#start_set_modal" data-backdrop="static">开始设置&raquo;</a></p>
+
                 <p>针对选中的设备，开始批量设置。</p>
             </div>
-            <div class="col-lg-3">
+            <div class="col-lg-4">
                 <p><a class="btn btn-info" role="button" id="add_new_btn" data-toggle="modal" data-target="#add_modal"
                       data-backdrop="static">添加设备 &raquo;</a></p>
+
                 <p>添加新的设备到数据库中。</p>
             </div>
-            <div class="col-lg-3">
-                <p><a href="/ipcset/missions/" class="btn btn-info" role="button" data-toggle="modal">查看任务 &raquo;</a>
-                </p>
-                <p>查看已保存的任务状态。</p>
-            </div>
-            <div class="col-lg-3">
-                <p><a class="btn btn-info" role="button" id="auto_scan_btn" data-toggle="modal"
-                      data-target="#scan_modal" data-backdrop="static">自动扫描 &raquo;</a></p>
-                <p>扫描局域网中的设备。</p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-3">
-                <p><a class="btn btn-info" role="button" id="down_load_settings_btn" href={% url 'download_video_setting' %}>下载配置&raquo;</a></p>
-                <p>保存已有的设置到本地文件中</p>
-            </div>
-            <div class="col-lg-3">
-                <p><a class="btn btn-info" href="/ipcset/basic/model/" role="button">查看信息&raquo;</a></p>
-                <p>查看已保存的设备基础信息</p>
-            </div>
-            <div class="col-lg-3">
-                <p><a class="btn btn-warning"  role="button" id="batch_delete_btn" data-toggle="modal"
+            <div class="col-lg-4">
+                <p><a class="btn btn-warning" role="button" id="batch_delete_btn" data-toggle="modal"
                       data-target="#batch_delete_modal" data-backdrop="static">批量删除&raquo;</a></p>
+
                 <p>批量删除已勾选的条目</p>
             </div>
+            {#            <div class="col-lg-4">#}
+            {#                <p><a href="/ipcset/missions/" class="btn btn-info" role="button" data-toggle="modal">查看任务 &raquo;</a>#}
+            {#                </p>#}
+            {##}
+            {#                <p>查看已保存的任务状态。</p>#}
+            {#            </div>#}
+            {##}
+            {#            <div class="col-lg-4">#}
+            {#                <p><a class="btn btn-info" role="button" id="down_load_settings_btn"#}
+            {#                      href={% url 'download_video_setting' %}>下载配置&raquo;</a></p>#}
+            {##}
+            {#                <p>保存已有的设置到本地文件中</p>#}
+            {#            </div>#}
         </div>
+        <hr>
     </div>
-    <hr>
+
     <div class="container">
-        <h2 class="sub-header">查看详细设置信息</h2>
+        <h3 class="sub-header">请选择需要设置的设备</h3>
+
         <div class="table-responsive">
             <table class="table table-striped" id="mac_table">
                 <thead>
@@ -109,6 +118,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>批量删除</h3>
+
                     <p>确认删除以下条目？</p>
                 </div>
                 <div class="modal-body">
@@ -130,7 +140,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-success" id="confirm_batch_delete_btn">确定</button>
-                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_batch_delete_btn">关闭
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal"
+                            id="abort_batch_delete_btn">关闭
                     </button>
                 </div>
             </div>
@@ -143,6 +154,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>同步设置</h3>
+
                     <p>同步该设备的参数至相同型号的其他设备。</p>
                 </div>
                 <div class="modal-body">
@@ -178,13 +190,17 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>扫描局域网</h3>
+
                     <p>自动扫描局域网内的在线设备，获取其信息并添加到数据库</p>
+
                     <p>点击“开始”后，系统会下发任务至终端，自动开始执行</p>
                 </div>
                 <div class="modal-body" id="scan_modal_body">
-                    <form class="form-horizontal" role="form" id="auto_scan_form" action="../api/mission/" method="post">
+                    <form class="form-horizontal" role="form" id="auto_scan_form" action="../api/mission/"
+                          method="post">
                         <div class="form-group">
                             <label class="col-sm-4 control-label">起始IP</label>
+
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="auto_start_ip" name="start_ip" value=""
                                        placeholder="eg: 192.168.1.2" required>
@@ -192,8 +208,10 @@
                         </div>
                         <div class="form-group">
                             <label class="col-sm-4 control-label">扫描数量</label>
+
                             <div class="col-sm-6">
-                                <input type="text" class="form-control" id="auto_total_count" name="total_count" value=""
+                                <input type="text" class="form-control" id="auto_total_count" name="total_count"
+                                       value=""
                                        placeholder="eg: 254" required>
                             </div>
                         </div>
@@ -202,6 +220,7 @@
                 <div class="modal-footer">
                     <div id="show_scan_progress" hidden>
                         <p>请确认执行终端已开启，等待扫描完成</p>
+
                         <div class="progress">
                             <div class="progress-bar progress-bar-striped active" role="progressbar"
                                  id="auto_scan_probar" style="width: 0%"></div>
@@ -209,7 +228,8 @@
                     </div>
                     <button type="button" class="btn btn-sm btn-success" id="show_scan_detail_btn" name="">查看详细</button>
                     <button type="button" class="btn btn-sm btn-success" id="confirm_scan_btn">开始</button>
-                    <button type="button" class="btn btn-sm btn-danger btn_terminate" id="scan_terminate_btn">终止</button>
+                    <button type="button" class="btn btn-sm btn-danger btn_terminate" id="scan_terminate_btn">终止
+                    </button>
                     <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_scan_btn"
                             name="">关闭
                     </button>
@@ -227,6 +247,7 @@
                     <form class="form-horizontal" role="form" id="edit_old_setting">
                         <div class="form-group">
                             <label for="edit_mac" class="col-sm-4 control-label">MAC地址</label>
+
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="mac_addr" name="mac_addr" value="MAC地址"
                                        disabled>
@@ -234,12 +255,14 @@
                         </div>
                         <div class="form-group">
                             <label for="edit_ip" class="col-sm-4 control-label">IP地址</label>
+
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="current_ip" name="current_ip" value="ip">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="edit_osd" class="col-sm-4 control-label">IPC类型</label>
+
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="type_id" name="type_id" value="IPC型号"
                                        disabled>
@@ -248,11 +271,13 @@
 
                         <div class="form-group">
                             <label for="edit_people" class="col-sm-3 control-label">主分辨率</label>
+
                             <div class="col-sm-3">
                                 <select class="form-control" id="set_resolution" name="set_resolution">
                                 </select>
                             </div>
                             <label for="edit_people" class="col-sm-2 control-label">子分辨率</label>
+
                             <div class="col-sm-3">
                                 <select class="form-control" id="set_min_resolution" name="set_min_resolution">
                                 </select>
@@ -261,11 +286,13 @@
 
                         <div class="form-group">
                             <label class="col-sm-3 control-label">主帧率</label>
+
                             <div class="col-sm-3">
                                 <select class="form-control" id="set_framerate" name="set_framerate">
                                 </select>
                             </div>
                             <label class="col-sm-2 control-label">子帧率</label>
+
                             <div class="col-sm-3">
                                 <select class="form-control" id="set_min_framerate" name="set_min_framerate">
                                 </select>
@@ -274,11 +301,13 @@
 
                         <div class="form-group">
                             <label class="col-sm-3 control-label">主比特率</label>
+
                             <div class="col-sm-3">
                                 <select class="form-control" id="set_bitrate" name="set_bitrate">
                                 </select>
                             </div>
                             <label class="col-sm-2 control-label">子比特率</label>
+
                             <div class="col-sm-3">
                                 <select class="form-control" id="set_min_bitrate" name="set_min_bitrate">
                                 </select>
@@ -287,6 +316,7 @@
 
                         <div class="form-group">
                             <label for="edit_people" class="col-sm-4 control-label">同步OSD</label>
+
                             <div class="col-sm-6">
                                 <label class="radio-inline" id="operate_type">
                                     <label class="radio-inline">
@@ -300,6 +330,7 @@
                         </div>
                         <div class="form-group">
                             <label for="edit_people" class="col-sm-4 control-label">修改人</label>
+
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="editor_name" name="editor_name"
                                        value={{ user.username }}>
@@ -324,6 +355,7 @@
                     <form class="form-horizontal" role="form" id="edit_old_setting">
                         <div class="form-group">
                             <label for="edit_mac" class="col-sm-4 control-label">MAC地址</label>
+
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="mac_addr" name="mac_addr"
                                        placeholder="请输入MAC地址" required>
@@ -331,6 +363,7 @@
                         </div>
                         <div class="form-group">
                             <label for="edit_ip" class="col-sm-4 control-label">IP地址</label>
+
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="current_ip" name="current_ip"
                                        placeholder="请输入IP地址" required>
@@ -338,6 +371,7 @@
                         </div>
                         <div class="form-group">
                             <label for="edit_type" class="col-sm-4 control-label">IPC类型</label>
+
                             <div class="col-sm-6">
                                 <select class="form-control" id="type_id" name="type_id" value="请选择型号">
                                 </select>
@@ -346,11 +380,13 @@
 
                         <div class="form-group">
                             <label for="edit_people" class="col-sm-3 control-label">主分辨率</label>
+
                             <div class="col-sm-3">
                                 <select class="form-control" id="set_resolution" name="set_resolution">
                                 </select>
                             </div>
                             <label for="edit_people" class="col-sm-2 control-label">子分辨率</label>
+
                             <div class="col-sm-3">
                                 <select class="form-control" id="set_min_resolution" name="set_min_resolution">
                                 </select>
@@ -359,11 +395,13 @@
 
                         <div class="form-group">
                             <label class="col-sm-3 control-label">主帧率</label>
+
                             <div class="col-sm-3">
                                 <select class="form-control" id="set_framerate" name="set_framerate">
                                 </select>
                             </div>
                             <label class="col-sm-2 control-label">子帧率</label>
+
                             <div class="col-sm-3">
                                 <select class="form-control" id="set_min_framerate" name="set_min_framerate">
                                 </select>
@@ -372,11 +410,13 @@
 
                         <div class="form-group">
                             <label class="col-sm-3 control-label">主比特率</label>
+
                             <div class="col-sm-3">
                                 <select class="form-control" id="set_bitrate" name="set_bitrate">
                                 </select>
                             </div>
                             <label class="col-sm-2 control-label">子比特率</label>
+
                             <div class="col-sm-3">
                                 <select class="form-control" id="set_min_bitrate" name="set_min_bitrate">
                                 </select>
@@ -385,6 +425,7 @@
 
                         <div class="form-group">
                             <label for="edit_people" class="col-sm-4 control-label">同步OSD</label>
+
                             <div class="col-sm-6">
                                 <label class="radio-inline" id="operate_type">
                                     <label class="radio-inline">
@@ -398,6 +439,7 @@
                         </div>
                         <div class="form-group">
                             <label for="edit_people" class="col-sm-4 control-label">修改人</label>
+
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="editor_name" name="editor_name"
                                        value={{ user.username }} required>
@@ -421,7 +463,9 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>开始执行设置</h3>
+
                     <p>确认需要执行的设备</p>
+
                     <p>点击确认后，系统会下发任务至终端，自动开始执行</p>
                 </div>
                 <div class="modal-body">
@@ -445,8 +489,10 @@
                     <form class="form-horizontal" role="form">
                         <div class="form-group">
                             <label for="edit_people" class="col-sm-4 control-label">修改人*</label>
+
                             <div class="col-sm-5">
-                                <input type="text" class="form-control" id="start_editor_name" value={{ user.username }} required>
+                                <input type="text" class="form-control" id="start_editor_name"
+                                       value={{ user.username }} required>
                             </div>
                         </div>
                     </form>
@@ -464,6 +510,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3>正在执行设置操作</h3>
+
                     <p>请确认执行终端已开启，等待设置完成</p>
                 </div>
                 <div class="modal-body">
@@ -489,19 +536,19 @@
         var timer_id;
         $('.btn_terminate').hide();
 
-{#              <!--下载配置-->#}
-{#      $('#down_load_settings_btn').on('click',function(){#}
-{#        location.href={% url 'download_video_setting' %};#}
-{#      });#}
+        {#              <!--下载配置-->#}
+        {#      $('#down_load_settings_btn').on('click',function(){#}
+        {#        location.href={% url 'download_video_setting' %};#}
+        {#      });#}
         <!--批量删除-->
         <!--确定删除-->
         $('#confirm_batch_delete_btn').click(function () {
             var js_data = {
-                'id':id_list
+                'id': id_list
             };
             console.log("batch delete.", js_data.id);
             $.ajax({
-                type:"POST",
+                type: "POST",
                 url: "/ipcset/api/settings/batch/",
                 data: JSON.stringify(js_data),
                 success: function (js_data) {
@@ -512,7 +559,7 @@
                 },
                 error: function (e) {
                     console.log("failed", e);
-                    alert("删除失败。error code:"+e.error);
+                    alert("删除失败。error code:" + e.error);
                 }
             })
         });
@@ -521,7 +568,10 @@
         $('#batch_delete_btn').click(function () {
             id_list = get_main_select_id();
             console.log(id_list);
-            if(id_list.length == 0){return;};
+            if (id_list.length == 0) {
+                return;
+            }
+            ;
             $.ajax({
                 type: "GET",
                 url: "/ipcset/api/settings/",
@@ -535,7 +585,7 @@
                         $("#batch_delete_modal tbody").append("<tr></tr>");
                         var mac_addr = "<td>" + this.mac_addr + "</td>";
                         var current_ip = "<td>" + this.current_ip + "</td>";
-                        var type_id = "<td>" +  this.type_id.model_name + "</td>";
+                        var type_id = "<td>" + this.type_id.model_name + "</td>";
                         $("#batch_delete_modal tbody tr:last").append(mac_addr, current_ip, type_id);
                     });
 
@@ -543,7 +593,7 @@
                 },
                 error: function (e) {
                     console.log("failed", e);
-                    alert("获取信息失败，请检查网络设置。error code:"+e.status);
+                    alert("获取信息失败，请检查网络设置。error code:" + e.status);
                 }
             });
         });
@@ -551,7 +601,7 @@
         $('#abort_batch_delete_btn').click(function () {
             $('#batch_delete_modal tbody').empty();
             $('#batch_delete_modal').hide();
-            id_list=[];
+            id_list = [];
         });
 
 
@@ -629,12 +679,12 @@
 
         <!--终止自动扫描-->
         $('#scan_terminate_btn').click(function () {
-            var js_data={
-                'mission_id':$('#show_scan_detail_btn').attr('name'),
-                'editor_name':$('#login_user_name').val(),
-                'run_status':0
+            var js_data = {
+                'mission_id': $('#show_scan_detail_btn').attr('name'),
+                'editor_name': $('#login_user_name').val(),
+                'run_status': 0
             }
-            console.log("terminate_btn.",js_data);
+            console.log("terminate_btn.", js_data);
             $.ajax({
                 type: "PUT",
                 url: "/ipcset/api/mission/",
@@ -643,10 +693,10 @@
                 data: JSON.stringify(js_data),
                 success: function (msg) {
                     console.log("success", msg);
-                    if(msg.run_status==0){
+                    if (msg.run_status == 0) {
                         alert("任务已终止！");
                         location.reload();
-                    }else{
+                    } else {
                         alert("终止失败！");
                     }
 
@@ -666,15 +716,16 @@
                 'mission_id': getTimeId(),
                 'start_ip': $('#auto_start_ip').val(),
                 'total_count': $('#auto_total_count').val(),
-                'mission_type':2,
-                'progress':0,
-                'run_status':1,
+                'mission_type': 2,
+                'progress': 0,
+                'run_status': 1,
             };
-            if(m_data.start_ip.split('.').length != 4){
+            if (m_data.start_ip.split('.').length != 4) {
                 alert("error:请输入合法IP地址！");
                 return;
-            };
-            if(m_data.total_count == ''){
+            }
+            ;
+            if (m_data.total_count == '') {
                 alert("error:请输入扫描数量");
                 return;
             }
@@ -692,7 +743,7 @@
                     $('#abort_scan_btn').attr("name", m_data.mission_id);
                     timer_id = window.setInterval(on_time_check_scan, 5000);
                     console.log('start timer:' + timer_id);
-                    $('#confirm_scan_btn').attr({'disabled':"disabled"});
+                    $('#confirm_scan_btn').attr({'disabled': "disabled"});
                     $('#scan_modal_body').hide();
                     $('#confirm_scan_btn').hide();
                     $('#scan_terminate_btn').show();
@@ -811,12 +862,12 @@
             var json_data = {
                 'editor_name': $('#start_editor_name').val(),
                 'mission_id': getTimeId(),
-                'start_ip':'0.0.0.0',
+                'start_ip': '0.0.0.0',
                 'total_count': id_list.length,
                 'detail_id': id_list,
                 'mission_type': 1,
-                'progress':0,
-                'run_status':1
+                'progress': 0,
+                'run_status': 1
             };
             $('#show_detail_btn').attr("name", json_data.mission_id);
             console.log(json_data);
@@ -850,12 +901,12 @@
 
         <!--取消设置-->
         $('#terminate_set_btn').click(function () {
-            var js_data={
-                'mission_id':$('#show_detail_btn').attr('name'),
-                'editor_name':$('#login_user_name').val(),
-                'run_status':0
+            var js_data = {
+                'mission_id': $('#show_detail_btn').attr('name'),
+                'editor_name': $('#login_user_name').val(),
+                'run_status': 0
             }
-            console.log("terminate_btn.",js_data);
+            console.log("terminate_btn.", js_data);
             $.ajax({
                 type: "PUT",
                 url: "/ipcset/api/mission/",
@@ -864,12 +915,13 @@
                 data: JSON.stringify(js_data),
                 success: function (msg) {
                     console.log("success", msg);
-                    if(msg.run_status==0){
+                    if (msg.run_status == 0) {
                         alert("任务已终止！");
                         location.reload();
-                    }else{
+                    } else {
                         alert("终止失败！");
-                    };
+                    }
+                    ;
                 },
                 error: function (e) {
                     console.log("failed", e);
@@ -1061,12 +1113,14 @@
                 // "csrfmiddlewaretoken":$("input[name='csrfmiddlewaretoken']").val(),
             };
             return json;
-        };
+        }
+        ;
 
         function getTimeId() {
             var time = new Date().getTime();
             return String(time);
-        };
+        }
+        ;
 
         $("#quit_new_btn").click(function () {
             $('#add_modal option').remove();
@@ -1098,7 +1152,8 @@
                     console.log("failed to get misson progress", e);
                 }
             });
-        };
+        }
+        ;
 
         function on_time_check_scan() {
             var op_id = $('#abort_scan_btn').attr("name");
@@ -1127,6 +1182,7 @@
                     alert("无法获取任务进度信息，请检查网络.error-" + e.status);
                 }
             });
-        };
+        }
+        ;
     </script>
 {% endblock %}
