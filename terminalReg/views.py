@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from jsonreformat import *
 
 from userManage.models import ApiKeyModel, UserApiModel
+from serializers import *
 
 
 # Create your views here.
@@ -46,13 +47,29 @@ class TerminalRegister(DetailView):
 
 @csrf_exempt
 def api_temrinal_register_post(request):
-	"""
-	terminal register by POST to this url
-	"""
-	#todo: register with ak,terminal_name,and so on
-	data = JSONParser().parse(request)
-	terminal_ak = data.get('ak', '')
-	api_model = ApiKeyModel.has_record(terminal_ak)
-	user_model = UserApiModel.objects.get(id=api_model.user_id)
+    """
+    terminal register by POST to this url with{ak, terminal_name}
+    """
+    # todo: register with ak,terminal_name,and so on
+    data = JSONParser().parse(request)
+    terminal_ak = data.get('ak', '')
+    api_model = ApiKeyModel.has_record(terminal_ak)
+    if api_model is None:
+        return ErrorJsonResponse(data={'ak':'un verified ak'}, status=400)
 
-	return SuccessJsonResponse(data={'user': user_model.username, 'ak': terminal_ak}, status=200)
+    user_model = UserApiModel.objects.get(id=api_model.user_id)
+    terminal_name = data.get('terminal_name', None)
+    if terminal_name is None:
+        return ErrorJsonResponse(data={'teminal_name':'is null'},status=400)
+
+    try:
+        old_terminal = TerminalModel.objects.get(terminal_name=terminal_name)
+        new_terminal = TerminalModelSerializer(old_terminal,data=data)
+    except Exception as e:
+        new_terminal = TerminalModelSerializer(data=data)
+
+    if new_terminal.is_valid():
+        new_terminal.save()
+        return SuccessJsonResponse(data={'user': user_model.username, 'ak': terminal_ak}, status=200)
+    else:
+        return ErrorJsonResponse(data=new_terminal.errors)
