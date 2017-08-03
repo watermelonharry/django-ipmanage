@@ -11,7 +11,7 @@ class TerminalModel(models.Model):
     """
     TERMINAL_STATUS_LIST = [
         (1, u'空闲'),
-        (1, u'繁忙'),
+        (2, u'繁忙'),
     ]
 
     terminal_name = models.CharField(max_length=40, blank=True, unique=True)
@@ -67,18 +67,24 @@ class TerminalWaitingMissionModel(models.Model):
     """
     newly created mission waiting to be fetched by terminals
     """
-    terminal_id = models.IntegerField(blank=True)
-    mission_id = models.CharField(max_length=40, blank=True)
+    mission_status_choice = [
+        (1, u'待分配'),
+        (2, u'已下发')
+    ]
+    terminal_name = models.CharField(max_length=40)
+    mission_id = models.CharField(max_length=40)
 
-    mission_from = models.CharField(max_length=20, blank=True)
+    # module
+    mission_from = models.CharField(max_length=20)
     mission_url = models.CharField(max_length=40, blank=True, null=True)
+
+    mission_status = models.IntegerField(choices=mission_status_choice, default=1)
 
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 
-
     def __unicode__(self):
-        return self.terminal_id + self.mission_id
+        return self.terminal_name + self.mission_id
 
     class Meta:
         ordering = ['id', 'create_time']

@@ -66,3 +66,9 @@ class FormatJsonParser(JSONParser):
 
     def get_terminal_name(self):
         return self.json_content.get('terminal_name', None)
+
+    def get_content(self):
+        return self.json_content
+
+    def get_data(self):
+        return self.json_content.get('data', None)

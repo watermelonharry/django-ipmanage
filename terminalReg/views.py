@@ -73,3 +73,19 @@ def api_temrinal_register_post(request):
         return SuccessJsonResponse(data={'user': user_model.username, 'ak': terminal_ak}, status=200)
     else:
         return ErrorJsonResponse(data=new_terminal.errors)
+
+
+class InnerApiBindMissionTerminal(DetailView):
+    @method_decorator(login_required)
+    def post(self, request):
+        """
+        api to bind the mission with terminal
+        """
+        data = FormatJsonParser(request).get_content()
+        new_bind = TerminalWaitingMissionSerializer(data)
+        if new_bind.is_valid() is True:
+            ##todo: success response
+            pass
+        else:
+            ##todo: fail response
+            pass
