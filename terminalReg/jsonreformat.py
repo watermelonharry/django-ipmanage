@@ -43,7 +43,7 @@ class ErrorJsonResponse(BaseResponse):
 
     def __init__(self, data, *args, **kwargs):
         # todo: status_code modify
-        super(SuccessJsonResponse, self).__init__(data, *args, **kwargs)
+        super(ErrorJsonResponse, self).__init__(data, *args, **kwargs)
 
     def init_content(self, data):
         content_dict = {}

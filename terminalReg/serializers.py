@@ -21,4 +21,4 @@ class TerminalHistorySerializer(serializers.ModelSerializer):
 class TerminalWaitingMissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = TerminalWaitingMissionModel
-        fields = {'id', 'terminal_name', 'mission_id', 'mission_from', 'mission_url', 'mission_status', 'edit_time'}
+        fields = ('id', 'terminal_name', 'mission_id', 'mission_from', 'mission_url', 'mission_status', 'edit_time')

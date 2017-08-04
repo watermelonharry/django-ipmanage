@@ -78,17 +78,17 @@ def api_temrinal_register_post(request):
 
 class InnerApiBindMissionTerminal(DetailView):
 
-	@method_decorator(csrf_exempt)
+	# @method_decorator(csrf_exempt)
 	def post(self, request):
 		"""
 		api to bind the mission with terminal
 		"""
 		format_data = FormatJsonParser(request)
 		if TerminalModel.has_terminal(format_data.get_terminal_name()) is False:
-			return ErrorJsonResponse(data={"terminal_name": "terminal not found"}, status=406)
+			return ErrorJsonResponse(data={"terminal_name": "terminal not found"}, status=400)
 
 		data = format_data.get_content()
-		new_bind = TerminalWaitingMissionSerializer(data)
+		new_bind = TerminalWaitingMissionSerializer(data=data)
 		if new_bind.is_valid() is True:
 			new_bind.save()
 			return SuccessJsonResponse(data=data, status=200)
