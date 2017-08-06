@@ -94,3 +94,11 @@ class InnerApiBindMissionTerminal(DetailView):
 			return SuccessJsonResponse(data=data, status=200)
 		else:
 			return ErrorJsonResponse(data=new_bind.errors, status=406)
+
+
+@csrf_exempt
+def api_get_online_terminal_list(request):
+	#todo: ak verify
+	terminal_list = map(lambda x:x if x.is_online() is True else None, TerminalModel.objects.all())
+	data = TerminalModelSerializer(data=terminal_list, many=True)
+	return SuccessJsonResponse(data=data)
