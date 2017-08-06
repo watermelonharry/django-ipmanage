@@ -100,7 +100,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'),]
 
 LANGUAGE_CODE = 'zh-cn'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
