@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.contrib.auth.models import User
+from rest_framework.parsers import JSONParser
+
 
 
 # Create your models here.
@@ -36,6 +38,24 @@ class ApiKeyModel(models.Model):
 			return cls.objects.get(key_chain=input_key_chain)
 		except:
 			return None
+
+	@classmethod
+	def has_ak(cls, data):
+		"""
+		verify the request data carries valid ak
+		:param request:
+		:return:
+		"""
+		try:
+			terminal_ak = data.get('ak', '')
+			api_model = cls.has_record(terminal_ak)
+			if not api_model:
+				return None
+			else:
+				return api_model
+		except Exception as e:
+			return None
+
 
 class UserApiModel(User):
 	other_info = models.TextField(blank=True)
