@@ -97,8 +97,31 @@ class InnerApiBindMissionTerminal(DetailView):
 
 
 @csrf_exempt
-def api_get_online_terminal_list(request):
-	#todo: ak verify
-	terminal_list = map(lambda x:x if x.is_online() is True else None, TerminalModel.objects.all())
-	data = TerminalModelSerializer(data=terminal_list, many=True)
-	return SuccessJsonResponse(data=data)
+def api_outer_get_online_terminal_list(request):
+    """
+    outer API for ?? to get online_terminals
+    :param request:
+    :return:
+    """
+    if request.method =='POST':
+        data=JSONParser().parse(request)
+        api_model = ApiKeyModel.has_ak(data)
+        if api_model:
+            online_list = TerminalModel.get_online_list()
+            terminal_data = TerminalModelSerializer(online_list, many=True).data
+            return SuccessJsonResponse(data=terminal_data)
+        else:
+            return ErrorJsonResponse(data={"ak":"invalid ak"},status=411)
+
+
+class InnerApiGetOnlineTerminal(ListView):
+    """
+    inner API for users to get online terminal_list
+    """
+    model = TerminalModel
+
+    @method_decorator(login_required)
+    def get(self):
+        online_list = TerminalModel.get_online_list()
+        data = TerminalModelSerializer(online_list, many=True).data
+        return SuccessJsonResponse(data=data)

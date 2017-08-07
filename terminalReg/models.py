@@ -53,7 +53,15 @@ class TerminalModel(models.Model):
 
 	@classmethod
 	def get_online_list(cls):
-		pass
+		"""
+		get online-terminal list
+		"""
+		all_terminal = cls.objects.all()
+		online_list =[]
+		for terminal in all_terminal:
+			if terminal.is_online():
+				online_list.append(terminal)
+		return online_list
 
 	@classmethod
 	def has_terminal(cls, input_name):
@@ -66,6 +74,7 @@ class TerminalModel(models.Model):
 			return True
 		except Exception as e:
 			return False
+
 
 
 class TerminalHistoryModel(models.Model):

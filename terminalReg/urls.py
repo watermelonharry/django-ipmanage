@@ -31,7 +31,9 @@ urlpatterns = [
     # url('^api/register/$', views.TerminalRegister.as_view(), name='api_terminal_register'),
     url('^api/register/$', views.api_temrinal_register_post, name='api_terminal_register'),
     url('^api/inner/bindterminal/$', views.InnerApiBindMissionTerminal.as_view(), name='api_inner_bind_terminal'),
-    url('^api/common/online/$', views.api_get_online_terminal_list, name='api_get_online_terminal_list'),
+
+    url('^api/common/online/$', views.api_outer_get_online_terminal_list, name='api_get_outer_online_terminal_list'),
+    url('^api/inner/online/$', views.InnerApiGetOnlineTerminal.as_view(), name='api_get_inner_online_terminal_list'),
 
 
     # url('^basic/$',views.show_basic_info),
