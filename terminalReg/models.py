@@ -21,7 +21,7 @@ class TerminalModel(models.Model):
 
 	available_time = models.IntegerField(blank=True, null=True)
 
-	ak = models.CharField(max_length=50, blank=True, unique=True, null=True)
+	ak = models.CharField(max_length=50, blank=True, null=True)
 	terminal_addr = models.CharField(max_length=20, blank=True, null=True)
 	terminal_port = models.IntegerField(blank=True, null=True)
 
