@@ -14,7 +14,7 @@ except Exception as e:
 """
 Globals here
 """
-REQUEST_COUNT = 5
+THREAD_COUNT = 5
 TIME_OUT = 2.0
 REGISTER_PATH = 'terminal/api/register/'
 
@@ -22,7 +22,14 @@ REGISTER_PATH = 'terminal/api/register/'
 class here
 """
 
-request_pool = threading.Semaphore(REQUEST_COUNT)
+request_pool = threading.Semaphore(THREAD_COUNT)
+
+
+class CONNECTION_STATUS(object):
+    OFFLINE = 0
+    IDLE = 1
+    BUSY = 2
+    ERROR = 3
 
 
 class RegisterThread(threading.Thread):
@@ -40,10 +47,13 @@ class RegisterThread(threading.Thread):
 
         self.reg_url = self.root_url + '/' + REGISTER_PATH
         self.RUN_FLAG = True
+        self.CONNECTION_STATUS = CONNECTION_STATUS.OFFLINE
 
         self.info_dict = {
             'terminal_name': self.terminal_name,
             'ak': self.ak,
+            'terminal_status': CONNECTION_STATUS.IDLE,
+            'assigned_mission': None
         }
 
         self.LOCK = threading.Lock()
@@ -60,8 +70,24 @@ class RegisterThread(threading.Thread):
         post on time
         """
         while self.RUN_FLAG:
-            # todo: post and get result
-            pass
+            assign_info = self.post()
+
+            # todo:post and get result
+            fields = ('id', 'terminal_name', 'mission_id', 'mission_from', 'mission_url', 'mission_status', 'edit_time')
+
+
+            time.sleep(self.interval_time)
+
+    def set_status(self, status):
+        """
+        set connection status
+        :param status:
+        :return:
+        """
+        self.LOCK.acquire()
+        self.CONNECTION_STATUS = status
+        self.info_dict['terminal_status'] = status
+        self.LOCK.release()
 
     def post(self):
         """
@@ -72,14 +98,14 @@ class RegisterThread(threading.Thread):
             reply = requests.api.post(self.reg_url, json=self.info_dict, timeout=TIME_OUT)
             if reply.status_code == 200:
                 re_dict = reply.json()
-                self.CONNECTION_STATUS = 1
+                self.set_status(CONNECTION_STATUS.IDLE)
                 return re_dict
             else:
                 raise requests.exceptions.ConnectionError
 
         except Exception as e:
             ##connect error
-            self.CONNECTION_STATUS = 2
+            self.set_status(CONNECTION_STATUS.ERROR)
             return None
 
     def get(self):
@@ -94,13 +120,17 @@ class RegisterThread(threading.Thread):
         check if the connection is established
         :return: True/False
         """
-        return self.CONNECTION_STATUS
+        self.LOCK.acquire()
+        status = self.CONNECTION_STATUS
+        self.LOCK.release()
+        return status
 
     def stop(self):
         """
         stop the register thread
         :return: None
         """
+        self.RUN_FLAG = False
 
     def set_params(self, **kwargs):
         """
@@ -109,3 +139,4 @@ class RegisterThread(threading.Thread):
         :return: None
         """
         # todo: manager Thread
+        pass
