@@ -16,8 +16,10 @@ class TerminalModel(models.Model):
 	]
 
 	terminal_name = models.CharField(max_length=40, blank=True, unique=True)
-	terminal_status = models.IntegerField(blank=True, null=True)
+	terminal_status = models.IntegerField(blank=True, null=True, choices=TERMINAL_STATUS_LIST)
 	terminal_type = models.CharField(max_length=20, blank=True, null=True)
+
+	assigned_mission = models.CharField(max_length=20, blank=True, null=True)
 
 	available_time = models.IntegerField(blank=True, null=True)
 
@@ -120,3 +122,17 @@ class TerminalWaitingMissionModel(models.Model):
 
 	class Meta:
 		ordering = ['id', 'create_time']
+
+	@classmethod
+	def delete_from_queue(cls, mission_id):
+		"""
+		waiting mission deleter
+		:param mission_id:
+		:return:
+		"""
+		try:
+			cls.objects.get(mission_id=mission_id).delete()
+			return True
+		except Exception as e:
+			return False
+
