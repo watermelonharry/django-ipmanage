@@ -39,6 +39,9 @@ class RegisterThread(threading.Thread):
 
     def __init__(self, interval=5, **kwargs):
         super(RegisterThread, self).__init__()
+        ##dispatch dict, module and its process thread
+        self.__dispatch = {}
+
         self.interval_time = interval
 
         self.terminal_name = kwargs.get('terminal_name', 'unknown')
@@ -71,12 +74,37 @@ class RegisterThread(threading.Thread):
         """
         while self.RUN_FLAG:
             assign_info = self.post()
+            if assign_info is not None:
+                self.dispatch_mission()
 
             # todo:post and get result
             fields = ('id', 'terminal_name', 'mission_id', 'mission_from', 'mission_url', 'mission_status', 'edit_time')
 
-
             time.sleep(self.interval_time)
+
+    @property
+    def dispatch_dict(self):
+        return self.__dispatch
+
+    @dispatch_dict.setter
+    def __dispatch_dict(self, module, callback):
+        self.__dispatch[module] = callback
+
+    def register_module(self, module=None, callback=None):
+        """
+        add module and its process threads to dispatch dict
+        :return:
+        """
+        if isinstance(module, str):
+            self.__dispatch_dict(module=module, callback=callback)
+        else:
+            raise ValueError('module name can not be empty')
+
+    def dispatch_mission(self):
+        """
+        dispatch the mission according to the returning info
+        :return:
+        """
 
     def set_status(self, status):
         """
