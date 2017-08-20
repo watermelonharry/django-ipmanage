@@ -1,5 +1,5 @@
 import unittest
-from terminalapi import Dispatcher
+from terminalapi.terminalapi import Dispatcher
 
 
 class LogLevel(object):
@@ -22,15 +22,17 @@ class TerminalApiTester(unittest.TestCase):
 
     def test_empty_dispatcher(self):
         dispatcher = Dispatcher()
-        assert len(dispatcher.dispatch_dict) == 0, '[!] new dispatcher failed'
+        self.assertEqual(len(dispatcher.dispatch_dict), 0, '[!] new dispatcher failed')
 
     def test_register_module_to_dispatcher(self):
         dispatcher = Dispatcher()
         test_func = lambda x: x - 1
         module = 'test_func'
+        new_one = {module:test_func}
         dispatcher.register_module(module=module, callback=test_func)
-        assert dispatcher.dispatch_dict.has_key(module), '[!] dispatcher register failed'
-        assert dispatcher.dispatch(module, 1) == 0, '[!] dispatcher diaspatch mission failed'
+        print dispatcher.dispatch_dict
+        self.assertTrue(dispatcher.dispatch_dict.has_key(module), '[!] dispatcher register failed')
+        self.assertEqual(dispatcher.dispatch(module, 1) , 0, '[!] dispatcher diaspatch mission failed')
 
 
 if __name__ == '__main__':
