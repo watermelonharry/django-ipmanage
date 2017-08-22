@@ -36,13 +36,49 @@ class CONNECTION_STATUS(object):
     ERROR = 3
 
 
-class Dispatcher(object):
+class DispatcherThread(threading.Thread):
     def __init__(self):
+        super(DispatcherThread,self).__init__()
         self.__dispatch_dict = {}
+        self.__mission_queue = Queue.Queue()
+        self.__RUN_FLAG = True
+
+    def say(self, words):
+        print('[*] {0}'.format(str(words)))
+
+    @property
+    def is_running(self):
+        return self.__RUN_FLAG
+
+    def terminate(self):
+        self.say('thread terminated.')
+        self.__RUN_FLAG = False
 
     @property
     def dispatch_dict(self):
         return self.__dispatch_dict
+
+    @property
+    def mission_queue(self):
+        return self.__mission_queue
+
+
+    def get_mission_blocked(self):
+        """
+        block the threading until a new mission is assigned
+        """
+        self.say('getting mission.')
+        return self.__mission_queue.get()
+
+    def append_to_mission_queue(self, mission):
+        """
+        put new mission to mission_queue
+        :param mission(dict): {'module':XXXX, 'data':{....}}
+        :return:
+        """
+        self.say('new mission appended.')
+        self.__mission_queue.put(mission)
+
 
     # @dispatch_dict.setter
     def __set_dispatch_dict(self, module, callfunc):
@@ -59,6 +95,7 @@ class Dispatcher(object):
         :param callback: callback function
         :return:
         """
+        self.say('new module registered')
         return self.__set_dispatch_dict(module, callback)
 
     def dispatch(self, module, *args, **kwargs):
@@ -68,6 +105,7 @@ class Dispatcher(object):
         :param kwargs:
         :return:
         """
+        self.say('dispatch mission.')
         if self.dispatch_dict.has_key(module):
             target_func =  self.dispatch_dict.get(module)(*args, **kwargs)
             if isinstance(target_func, threading.Thread):
@@ -77,6 +115,24 @@ class Dispatcher(object):
                 return target_func
         else:
             pass
+
+    def run(self):
+        """
+        1. get mission from queue
+        2. dispatch mission and run
+        """
+        self.say('dispatcher thread running.')
+        while self.is_running:
+            self.say('waiting for mission')
+            new_mission = self.get_mission_blocked()
+            self.say('new mission get: {0}'.format(str(new_mission)))
+
+            ret = self.dispatch(module = new_mission.get('module'), **(new_mission.get('data')))
+            self.say('dispatch result is {0}'.format(ret))
+            self.say('dispatch finished')
+            time.sleep(5)
+
+        self.say('dispatch thread end')
 
 
 class RegisterThread(threading.Thread):
