@@ -42,9 +42,10 @@ class TerminalApiTester(unittest.TestCase):
         self.assertTrue(dispatcher.dispatch_dict.has_key(module), '[!] dispatcher register failed')
 
         dispatcher.terminate()
-        dispatcher.append_to_mission_queue({'module':'None','data':'None'})
+        dispatcher.append_to_mission_queue({'module':'None','data':{}})
         time.sleep(1)
         del dispatcher
+
 
     def test_append_mission_to_queue(self):
         dispatcher = DispatcherThread()

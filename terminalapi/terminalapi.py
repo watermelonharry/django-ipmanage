@@ -42,6 +42,7 @@ class DispatcherThread(threading.Thread):
         self.__dispatch_dict = {}
         self.__mission_queue = Queue.Queue()
         self.__RUN_FLAG = True
+        self.__register_lock =  threading.Lock()
 
     def say(self, words):
         print('[*] {0}'.format(str(words)))
@@ -82,10 +83,14 @@ class DispatcherThread(threading.Thread):
 
     # @dispatch_dict.setter
     def __set_dispatch_dict(self, module, callfunc):
+        self.__register_lock.acquire()
         try:
             self.__dispatch_dict[module] = callfunc
+
+            self.__register_lock.release()
             return True
         except Exception as e:
+            self.__register_lock.release()
             return False
 
     def register_module(self, module, callback):
@@ -95,7 +100,7 @@ class DispatcherThread(threading.Thread):
         :param callback: callback function
         :return:
         """
-        self.say('new module registered')
+        self.say('new module registering.')
         return self.__set_dispatch_dict(module, callback)
 
     def dispatch(self, module, *args, **kwargs):
@@ -107,7 +112,9 @@ class DispatcherThread(threading.Thread):
         """
         self.say('dispatch mission.')
         if self.dispatch_dict.has_key(module):
+            self.__register_lock.acquire()
             target_func =  self.dispatch_dict.get(module)(*args, **kwargs)
+            self.__register_lock.release()
             if isinstance(target_func, threading.Thread):
                 target_func.start()
                 target_func.join()
@@ -337,6 +344,13 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             form = request.split('\r\n')
             entry_json = form[-1]  # main content of the request
             in_dict = json.loads(entry_json)
+            if hasattr(self, 'handle_func'):
+                print "[*] entering handle_func"
+
+                self.handle_func(ReceiverThread)
+
+            else:
+                print "[*] has no handle_func"
             re_dict = {'a': 1, 'b': 2}
             re_dict.update(in_dict)
 
@@ -353,6 +367,14 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
         # just send back the same data, but upper-cased
         self.request.sendall(content)
+
+    @classmethod
+    def register_handle_func(cls, func):
+        if hasattr(cls, 'handle_func'):
+            print "[*] already has a handle_func"
+        else:
+            setattr(cls, 'handle_func', func)
+            print "[*] handle_func registered"
 
 
 if __name__ == '__main__':
