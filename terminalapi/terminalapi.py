@@ -100,7 +100,7 @@ class DispatcherThread(threading.Thread):
         :param callback: callback function
         :return:
         """
-        self.say('new module registering.')
+        self.say('new module registering:{0}.'.format(module))
         return self.__set_dispatch_dict(module, callback)
 
     def dispatch(self, module, *args, **kwargs):
@@ -150,8 +150,6 @@ class RegisterThread(threading.Thread):
     def __init__(self, interval=5, **kwargs):
         super(RegisterThread, self).__init__()
         ##dispatch dict, module and its process thread
-        self.__dispatch = {}
-
         self.interval_time = interval
 
         self.terminal_name = kwargs.get('terminal_name', 'unknown')
@@ -170,7 +168,6 @@ class RegisterThread(threading.Thread):
         }
 
         self.LOCK = threading.Lock()  # r/w lock for variants
-        self.DISPATCH_LOCK = threading.Lock()  # for dispatch
 
         """
         0: no connection
@@ -178,6 +175,23 @@ class RegisterThread(threading.Thread):
         2: error in connecting
         """
         self.CONNECTION_STATUS = 0
+
+        ##init other Thread
+        try:
+            self.__dispath_thread = DispatcherThread()
+            self.__dispath_thread.start()
+
+            MyTCPHandler.register_handle_func(self.__dispath_thread.append_to_mission_queue)
+            self.__receiver_thread = ReceiverThread()
+
+        except Exception as e:
+            self.RUN_FLAG = False
+            print('[*] init sub thread error:{0}, quit Register Thread'.format(str(e)))
+
+
+    def register_module(self, module, callback):
+        return self.__dispath_thread.register_module(module, callback)
+
 
     def run(self):
         """
@@ -192,30 +206,6 @@ class RegisterThread(threading.Thread):
             fields = ('id', 'terminal_name', 'mission_id', 'mission_from', 'mission_url', 'mission_status', 'edit_time')
 
             time.sleep(self.interval_time)
-
-    @property
-    def dispatch_dict(self):
-        return self.__dispatch
-
-    @dispatch_dict.setter
-    def __dispatch_dict(self, module, callback):
-        self.__dispatch[module] = callback
-
-    def register_module(self, module=None, callback=None):
-        """
-        add module and its process threads to dispatch dict
-        :return:
-        """
-        if isinstance(module, str):
-            self.__dispatch_dict(module=module, callback=callback)
-        else:
-            raise ValueError('module name can not be empty')
-
-    def dispatch_mission(self):
-        """
-        dispatch the mission according to the returning info
-        :return:
-        """
 
     def set_status(self, status):
         """
@@ -285,7 +275,9 @@ class ReceiverThread(threading.Thread):
     def __init__(self):
         super(ReceiverThread, self).__init__()
         if self.__assign_port() is False:
-            print('[*] receiver thread init failed')
+            print('[*] receiver thread init failed, quit Receiver Thread.')
+            raise AttributeError('receiver thread init failed, quit Receiver Thread.')
+
         else:
             print('[*] receiver thread init success with port: %s' % str(self.port))
             self.start()
@@ -347,7 +339,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             if hasattr(self, 'handle_func'):
                 print "[*] entering handle_func"
 
-                self.handle_func(ReceiverThread)
+                self.handle_func(in_dict)
 
             else:
                 print "[*] has no handle_func"
@@ -371,11 +363,22 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     @classmethod
     def register_handle_func(cls, func):
         if hasattr(cls, 'handle_func'):
-            print "[*] already has a handle_func"
+            print "[*] already has a handle_func, replaced"
+            setattr(cls, ' handle_func', func)
         else:
             setattr(cls, 'handle_func', func)
             print "[*] handle_func registered"
 
+def printer(x):
+    print('[*] in printer func:{0}'.format(str(x)))
+
+def summer(x,y):
+    print('[*] in sum func: {0}'.format(str(x+y)))
+
 
 if __name__ == '__main__':
-    k = ReceiverThread()
+    k = RegisterThread()
+    k.register_module(module='print', callback=printer)
+    k.register_module(module='sum', callback=summer)
+    k.start()
+    k.join()
