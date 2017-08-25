@@ -113,13 +113,23 @@ class DispatcherThread(threading.Thread):
         self.say('dispatch mission.')
         if self.dispatch_dict.has_key(module):
             self.__register_lock.acquire()
-            target_func =  self.dispatch_dict.get(module)(*args, **kwargs)
+
+            try:
+                target_func =  self.dispatch_dict.get(module)
+            except Exception as e:
+                print('[*]error in dispatch:{0}'.format(e.message))
+
             self.__register_lock.release()
-            if isinstance(target_func, threading.Thread):
-                target_func.start()
-                target_func.join()
-            else:
-                return target_func
+
+            try:
+                if isinstance(target_func, threading.Thread):
+                    target_func.start()
+                    target_func.join()
+                else:
+                    return target_func(*args, **kwargs)
+            except Exception as e:
+                print('[*]error in call target_func:{0}'.format(e.message))
+
         else:
             pass
 
@@ -382,3 +392,8 @@ if __name__ == '__main__':
     k.register_module(module='sum', callback=summer)
     k.start()
     k.join()
+
+    """
+    for test: send {"module":"sum", "data":{"x":20,"y":30}} to localhost:port
+    for test: send {"module":"print", "data":{"x":20}} to localhost:port
+    """
