@@ -73,12 +73,12 @@ def api_temrinal_register_post(request):
         new_terminal.save()
 
         try:
-            m_serializer = TerminalWaitingMissionModel.get_mission_by_name(terminal_name=terminal_name)
+            m_serializer = TerminalWaitingMissionSerializer(TerminalWaitingMissionModel.get_mission_by_name(terminal_name=terminal_name))
             mission_info = m_serializer.data
         except Exception as e:
             mission_info = {'mission_id': 'None'}
 
-        return SuccessJsonResponse(data={'user': user_model.username, 'ak': terminal_ak}.update(**mission_info),
+        return SuccessJsonResponse(data={'user': user_model.username, 'ak': terminal_ak}.update(mission_info),
                                    status=200)
     else:
         return ErrorJsonResponse(data=new_terminal.errors)
