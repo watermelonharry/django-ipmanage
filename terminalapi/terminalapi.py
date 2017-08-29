@@ -38,11 +38,11 @@ class CONNECTION_STATUS(object):
 
 class DispatcherThread(threading.Thread):
     def __init__(self):
-        super(DispatcherThread,self).__init__()
+        super(DispatcherThread, self).__init__()
         self.__dispatch_dict = {}
         self.__mission_queue = Queue.Queue()
         self.__RUN_FLAG = True
-        self.__register_lock =  threading.Lock()
+        self.__register_lock = threading.Lock()
 
     def say(self, words):
         print('[*] {0}'.format(str(words)))
@@ -63,7 +63,6 @@ class DispatcherThread(threading.Thread):
     def mission_queue(self):
         return self.__mission_queue
 
-
     def get_mission_blocked(self):
         """
         block the threading until a new mission is assigned
@@ -78,8 +77,8 @@ class DispatcherThread(threading.Thread):
         :return:
         """
         self.say('new mission appended.')
+        self.say('new mission is {0}.'.format(str(mission)))
         self.__mission_queue.put(mission)
-
 
     # @dispatch_dict.setter
     def __set_dispatch_dict(self, module, callfunc):
@@ -115,7 +114,7 @@ class DispatcherThread(threading.Thread):
             self.__register_lock.acquire()
 
             try:
-                target_func =  self.dispatch_dict.get(module)
+                target_func = self.dispatch_dict.get(module)
             except Exception as e:
                 print('[*]error in dispatch:{0}'.format(e.message))
 
@@ -144,7 +143,7 @@ class DispatcherThread(threading.Thread):
             new_mission = self.get_mission_blocked()
             self.say('new mission get: {0}'.format(str(new_mission)))
 
-            ret = self.dispatch(module = new_mission.get('module'), **(new_mission.get('data')))
+            ret = self.dispatch(module=new_mission.get('module'), **(new_mission.get('data')))
             self.say('dispatch result is {0}'.format(ret))
             self.say('dispatch finished')
             time.sleep(5)
@@ -157,7 +156,7 @@ class RegisterThread(threading.Thread):
     register thread, request the URL
     """
 
-    def __init__(self, interval=5, **kwargs):
+    def __init__(self, interval=30, **kwargs):
         super(RegisterThread, self).__init__()
         ##dispatch dict, module and its process thread
         self.interval_time = interval
@@ -174,7 +173,9 @@ class RegisterThread(threading.Thread):
             'terminal_name': self.terminal_name,
             'ak': self.ak,
             'terminal_status': CONNECTION_STATUS.IDLE,
-            'assigned_mission': None
+            'assigned_mission': None,
+            'register_url': self.reg_url,
+            'live_time': self.interval_time / 2
         }
 
         self.LOCK = threading.Lock()  # r/w lock for variants
@@ -193,29 +194,47 @@ class RegisterThread(threading.Thread):
 
             MyTCPHandler.register_handle_func(self.__dispath_thread.append_to_mission_queue)
             self.__receiver_thread = ReceiverThread()
+            self.info_dict.update(self.__receiver_thread.get_info_dict())
+            MyTCPHandler.update_info_dict(self.info_dict)
 
         except Exception as e:
             self.RUN_FLAG = False
             print('[*] init sub thread error:{0}, quit Register Thread'.format(str(e)))
 
+        print('[*] init register thread success:{0}.'.format(str(self.get_info_dict())))
+
+
 
     def register_module(self, module, callback):
         return self.__dispath_thread.register_module(module, callback)
 
+    def get_info_dict(self):
+        return self.info_dict
 
     def run(self):
         """
         post on time
         """
         while self.RUN_FLAG:
-            assign_info = self.post()
-            if assign_info is not None:
-                self.dispatch_mission()
+            reply_dict = self.post()
+            if reply_dict is not None:
+                self.dispatch_mission(reply_dict)
 
             # todo:post and get result
             fields = ('id', 'terminal_name', 'mission_id', 'mission_from', 'mission_url', 'mission_status', 'edit_time')
 
             time.sleep(self.interval_time)
+
+    def dispatch_mission(self, mission_dict):
+        """
+        deliver the mission dict to dispatch thread and run
+        :param mission_dict: mission_info_dict, eg: {'module':xxx, 'data':{....}}
+        :return:
+        """
+        try:
+            self.__dispath_thread.append_to_mission_queue(mission_dict)
+        except Exception as e:
+            pass
 
     def set_status(self, status):
         """
@@ -228,13 +247,18 @@ class RegisterThread(threading.Thread):
         self.info_dict['terminal_status'] = status
         self.LOCK.release()
 
-    def post(self):
+    def post(self, info_dict=None, post_url = None):
         """
         post data to register_url
         :return:
         """
+        if info_dict is None:
+            info_dict = self.info_dict
+        if post_url is None:
+            post_url = self.reg_url
+
         try:
-            reply = requests.api.post(self.reg_url, json=self.info_dict, timeout=TIME_OUT)
+            reply = requests.api.post(url=post_url, json=info_dict, timeout=TIME_OUT)
             if reply.status_code == 200:
                 re_dict = reply.json()
                 self.set_status(CONNECTION_STATUS.IDLE)
@@ -247,12 +271,29 @@ class RegisterThread(threading.Thread):
             self.set_status(CONNECTION_STATUS.ERROR)
             return None
 
-    def get(self):
+    def get(self, info_dict=None, post_url = None):
         """
         get status
         :return:
         """
-        pass
+        if info_dict is None:
+            info_dict = self.info_dict
+        if post_url is None:
+            post_url = self.reg_url
+
+        try:
+            reply = requests.api.get(url=post_url, json=info_dict, timeout=TIME_OUT)
+            if reply.status_code == 200:
+                re_dict = reply.json()
+                self.set_status(CONNECTION_STATUS.IDLE)
+                return re_dict
+            else:
+                raise requests.exceptions.ConnectionError
+
+        except Exception as e:
+            ##connect error
+            self.set_status(CONNECTION_STATUS.ERROR)
+            return None
 
     def get_connect_status(self):
         """
@@ -314,6 +355,14 @@ class ReceiverThread(threading.Thread):
                 retry_count -= 1
         return False
 
+    def get_info_dict(self):
+        """
+        get the thread info dict
+        :return: {"port":12313, ...}
+        """
+        info_dict = {"port": self.port}
+        return info_dict
+
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
     """
@@ -325,6 +374,16 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     """
     index_content = '''HTTP/1.x 200 ok\r\nContent-Type: application/json\r\n\r\n'''
 
+
+    @classmethod
+    def update_info_dict(cls, info_dict):
+        if hasattr(cls, 'info_dict'):
+            print('[*] Handler class already has info_dict attr, updating.')
+            cls.info_dict.update(info_dict)
+        else:
+            print('[*] Handler class attr info_dict add success.')
+            setattr(cls, 'info_dict', info_dict)
+
     def handle(self):
         # self.request is the TCP socket connected to the client
         request = self.request.recv(2048)
@@ -335,7 +394,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
         content = self.index_content
 
-        print 'Request is:\n', request
+        # print 'Request is:\n', request
 
         # deal wiht GET method
         if method == 'GET':
@@ -353,7 +412,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
             else:
                 print "[*] has no handle_func"
-            re_dict = {'a': 1, 'b': 2}
+            re_dict = {}
+            re_dict.update(self.info_dict)
             re_dict.update(in_dict)
 
             content += json.dumps({'error': 'none', 'data': re_dict})
@@ -379,11 +439,13 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             setattr(cls, 'handle_func', func)
             print "[*] handle_func registered"
 
+
 def printer(x):
     print('[*] in printer func:{0}'.format(str(x)))
 
-def summer(x,y):
-    print('[*] in sum func: {0}'.format(str(x+y)))
+
+def summer(x, y):
+    print('[*] in sum func: {0}'.format(str(x + y)))
 
 
 if __name__ == '__main__':
