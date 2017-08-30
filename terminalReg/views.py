@@ -53,6 +53,7 @@ def api_temrinal_register_post(request):
     """
     # todo: register with ak,terminal_name,and so on
     data = JSONParser().parse(request)
+    terminal_addr = request.META.get('REMOTE_ADDR', '')
     terminal_ak = data.get('ak', '')
     api_model = ApiKeyModel.has_record(terminal_ak)
     if api_model is None:
@@ -78,7 +79,10 @@ def api_temrinal_register_post(request):
         except Exception as e:
             mission_info = {'mission_id': 'None'}
 
-        return SuccessJsonResponse(data={'user': user_model.username, 'ak': terminal_ak}.update(mission_info),
+        reply_dict = {'user': user_model.username, 'ak': terminal_ak}
+        reply_dict.update(mission_info)
+
+        return SuccessJsonResponse(data=reply_dict,
                                    status=200)
     else:
         return ErrorJsonResponse(data=new_terminal.errors)

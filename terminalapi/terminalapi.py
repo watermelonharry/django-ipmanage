@@ -139,14 +139,18 @@ class DispatcherThread(threading.Thread):
         """
         self.say('dispatcher thread running.')
         while self.is_running:
-            self.say('waiting for mission')
-            new_mission = self.get_mission_blocked()
-            self.say('new mission get: {0}'.format(str(new_mission)))
 
-            ret = self.dispatch(module=new_mission.get('module'), **(new_mission.get('data')))
-            self.say('dispatch result is {0}'.format(ret))
-            self.say('dispatch finished')
-            time.sleep(5)
+            try:
+                self.say('waiting for mission')
+                new_mission = self.get_mission_blocked()
+                self.say('new mission get: {0}'.format(str(new_mission)))
+
+                ret = self.dispatch(module=new_mission.get('module'), **(new_mission.get('data')))
+                self.say('dispatch result is {0}'.format(ret))
+                self.say('dispatch finished')
+                time.sleep(5)
+            except Exception as e:
+                self.say('error in DispatcherThread:{0}'.format(e.message))
 
         self.say('dispatch thread end')
 
@@ -165,7 +169,7 @@ class RegisterThread(threading.Thread):
         self.root_url = kwargs.get('url', 'http://127.0.0.1:8000/')
         self.ak = kwargs.get('ak', 'no_ak')
 
-        self.reg_url = self.root_url + '/' + REGISTER_PATH
+        self.reg_url = self.root_url + REGISTER_PATH
         self.RUN_FLAG = True
         self.CONNECTION_STATUS = CONNECTION_STATUS.OFFLINE
 
@@ -218,12 +222,27 @@ class RegisterThread(threading.Thread):
         while self.RUN_FLAG:
             reply_dict = self.post()
             if reply_dict is not None:
-                self.dispatch_mission(reply_dict)
+                self.dispatch_mission(self.extract_mission_dict(reply_dict))
 
             # todo:post and get result
-            fields = ('id', 'terminal_name', 'mission_id', 'mission_from', 'mission_url', 'mission_status', 'edit_time')
 
             time.sleep(self.interval_time)
+
+    def extract_mission_dict(self, reply_dict):
+        """
+        extract mission dict in dispatcher's pattern
+        :param reply_dict: reply dict from server
+        :return: mission_dict, eg. {'module':xxxx, 'data':{....params...}}
+        """
+        #todo:
+        try:
+            mission_data = reply_dict.get('data',{})
+            mission_dict = {'module': mission_data.get('mission_from', 'unknown'),
+                            'data':mission_data}
+            return mission_dict
+        except Exception as e:
+            return {'module':'unknown'}
+
 
     def dispatch_mission(self, mission_dict):
         """
@@ -449,7 +468,7 @@ def summer(x, y):
 
 
 if __name__ == '__main__':
-    k = RegisterThread()
+    k = RegisterThread(ak='3d620ef6068e64e7e55d', terminal_name='regi_terminal')
     k.register_module(module='print', callback=printer)
     k.register_module(module='sum', callback=summer)
     k.start()
