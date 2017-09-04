@@ -114,7 +114,7 @@ class DispatcherThread(threading.Thread):
             self.__register_lock.acquire()
 
             try:
-                target_func = self.dispatch_dict.get(module)
+                target_func = self.dispatch_dict.get(module)(*args,**kwargs)
             except Exception as e:
                 print('[*]error in dispatch:{0}'.format(e.message))
 
@@ -125,7 +125,7 @@ class DispatcherThread(threading.Thread):
                     target_func.start()
                     target_func.join()
                 else:
-                    return target_func(*args, **kwargs)
+                    return target_func
             except Exception as e:
                 print('[*]error in call target_func:{0}'.format(e.message))
 
