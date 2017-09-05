@@ -836,7 +836,8 @@
         $('#start_set_btn').click(function () {
             id_list = get_main_select_id();
             console.log(id_list);
-            $('#start_set_modal option').remove();
+            refresh_terminal($("#start_set_modal"));
+
             $.ajax({
                 type: "GET",
                 url: "/ipcset/api/settings/",
@@ -860,6 +861,11 @@
                     console.log("failed", e);
                 }
             });
+
+        })
+
+        function refresh_terminal(target){
+            target.find("option").remove();
             $.ajax({
                 type: "GET",
                 url: "/terminal/api/inner/online/",
@@ -868,18 +874,17 @@
                 success: function (js_data) {
                     terminal_list=js_data;
                     console.log("success", js_data);
-                    $.each(js_data, function () {
+                    $.each(js_data.data, function () {
                         var choice = '<option>' + this.terminal_name + '</option>';
-                        $("#start_set_modal").find('#assign_terminal').append(choice);
+                        target.find('#assign_terminal').append(choice);
                         console.log(this.terminal_name);
-{#                        target.find('#set_resolution').val(data.set_resolution);#}
                     });
                 },
                 error: function (e) {
                     console.log("failed", e);
                 }
             });
-        })
+        }
 
         $('#quit_edit').click(function () {
             $('#edit_modal option').remove();
