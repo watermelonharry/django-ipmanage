@@ -3,7 +3,7 @@ from django.db import models
 import time
 import datetime
 
-TERMINAL_BURN_TIME = 5
+TERMINAL_BURN_TIME = 500000
 
 
 class TerminalModel(models.Model):

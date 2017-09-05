@@ -2,7 +2,7 @@
 {% block content %}
     {% csrf_token %}
     <div class="container">
-    <div class="well">
+        <div class="well">
             <h4><b>操作指导：</b></h4>
             <p>批量设置：在列表中勾选需要设置的设备，点击“开始设置”按钮，进行设置操作。</p>
             <p>添加设备：点击“添加设备”按钮，手动添加一个设备条目到列表中。</p>
@@ -495,6 +495,13 @@
                                        value={{ user.username }} required>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">分配终端*</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" id="assign_terminal" name="assign_terminal">
+                                </select>
+                            </div>
+                        </div>
                     </form>
                     <button type="button" class="btn btn-sm btn-success" id="confirm_set_btn">确定</button>
                     <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_set_btn">关闭
@@ -534,6 +541,7 @@
         var id_list = [];
         var model_list = [];
         var timer_id;
+        var terminal_list = [];
         $('.btn_terminate').hide();
 
         {#              <!--下载配置-->#}
@@ -828,6 +836,7 @@
         $('#start_set_btn').click(function () {
             id_list = get_main_select_id();
             console.log(id_list);
+            $('#start_set_modal option').remove();
             $.ajax({
                 type: "GET",
                 url: "/ipcset/api/settings/",
@@ -846,6 +855,25 @@
                     });
 
 
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                }
+            });
+            $.ajax({
+                type: "GET",
+                url: "/terminal/api/inner/online/",
+                dataType:"json",
+                contentType:"application/json",
+                success: function (js_data) {
+                    terminal_list=js_data;
+                    console.log("success", js_data);
+                    $.each(js_data, function () {
+                        var choice = '<option>' + this.terminal_name + '</option>';
+                        $("#start_set_modal").find('#assign_terminal').append(choice);
+                        console.log(this.terminal_name);
+{#                        target.find('#set_resolution').val(data.set_resolution);#}
+                    });
                 },
                 error: function (e) {
                     console.log("failed", e);
@@ -987,6 +1015,7 @@
         })
 
         function set_stream_params(data, target) {
+            console.log(data);
             $.each(data.type_id.resolution_set, function () {
                 var choice = '<option>' + this.resolution + '</option>';
                 target.find('#set_resolution').append(choice);

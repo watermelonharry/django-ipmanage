@@ -132,7 +132,7 @@ class InnerApiGetOnlineTerminal(ListView):
     model = TerminalModel
 
     @method_decorator(login_required)
-    def get(self):
+    def get(self, request):
         online_list = TerminalModel.get_online_list()
         data = TerminalModelSerializer(online_list, many=True).data
         return SuccessJsonResponse(data=data)
