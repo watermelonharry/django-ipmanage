@@ -900,7 +900,8 @@
                 'detail_id': id_list,
                 'mission_type': 1,
                 'progress': 0,
-                'run_status': 1
+                'run_status': 1,
+                'remote_id':$("#start_set_modal #assign_terminal").val()
             };
             $('#show_detail_btn').attr("name", json_data.mission_id);
             console.log(json_data);
