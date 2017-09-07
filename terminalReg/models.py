@@ -19,6 +19,7 @@ class TerminalModel(models.Model):
     terminal_status = models.IntegerField(blank=True, null=True, choices=TERMINAL_STATUS_LIST)
     terminal_type = models.CharField(max_length=20, blank=True, null=True)
 
+    user_name = models.CharField(max_length=30, blank=True)
     assigned_mission = models.CharField(max_length=20, blank=True, null=True)
 
     available_time = models.IntegerField(blank=True, null=True)
@@ -52,6 +53,15 @@ class TerminalModel(models.Model):
             return True
         else:
             return False
+
+    def update_data(self, **kwargs):
+        user_name = kwargs.get('user_name', None)
+        if user_name:
+            self.user_name = user_name
+            self.save()
+        else:
+            pass
+
 
     @classmethod
     def get_online_list(cls):
@@ -108,6 +118,7 @@ class TerminalWaitingMissionModel(models.Model):
     mission_id = models.CharField(max_length=40)
 
     # module
+    user_name = models.CharField(max_length=30, blank=True)
     mission_from = models.CharField(max_length=20)
     mission_url = models.CharField(max_length=40, blank=True, null=True)
 
@@ -121,6 +132,14 @@ class TerminalWaitingMissionModel(models.Model):
 
     class Meta:
         ordering = ['id', 'create_time']
+
+    def update_data(self, **kwargs):
+        user_name = kwargs.get('user_name', None)
+        if user_name:
+            self.user_name = user_name
+            self.save()
+        else:
+            pass
 
     @classmethod
     def delete_from_queue(cls, mission_id):
@@ -144,6 +163,8 @@ class TerminalWaitingMissionModel(models.Model):
         """
         try:
             single_mission = cls.objects.filter(terminal_name=terminal_name).filter(mission_status=1)[0]
+            single_mission.mission_status = 2
+            single_mission.save()
             return single_mission
         except Exception as e:
             return None

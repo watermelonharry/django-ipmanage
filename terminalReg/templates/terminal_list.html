@@ -13,6 +13,7 @@
                     <th>类型</th>
                     <th>有效时间</th>
                     <th>ak</th>
+                    <th>用户</th>
                     <th>地址</th>
                     <th>端口</th>
                     <th>其他</th>
@@ -24,14 +25,21 @@
                 {% for terminal in terminal_list %}
                     <tr>
                         <td>{{ terminal.terminal_name }}</td>
-                        <td>{{terminal.terminal_status}}</td>
+                        {% if terminal.is_online %}
+                            <td><span class="label label-success">在线</span></td>
+                        {% else %}
+                            <td><span class="label label-danger">离线</span></td>
+                        {% endif %}
+{#                        <td>{{terminal.terminal_status}}</td>#}
                         <td>{{terminal.terminal_type}}</td>
                         <td>{{terminal.available_time}}</td>
                         <td>{{terminal.ak}}</td>
+                        <td>{{terminal.user_name}}</td>
                         <td>{{terminal.terminal_addr}}</td>
                         <td>{{terminal.terminal_port}}</td>
                         <td>{{terminal.other_info}}</td>
                         <td>{{terminal.edit_time|date:"Y-m-d,G:i:s" }}</td>
+
 
                     </tr>
                 {% endfor %}

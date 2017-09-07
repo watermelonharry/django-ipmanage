@@ -3,15 +3,12 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.db.models.query import QuerySet
-from django.http import HttpResponse, StreamingHttpResponse, HttpResponseRedirect
+from django.http import StreamingHttpResponse
 from django.shortcuts import render
 from django.shortcuts import render_to_response, RequestContext
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser
-from rest_framework.renderers import JSONRenderer
-from jsonreformat import *
 
-from models import *
+from basepkg.jsonreformat import *
 from serializers import *
 
 

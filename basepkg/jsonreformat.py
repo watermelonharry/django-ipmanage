@@ -11,9 +11,15 @@ class BaseResponse(HttpResponse):
     '''
 
     def __init__(self, data, *args, **kwargs):
-        if data is None or type(data) is not dict:
-            data = {"error":"please input dict"}
-        content = self.init_content(data)
+        if type(data) is str:
+            content = data
+        elif type(data) is dict:
+            content = self.init_content(data)
+        elif data is None:
+            content = self.init_content({"error":"please input dict"})
+        else:
+            content = self.init_content(data)
+
         kwargs['content_type'] = 'application/json'
         super(BaseResponse, self).__init__(content, **kwargs)
 

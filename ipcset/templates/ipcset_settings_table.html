@@ -939,7 +939,7 @@
                     success: function (msg) {
                         console.log("success", msg);
 
-                        push_to_mission_queue(terminal_name=json_data.remote_id,mission_id=json_data.mission_id,mission_from="ipcset",mission_url=)
+                        push_to_mission_queue(terminal_name=json_data.remote_id,mission_id=json_data.mission_id,mission_from="ipcset",mission_url='/ipcset/api/mission/info/'+json_data.mission_id+'/');
 
                         $('#start_set_modal').modal('toggle');
                         $('#start_set_modal tbody').empty();

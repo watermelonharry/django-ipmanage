@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic.detail import DetailView
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from jsonreformat import *
+from basepkg.jsonreformat import *
 
 from userManage.models import ApiKeyModel, UserApiModel
 from serializers import *
@@ -66,6 +66,7 @@ def api_temrinal_register_post(request):
 
     try:
         old_terminal = TerminalModel.objects.get(terminal_name=terminal_name)
+        old_terminal.update_data(user_name=user_model.username)
         new_terminal = TerminalModelSerializer(old_terminal, data=data)
     except Exception as e:
         new_terminal = TerminalModelSerializer(data=data)
@@ -74,10 +75,11 @@ def api_temrinal_register_post(request):
         new_terminal.save()
 
         try:
-            m_serializer = TerminalWaitingMissionSerializer(TerminalWaitingMissionModel.get_mission_by_terminal_name(terminal_name=terminal_name))
+            waiting_mission = TerminalWaitingMissionModel.get_mission_by_terminal_name(terminal_name)
+            m_serializer = TerminalWaitingMissionSerializer(waiting_mission)
             mission_info = m_serializer.data
         except Exception as e:
-            mission_info = {'mission_id': 'None'}
+            mission_info = {}
 
         reply_dict = {'user': user_model.username, 'ak': terminal_ak}
         reply_dict.update(mission_info)
