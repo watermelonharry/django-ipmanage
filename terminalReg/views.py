@@ -69,6 +69,7 @@ def api_temrinal_register_post(request):
         old_terminal.update_data(user_name=user_model.username)
         new_terminal = TerminalModelSerializer(old_terminal, data=data)
     except Exception as e:
+        data.update({'user_name':user_model.username})
         new_terminal = TerminalModelSerializer(data=data)
 
     if new_terminal.is_valid():
