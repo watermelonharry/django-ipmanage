@@ -862,17 +862,41 @@
                 }
             });
 
-        })
+        });
 
-        function refresh_terminal(target){
+        function push_to_mission_queue(terminal_name, mission_id, mission_from, mission_url) {
+            var mission_info = {
+                "terminal_name": terminal_name,
+                "mission_id": mission_id,
+                "mission_from": mission_from,
+                "mission_url": mission_url,
+                "mission_status": 1
+            };
+            $.ajax({
+                type: "POST",
+                url: "/terminal/api/inner/bindterminal/",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(mission_info),
+                success: function (msg) {
+                    console.log(msg);
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                    alert("添加失败！ error-" + e.status);
+                }
+            });
+        };
+
+        function refresh_terminal(target) {
             target.find("option").remove();
             $.ajax({
                 type: "GET",
                 url: "/terminal/api/inner/online/",
-                dataType:"json",
-                contentType:"application/json",
+                dataType: "json",
+                contentType: "application/json",
                 success: function (js_data) {
-                    terminal_list=js_data;
+                    terminal_list = js_data;
                     console.log("success", js_data);
                     $.each(js_data.data, function () {
                         var choice = '<option>' + this.terminal_name + '</option>';
@@ -901,7 +925,7 @@
                 'mission_type': 1,
                 'progress': 0,
                 'run_status': 1,
-                'remote_id':$("#start_set_modal #assign_terminal").val()
+                'remote_id': $("#start_set_modal #assign_terminal").val()
             };
             $('#show_detail_btn').attr("name", json_data.mission_id);
             console.log(json_data);
@@ -914,6 +938,9 @@
                     data: JSON.stringify(json_data),
                     success: function (msg) {
                         console.log("success", msg);
+
+                        push_to_mission_queue(terminal_name=json_data.remote_id,mission_id=json_data.mission_id,mission_from="ipcset",mission_url=)
+
                         $('#start_set_modal').modal('toggle');
                         $('#start_set_modal tbody').empty();
                         $('#scanning_modal').modal('toggle');

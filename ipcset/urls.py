@@ -40,6 +40,7 @@ urlpatterns = [
     url(r'^api/basic/model/$', views.api_get_model_type),
     url(r'^api/mission/$', views.api_get_add_put_mission),
     url(r'^api/mission/assign/$', views.api_get_waiting_mission),
+    url(r'^api/mission/info/(?P<mid>[0-9]+)/$', views.api_get_mission_by_mid),
     url(r'^api/mission/(?P<mid>[0-9]+)/$', views.api_get_add_put_mission_detail),
     url(r'^api/mission/discover/(?P<mid>[0-9]+)/$', views.api_add_put_discover_mission_detail),
 ]

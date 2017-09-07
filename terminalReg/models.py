@@ -136,14 +136,14 @@ class TerminalWaitingMissionModel(models.Model):
             return False
 
     @classmethod
-    def get_mission_by_name(cls, terminal_name):
+    def get_mission_by_terminal_name(cls, terminal_name):
         """
         get waiting mission by input terminal_name
         :param terminal_name:
         :return:
         """
         try:
-            single_mission = cls.objects.filter(terminal_name=terminal_name)[0]
+            single_mission = cls.objects.filter(terminal_name=terminal_name).filter(mission_status=1)[0]
             return single_mission
         except Exception as e:
             return None

@@ -74,7 +74,7 @@ def api_temrinal_register_post(request):
         new_terminal.save()
 
         try:
-            m_serializer = TerminalWaitingMissionSerializer(TerminalWaitingMissionModel.get_mission_by_name(terminal_name=terminal_name))
+            m_serializer = TerminalWaitingMissionSerializer(TerminalWaitingMissionModel.get_mission_by_terminal_name(terminal_name=terminal_name))
             mission_info = m_serializer.data
         except Exception as e:
             mission_info = {'mission_id': 'None'}

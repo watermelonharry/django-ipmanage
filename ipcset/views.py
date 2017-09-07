@@ -9,6 +9,7 @@ from django.shortcuts import render_to_response, RequestContext
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
+from jsonreformat import *
 
 from models import *
 from serializers import *
@@ -233,6 +234,16 @@ def api_get_waiting_mission(request):
 		except:
 			serializer = MissionInfoSerializer()
 			return JSONResponse(serializer.errors, status=400)
+
+@csrf_exempt
+def api_get_mission_by_mid(request, mid):
+	if request.method == 'GET':
+		try:
+			mission_info = MissionInfoTable.objects.get(mission_id=mid)
+			serializer = MissionInfoSerializer(mission_info)
+			return SuccessJsonResponse(data=serializer.data)
+		except Exception as e:
+			return ErrorJsonResponse(data={'e':str(e)},status=400)
 
 
 @csrf_exempt
