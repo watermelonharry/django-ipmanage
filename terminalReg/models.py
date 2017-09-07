@@ -3,7 +3,7 @@ from django.db import models
 import time
 import datetime
 
-TERMINAL_BURN_TIME = 500000
+TERMINAL_BURN_TIME = 3600
 
 
 class TerminalModel(models.Model):
@@ -38,6 +38,14 @@ class TerminalModel(models.Model):
 
     def __unicode__(self):
         return self.terminal_name
+
+    @classmethod
+    def get_terminal_by_name(cls, terminal_name):
+        try:
+            terminal = cls.objects.get(terminal_name=terminal_name)
+            return terminal
+        except Exception as e:
+            return None
 
     def is_online(self):
         """

@@ -69,7 +69,7 @@ def api_temrinal_register_post(request):
         old_terminal.update_data(user_name=user_model.username)
         new_terminal = TerminalModelSerializer(old_terminal, data=data)
     except Exception as e:
-        data.update({'user_name':user_model.username})
+        data.update({'user_name': user_model.username})
         new_terminal = TerminalModelSerializer(data=data)
 
     if new_terminal.is_valid():
@@ -82,8 +82,10 @@ def api_temrinal_register_post(request):
         except Exception as e:
             mission_info = {}
 
-        reply_dict = {'user': user_model.username, 'ak': terminal_ak}
+        reply_dict = {}
         reply_dict.update(mission_info)
+        reply_dict.update(TerminalModelSerializer(TerminalModel.get_terminal_by_name(terminal_name)).data)
+
 
         return SuccessJsonResponse(data=reply_dict,
                                    status=200)

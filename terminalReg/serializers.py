@@ -8,7 +8,7 @@ class TerminalModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = TerminalModel
         fields = ('id', 'terminal_name', 'terminal_status',
-                  'terminal_type', 'ak', 'terminal_addr',
+                  'terminal_type', 'ak', 'user_name','terminal_addr',
                   'terminal_port', 'other_info', 'edit_time')
 
 
