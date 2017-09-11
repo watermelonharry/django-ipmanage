@@ -54,6 +54,7 @@ def api_temrinal_register_post(request):
     # todo: register with ak,terminal_name,and so on
     data = JSONParser().parse(request)
     terminal_addr = request.META.get('REMOTE_ADDR', '')
+    data.update({'terminal_addr':terminal_addr})
     terminal_ak = data.get('ak', '')
     api_model = ApiKeyModel.has_record(terminal_ak)
     if api_model is None:

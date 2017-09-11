@@ -114,7 +114,7 @@ class DispatcherThread(threading.Thread):
             self.__register_lock.acquire()
 
             try:
-                target_func = self.dispatch_dict.get(module)(*args,**kwargs)
+                target_func = self.dispatch_dict.get(module)(*args, **kwargs)
             except Exception as e:
                 print('[*]error in dispatch:{0}'.format(e.message))
 
@@ -179,7 +179,10 @@ class RegisterThread(threading.Thread):
             'terminal_status': CONNECTION_STATUS.IDLE,
             'assigned_mission': None,
             'register_url': self.reg_url,
-            'live_time': self.interval_time / 2
+            'available_time': self.interval_time / 2,
+            'terminal_addr': None,
+            'terminal_port': None,
+            'other_info': {'registered_module': []},
         }
 
         self.LOCK = threading.Lock()  # r/w lock for variants
@@ -207,9 +210,20 @@ class RegisterThread(threading.Thread):
 
         print('[*] init register thread success:{0}.'.format(str(self.get_info_dict())))
 
-
+    def update_other_info(self, **kwargs):
+        target = self.info_dict.get('other_info', [])
+        try:
+            for key, val in kwargs.items():
+                if target.has_key(key):
+                    target[key].append(val)
+                else:
+                    target.update({key: [val]})
+                print('[*] {0}:{1} info updated.'.format(str(key), str(val)))
+        except Exception as e:
+            print('[*] ERROR: {0}:{1} info updating.'.format(str(key), str(val)))
 
     def register_module(self, module, callback):
+        self.update_other_info(registered_module=module)
         return self.__dispath_thread.register_module(module, callback)
 
     def get_info_dict(self):
@@ -234,15 +248,14 @@ class RegisterThread(threading.Thread):
         :param reply_dict: reply dict from server
         :return: mission_dict, eg. {'module':xxxx, 'data':{....params...}}
         """
-        #todo:
+        # todo:
         try:
-            mission_data = reply_dict.get('data',{})
+            mission_data = reply_dict.get('data', {})
             mission_dict = {'module': mission_data.get('mission_from', 'unknown'),
-                            'data':mission_data}
+                            'data': mission_data}
             return mission_dict
         except Exception as e:
-            return {'module':'unknown'}
-
+            return {'module': 'unknown'}
 
     def dispatch_mission(self, mission_dict):
         """
@@ -266,7 +279,7 @@ class RegisterThread(threading.Thread):
         self.info_dict['terminal_status'] = status
         self.LOCK.release()
 
-    def post(self, info_dict=None, post_url = None):
+    def post(self, info_dict=None, post_url=None):
         """
         post data to register_url
         :return:
@@ -290,7 +303,7 @@ class RegisterThread(threading.Thread):
             self.set_status(CONNECTION_STATUS.ERROR)
             return None
 
-    def get(self, info_dict=None, post_url = None):
+    def get(self, info_dict=None, post_url=None):
         """
         get status
         :return:
@@ -379,7 +392,7 @@ class ReceiverThread(threading.Thread):
         get the thread info dict
         :return: {"port":12313, ...}
         """
-        info_dict = {"port": self.port}
+        info_dict = {"terminal_port": self.port}
         return info_dict
 
 
@@ -392,7 +405,6 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     client.
     """
     index_content = '''HTTP/1.x 200 ok\r\nContent-Type: application/json\r\n\r\n'''
-
 
     @classmethod
     def update_info_dict(cls, info_dict):
@@ -412,8 +424,6 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             return
 
         content = self.index_content
-
-        # print 'Request is:\n', request
 
         # deal wiht GET method
         if method == 'GET':
@@ -468,7 +478,7 @@ def summer(x, y):
 
 
 if __name__ == '__main__':
-    k = RegisterThread(ak='3d620ef6068e64e7e55d', terminal_name='regi_terminal')
+    k = RegisterThread(ak='28e444bbe8d17bba573e', terminal_name='regi_terminal_33')
     k.register_module(module='print', callback=printer)
     k.register_module(module='sum', callback=summer)
     k.start()

@@ -864,6 +864,28 @@
 
         });
 
+        function push_to_terminal(module, url, mission_info) {
+            var push_data = {
+                "module": module,
+                "data": mission_info,
+            };
+            $.ajax({
+                type: "POST",
+                url: url,
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(push_data),
+                success: function (msg) {
+                    console.log("successed push to terminal:"+msg);
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                    alert("推送到终端失败！ error-" + e.status);
+                }
+            });
+        };
+
+
         function push_to_mission_queue(terminal_name, mission_id, mission_from, mission_url) {
             var mission_info = {
                 "terminal_name": terminal_name,
