@@ -52,6 +52,11 @@ def api_temrinal_register_post(request):
     terminal register by POST to this url with{ak, terminal_name}
     """
     # todo: register with ak,terminal_name,and so on
+    if request.META.has_key('HTTP_X_FORWARDED_FOR'):
+        terminal_addr = request.META['HTTP_X_FORWARDED_FOR']
+    else:
+        terminal_addr = request.META['REMOTE_ADDR']
+
     data = JSONParser().parse(request)
     terminal_addr = request.META.get('REMOTE_ADDR', '')
     data.update({'terminal_addr':terminal_addr})
@@ -62,6 +67,7 @@ def api_temrinal_register_post(request):
 
     user_model = UserApiModel.objects.get(id=api_model.user_id)
     terminal_name = data.get('terminal_name', None)
+    data.update({'user_name': user_model.username, 'terminal_addr':terminal_addr})
     if terminal_name is None:
         return ErrorJsonResponse(data={'teminal_name': 'is null'}, status=400)
 
@@ -70,7 +76,6 @@ def api_temrinal_register_post(request):
         old_terminal.update_data(user_name=user_model.username)
         new_terminal = TerminalModelSerializer(old_terminal, data=data)
     except Exception as e:
-        data.update({'user_name': user_model.username})
         new_terminal = TerminalModelSerializer(data=data)
 
     if new_terminal.is_valid():
