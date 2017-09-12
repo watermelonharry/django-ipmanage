@@ -864,23 +864,24 @@
 
         });
 
-        function push_to_terminal(module, url, mission_info) {
+        function push_to_terminal(module, t_url, mission_info, terminal_name, m_url) {
             var push_data = {
                 "module": module,
                 "data": mission_info,
             };
             $.ajax({
                 type: "POST",
-                url: url,
+                url: t_url,
                 dataType: "json",
                 contentType: "application/json",
                 data: JSON.stringify(push_data),
                 success: function (msg) {
-                    console.log("successed push to terminal:"+msg);
+                    console.log("successed push to terminal:" + msg);
                 },
                 error: function (e) {
-                    console.log("failed", e);
-                    alert("推送到终端失败！ error-" + e.status);
+                    console.log("failed to push to terminal", e);
+                    push_to_mission_queue(terminal_name, mission_info.mission_id, module, m_url)
+
                 }
             });
         };
@@ -901,11 +902,10 @@
                 contentType: "application/json",
                 data: JSON.stringify(mission_info),
                 success: function (msg) {
-                    console.log(msg);
+                    console.log("push to mission queue", msg);
                 },
                 error: function (e) {
-                    console.log("failed", e);
-                    alert("添加失败！ error-" + e.status);
+                    console.log("failed to push to mission queue", e);
                 }
             });
         };
@@ -918,7 +918,7 @@
                 dataType: "json",
                 contentType: "application/json",
                 success: function (js_data) {
-                    terminal_list = js_data;
+                    terminal_list = js_data.data;
                     console.log("success", js_data);
                     $.each(js_data.data, function () {
                         var choice = '<option>' + this.terminal_name + '</option>';
@@ -960,8 +960,11 @@
                     data: JSON.stringify(json_data),
                     success: function (msg) {
                         console.log("success", msg);
-
-                        push_to_mission_queue(terminal_name=json_data.remote_id,mission_id=json_data.mission_id,mission_from="ipcset",mission_url='/ipcset/api/mission/info/'+json_data.mission_id+'/');
+                        push_to_terminal(module = "ipcset",
+                            t_url=get_terminal_url_by_name(json_data.remote_id),
+                            mission_info=json_data,
+                            terminal_name=json_data.remote_id,
+                            m_url="/ipcset/api/mission/info/"+json_data.mission_id);
 
                         $('#start_set_modal').modal('toggle');
                         $('#start_set_modal tbody').empty();
@@ -982,6 +985,15 @@
 
         });
 
+        function get_terminal_url_by_name(t_name) {
+            var url= "";
+            $.each(terminal_list, function () {
+                if (this.terminal_name == t_name) {
+                    url= "http://" + this.terminal_addr + "/" + this.terminal_port;
+                }
+            });
+            return url;
+        };
         <!--取消设置-->
         $('#terminate_set_btn').click(function () {
             var js_data = {
