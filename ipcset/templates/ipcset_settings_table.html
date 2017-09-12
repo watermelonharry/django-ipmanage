@@ -989,7 +989,7 @@
             var url= "";
             $.each(terminal_list, function () {
                 if (this.terminal_name == t_name) {
-                    url= "http://" + this.terminal_addr + "/" + this.terminal_port;
+                    url= "http://" + this.terminal_addr + ":" + this.terminal_port+"/";
                 }
             });
             return url;
