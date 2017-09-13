@@ -102,7 +102,8 @@
         </div>
     </div>
     <script>
-        var t;
+        var terminal_list;
+        var timer_id;
 
         <!--终止自动扫描-->
 
@@ -147,15 +148,20 @@
                 'mission_type': 2,
                 'progress': 0,
                 'run_status': 1,
+                'remote_id':$('#assign_terminal').val()
             };
             if (m_data.start_ip.split('.').length != 4) {
                 alert("error:请输入合法IP地址！");
                 return;
-            }
+            };
             if (m_data.total_count == '') {
                 alert("error:请输入扫描数量");
                 return;
-            }
+            };
+            if (m_data.remote_id == ''){
+                alert("error:请选择运行终端");
+                return;
+            };
 
             $.ajax({
                 type: "POST",
@@ -164,7 +170,18 @@
                 contentType: "application/json",
                 data: JSON.stringify(m_data),
                 success: function (msg) {
-                    console.log("success", msg);
+                    console.log("push to server success", msg);
+
+                    push_to_terminal(module = "ipcset",
+                            t_url=get_terminal_url_by_name(m_data.remote_id),
+                            mission_info=m_data,
+                            terminal_name=m_data.remote_id,
+                            m_url="/ipcset/api/mission/info/"+m_data.mission_id);
+
+                    $('#confirm_scan_btn').hide();
+                    $("#scan_terminate_btn").show();
+                    $("#show_scan_detail_btn").show();
+
                     $('#show_scan_progress').show();
                     $('#show_scan_detail_btn').attr("name", m_data.mission_id);
                     $('#abort_scan_btn').attr("name", m_data.mission_id);
@@ -181,6 +198,62 @@
                 }
             });
         });
+
+        function get_terminal_url_by_name(t_name) {
+            var url= "";
+            $.each(terminal_list, function () {
+                if (this.terminal_name == t_name) {
+                    url= "http://" + this.terminal_addr + ":" + this.terminal_port+"/";
+                }
+            });
+            return url;
+        };
+
+        function push_to_terminal(module, t_url, mission_info, terminal_name, m_url) {
+            var push_data = {
+                "module": module,
+                "data": mission_info,
+            };
+            $.ajax({
+                type: "POST",
+                url: t_url,
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(push_data),
+                success: function (msg) {
+                    console.log("successed push to terminal:" + msg);
+                },
+                error: function (e) {
+                    console.log("failed to push to terminal", e);
+                    push_to_mission_queue(terminal_name, mission_info.mission_id, module, m_url)
+
+                }
+            });
+        };
+
+
+        function push_to_mission_queue(terminal_name, mission_id, mission_from, mission_url) {
+            var mission_info = {
+                "terminal_name": terminal_name,
+                "mission_id": mission_id,
+                "mission_from": mission_from,
+                "mission_url": mission_url,
+                "mission_status": 1
+            };
+            $.ajax({
+                type: "POST",
+                url: "/terminal/api/inner/bindterminal/",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(mission_info),
+                success: function (msg) {
+                    console.log("push to mission queue", msg);
+                },
+                error: function (e) {
+                    console.log("failed to push to mission queue", e);
+                }
+            });
+        };
 
         $('#show_scan_detail_btn').on('click', function () {
             window.open('/ipcset/missions/' + $('#show_scan_detail_btn').attr("name"));
@@ -229,6 +302,8 @@
             refresh_terminal($("#scan_modal"));
             $("#scan_terminate_btn").hide();
             $("#show_scan_detail_btn").hide();
+            $('#confirm_scan_btn').show();
+
         });
         function refresh_terminal(target) {
             target.find("option").remove();

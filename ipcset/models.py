@@ -147,7 +147,7 @@ class MissionInfoTable(models.Model):
 		pass
 
 	class Meta:
-		ordering = ('mission_id',)
+		ordering = ('-create_time',)
 
 	@classmethod
 	def get_missions_by_terminal(cls, terminal_name):
