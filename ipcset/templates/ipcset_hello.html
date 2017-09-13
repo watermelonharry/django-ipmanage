@@ -57,19 +57,26 @@
                         <div class="form-group">
                             <label class="col-sm-4 control-label">起始IP</label>
 
-                            <div class="col-sm-6">
+                            <div class="col-sm-5">
                                 <input type="text" class="form-control" id="auto_start_ip" name="start_ip"
                                        value="192.168.1.2"
                                        placeholder="eg: 192.168.1.2" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-4 control-label">扫描数量</label>
+                            <label class="col-sm-4 control-label">扫描IP数量</label>
 
-                            <div class="col-sm-6">
+                            <div class="col-sm-5">
                                 <input type="text" class="form-control" id="auto_total_count" name="total_count"
                                        value="254"
                                        placeholder="eg: 254" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">分配终端</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" id="assign_terminal" name="assign_terminal">
+                                </select>
                             </div>
                         </div>
                     </form>
@@ -95,6 +102,8 @@
         </div>
     </div>
     <script>
+        var t;
+
         <!--终止自动扫描-->
 
         $('#scan_terminate_btn').click(function () {
@@ -102,7 +111,7 @@
                 'mission_id': $('#show_scan_detail_btn').attr('name'),
                 'editor_name': $('#login_user_name').val(),
                 'run_status': 0
-            }
+            };
             console.log("terminate_btn.", js_data);
             $.ajax({
                 type: "PUT",
@@ -143,7 +152,6 @@
                 alert("error:请输入合法IP地址！");
                 return;
             }
-            ;
             if (m_data.total_count == '') {
                 alert("error:请输入扫描数量");
                 return;
@@ -176,7 +184,7 @@
 
         $('#show_scan_detail_btn').on('click', function () {
             window.open('/ipcset/missions/' + $('#show_scan_detail_btn').attr("name"));
-        })
+        });
         $('#abort_scan_btn').click(function () {
             $('#show_scan_progress').hide();
             window.clearInterval(timer_id);
@@ -206,13 +214,40 @@
                     $('#auto_scan_probar').attr("style", "width: " + progress);
                     if (total == fin) {
                         window.clearInterval(timer_id);
-                        console.log("clear interval")
+                        console.log("clear interval");
                         alert('设置完成！')
                     }
                 },
                 error: function (e) {
                     console.log("failed to get misson progress", e);
                     alert("无法获取任务进度信息，请检查网络.error-" + e.status);
+                }
+            });
+        };
+
+        $("#auto_scan_btn").on("click",function () {
+            refresh_terminal($("#scan_modal"));
+            $("#scan_terminate_btn").hide();
+            $("#show_scan_detail_btn").hide();
+        });
+        function refresh_terminal(target) {
+            target.find("option").remove();
+            $.ajax({
+                type: "GET",
+                url: "/terminal/api/inner/online/",
+                dataType: "json",
+                contentType: "application/json",
+                success: function (js_data) {
+                    terminal_list = js_data.data;
+                    console.log("success", js_data);
+                    $.each(js_data.data, function () {
+                        var choice = '<option>' + this.terminal_name + '</option>';
+                        target.find('#assign_terminal').append(choice);
+                        console.log(this.terminal_name);
+                    });
+                },
+                error: function (e) {
+                    console.log("failed", e);
                 }
             });
         }
