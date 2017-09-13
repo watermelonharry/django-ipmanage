@@ -43,9 +43,16 @@ class DispatcherThread(threading.Thread):
         self.__mission_queue = Queue.Queue()
         self.__RUN_FLAG = True
         self.__register_lock = threading.Lock()
+        self.__set_status_func = None
 
     def say(self, words):
         print('[*] {0}'.format(str(words)))
+
+    def link_func_set_terminal_status(self, func):
+        self.__set_status_func = func
+
+    def set_terminal_status(self, status):
+        self.__set_status_func(status)
 
     @property
     def is_running(self):
@@ -111,6 +118,8 @@ class DispatcherThread(threading.Thread):
         """
         self.say('dispatch mission.')
         if self.dispatch_dict.has_key(module):
+            self.set_terminal_status(CONNECTION_STATUS.BUSY)
+
             self.__register_lock.acquire()
 
             try:
@@ -122,13 +131,16 @@ class DispatcherThread(threading.Thread):
 
             try:
                 if isinstance(target_func, threading.Thread):
+                    print("[*] start {0} thread.".format(module))
                     target_func.start()
                     target_func.join()
                 else:
+                    self.set_terminal_status(CONNECTION_STATUS.IDLE)
                     return target_func
             except Exception as e:
                 print('[*]error in call target_func:{0}'.format(e.message))
 
+            self.set_terminal_status(CONNECTION_STATUS.IDLE)
         else:
             pass
 
@@ -197,6 +209,7 @@ class RegisterThread(threading.Thread):
         ##init other Thread
         try:
             self.__dispath_thread = DispatcherThread()
+            self.__dispath_thread.link_func_set_terminal_status(self.set_terminal_status)
             self.__dispath_thread.start()
 
             MyTCPHandler.register_handle_func(self.__dispath_thread.append_to_mission_queue)
@@ -228,6 +241,10 @@ class RegisterThread(threading.Thread):
 
     def get_info_dict(self):
         return self.info_dict
+
+    def set_terminal_status(self, status):
+        print('[*] set terminal status {0}.'.format(status))
+        self.info_dict['terminal_status'] = status
 
     def run(self):
         """
@@ -264,7 +281,10 @@ class RegisterThread(threading.Thread):
         :return:
         """
         try:
-            self.__dispath_thread.append_to_mission_queue(mission_dict)
+            if mission_dict.get('data',{}).get('mission_id',"") != "":
+                self.__dispath_thread.append_to_mission_queue(mission_dict)
+            else:
+                print("[*] mission id is empty, skip dispatch.")
         except Exception as e:
             pass
 
@@ -458,8 +478,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         else:
             pass
 
-        print "[*] {} wrote:".format(self.client_address[0])
-        print "[*] send back: {}".format(content)
+        # print "[*] {} wrote:".format(self.client_address[0])
+        # print "[*] send back: {}".format(content)
 
         # just send back the same data, but upper-cased
         self.request.sendall(content)
