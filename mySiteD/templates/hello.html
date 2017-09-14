@@ -1,5 +1,25 @@
 {% extends "banner.html" %}
-  {% block content %}
-      <div class="container">
-      </div>
-  {% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="well">
+            <h4><b>更新记录：</b></h4>
+            <h5>2017.09.14</h5>
+            <p>server端</p>
+            <ol>
+                <li>增加终端注册功能，30s注册一次，超过一定时间未注册视为离线。</li>
+                <li>码流参数设置时能够选择在线终端进行任务分配。</li>
+            </ol>
+            <p>local端</p>
+            <ol>
+                <li>更改自动扫描的在线ip获取逻辑，采用多线程ping</li>
+                <li>分解为注册线程、本地接收线程、任务分发线程。由任务分发线程统一管理、运行任务。</li>
+            </ol>
+            <p>todo:</p>
+            <ol>
+                <li>验证主动推送任务的有效性</li>
+                <li>更改IP管理的执行逻辑：批量恢复出厂+IP设置，扫描局域网添加MAC</li>
+            </ol>
+            <hr>
+        </div>
+    </div>
+{% endblock %}
