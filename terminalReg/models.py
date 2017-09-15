@@ -11,8 +11,10 @@ class TerminalModel(models.Model):
     terminal registration
     """
     TERMINAL_STATUS_LIST = [
+        (0, u'离线'),
         (1, u'空闲'),
         (2, u'繁忙'),
+        (3, u'出错'),
     ]
 
     terminal_name = models.CharField(max_length=40, blank=True, unique=True)
