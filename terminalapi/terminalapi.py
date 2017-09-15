@@ -10,6 +10,7 @@ try:
     import SocketServer as socketserver
     import random
     import Queue
+    import logging
 
 except Exception as e:
     print('[*] import error:' + e.message)
@@ -20,13 +21,10 @@ Globals here
 """
 THREAD_COUNT = 5
 TIME_OUT = 2.0
-ROOT_PATH = 'http://127.0.0.1:8000/'
-REGISTER_PATH = 'terminal/api/register/'
+ROOT_PATH = 'http://127.0.0.1:8000'
+REGISTER_PATH = '/terminal/api/register/'
 REGISTER_INTERVAL = 30
 
-"""
-class here
-"""
 mission_queue = Queue.Queue()
 request_pool = threading.Semaphore(THREAD_COUNT)
 
@@ -37,9 +35,40 @@ class CONNECTION_STATUS(object):
     BUSY = 2
     ERROR = 3
 
+"""
+log settings
+"""
+formatter = logging.Formatter("%(asctime)s- %(levelname)s- %(name)s- %(message)s")
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(formatter)
+file_handler =  logging.FileHandler("terminal.log")
+file_handler.setFormatter(formatter)
+
+# DispatcherThread
+logger = logging.getLogger("DispatcherThread")
+logger.setLevel(logging.DEBUG)
+logger.addHandler(stream_handler)
+logger.addHandler(file_handler)
+
+# RegisterThread
+logger = logging.getLogger("RegisterThread")
+logger.setLevel(logging.DEBUG)
+logger.addHandler(stream_handler)
+logger.addHandler(file_handler)
+
+# ReceiverThread
+logger = logging.getLogger("ReceiverThread")
+logger.setLevel(logging.DEBUG)
+logger.addHandler(stream_handler)
+logger.addHandler(file_handler)
+
+"""
+classes here
+"""
+
 
 class DispatcherThread(threading.Thread):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super(DispatcherThread, self).__init__()
         self.__dispatch_dict = {}
         self.__mission_queue = Queue.Queue()
@@ -47,9 +76,12 @@ class DispatcherThread(threading.Thread):
         self.__register_lock = threading.Lock()
         self.__set_status_func = None
         self.__THREAD_RUN_LOCK = threading.Lock()
+        self.__api_root_url = kwargs.get('api_root_url', 'http://127.0.0.1:8000')
+        self.logger = logging.getLogger("DispatcherThread")
 
     def say(self, words):
         print('[*] {0}'.format(str(words)))
+        self.logger.info('{0}'.format(str(words)))
 
     def link_func_set_terminal_status(self, func):
         self.__set_status_func = func
@@ -112,7 +144,7 @@ class DispatcherThread(threading.Thread):
         self.say('new module registering:{0}.'.format(module))
         return self.__set_dispatch_dict(module, callback)
 
-    def dispatch(self, module, *args, **kwargs):
+    def dispatch(self, module, data, *args, **kwargs):
         """
         dispatch mission with module name and params
         :param module:
@@ -126,7 +158,10 @@ class DispatcherThread(threading.Thread):
             self.__register_lock.acquire()
 
             try:
-                target_func = self.dispatch_dict.get(module, None)(*args, **kwargs)
+                target_func = self.dispatch_dict.get(module, None)(data=data,
+                                                                   api_root_url=self.__api_root_url,
+                                                                   *args,
+                                                                   **kwargs)  # todo:, *args, **kwargs
             except Exception as e:
                 print('[*]error in dispatch:{0}'.format(e.message))
 
@@ -165,12 +200,12 @@ class DispatcherThread(threading.Thread):
                 new_mission = self.get_mission_blocked()
                 self.say('new mission get: {0}'.format(str(new_mission)))
 
-                ret = self.dispatch(module=new_mission.get('module'), **(new_mission.get('data')))
+                ret = self.dispatch(module=new_mission.get('module'), data=new_mission.get('data'))
                 self.say('dispatch result is {0}'.format(ret))
                 self.say('dispatch finished')
                 # time.sleep(5)
             except Exception as e:
-                self.say('error in DispatcherThread:{0}'.format(e.message))
+                self.say('error in DispatcherThread:{0}'.format(e))
 
         self.say('dispatch thread end')
 
@@ -180,17 +215,19 @@ class RegisterThread(threading.Thread):
     register thread, request the URL
     """
 
-    def __init__(self, interval=REGISTER_INTERVAL, root_url=ROOT_PATH, **kwargs):
+    def __init__(self, interval=REGISTER_INTERVAL, api_root_url=ROOT_PATH, register_path=REGISTER_PATH, **kwargs):
         super(RegisterThread, self).__init__()
         ##dispatch dict, module and its process thread
         self.interval_time = interval
-        self.root_url = root_url
+        self.api_root_url = api_root_url
+        self.register_path = register_path
         self.ak = kwargs.get('ak', 'no_ak')
         self.terminal_name = kwargs.get('terminal_name', 'not set')
+        self.reg_url = self.api_root_url + self.register_path
 
-        self.reg_url = self.root_url + REGISTER_PATH
         self.RUN_FLAG = True
         self.CONNECTION_STATUS = CONNECTION_STATUS.OFFLINE
+        self.logger = logging.getLogger("RegisterThread")
 
         self.info_dict = {
             'terminal_name': self.terminal_name,
@@ -215,7 +252,7 @@ class RegisterThread(threading.Thread):
 
         ##init other Thread
         try:
-            self.__dispath_thread = DispatcherThread()
+            self.__dispath_thread = DispatcherThread(api_root_url=self.api_root_url)
             self.__dispath_thread.link_func_set_terminal_status(self.set_terminal_status)
             self.__dispath_thread.start()
 
@@ -226,9 +263,14 @@ class RegisterThread(threading.Thread):
 
         except Exception as e:
             self.RUN_FLAG = False
-            print('[*] init sub thread error:{0}, quit Register Thread'.format(str(e)))
+            self.say('[*] init sub thread error:{0}, quit Register Thread'.format(str(e)))
 
-        print('[*] init register thread success:{0}.'.format(str(self.get_info_dict())))
+        self.say('[*] init register thread success:{0}.'.format(str(self.get_info_dict())))
+
+
+    def say(self, words):
+        self.say('[*] {0}'.format(str(words)))
+        self.logger.info('{0}'.format(str(words)))
 
     def update_other_info(self, **kwargs):
         target = self.info_dict.get('other_info', [])
@@ -238,9 +280,9 @@ class RegisterThread(threading.Thread):
                     target[key].append(val)
                 else:
                     target.update({key: [val]})
-                print('[*] {0}:{1} info updated.'.format(str(key), str(val)))
+                self.say('[*] {0}:{1} info updated.'.format(str(key), str(val)))
         except Exception as e:
-            print('[*] ERROR: {0}:{1} info updating.'.format(str(key), str(val)))
+            self.say('[*] ERROR: {0}:{1} info updating.'.format(str(key), str(val)))
 
     def register_module(self, module, callback):
         self.update_other_info(registered_module=module)
@@ -250,7 +292,7 @@ class RegisterThread(threading.Thread):
         return self.info_dict
 
     def set_terminal_status(self, status):
-        print('[*] set terminal status {0}.'.format(status))
+        self.say('[*] set terminal status {0}.'.format(status))
         self.info_dict['terminal_status'] = status
 
     def run(self):
@@ -291,7 +333,7 @@ class RegisterThread(threading.Thread):
             if mission_dict.get('data', {}).get('mission_id', "") != "":
                 self.__dispath_thread.append_to_mission_queue(mission_dict)
             else:
-                print("[*] mission id is empty, skip dispatch.")
+                self.say("[*] mission id is empty, skip dispatch.")
         except Exception as e:
             pass
 
@@ -384,16 +426,21 @@ class RegisterThread(threading.Thread):
 class ReceiverThread(threading.Thread):
     def __init__(self):
         super(ReceiverThread, self).__init__()
+        self.logger = logging.getLogger("ReceiverThread")
         if self.__assign_port() is False:
-            print('[*] receiver thread init failed, quit Receiver Thread.')
+            self.say('[*] receiver thread init failed, quit Receiver Thread.')
             raise AttributeError('receiver thread init failed, quit Receiver Thread.')
 
         else:
-            print('[*] receiver thread init success with port: %s' % str(self.port))
+            self.say('[*] receiver thread init success with port: %s' % str(self.port))
             self.start()
 
+    def say(self, words):
+        self.say('[*] {0}'.format(str(words)))
+        self.logger.info('{0}'.format(str(words)))
+
     def run(self):
-        print('[*] start receive server.')
+        self.say('[*] start receive server.')
         self.server.serve_forever()
 
     def __start_tcp_server(self, host, port):
@@ -401,7 +448,7 @@ class ReceiverThread(threading.Thread):
             self.server = socketserver.TCPServer((host, port), MyTCPHandler)
             return True
         except Exception as e:
-            print(e.message)
+            self.say(e.message)
             return False
 
     def __assign_port(self):
