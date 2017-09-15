@@ -57,7 +57,8 @@ class TerminalModel(models.Model):
         record = self.edit_time
         now = datetime.datetime.now(tz=record.tzinfo)
         time_gap = now - record
-        if time_gap.total_seconds() < TERMINAL_BURN_TIME:
+        tall = abs(time_gap.days * 60 * 60 * 24 + time_gap.seconds)
+        if tall < TERMINAL_BURN_TIME:
             return True
         else:
             return False
@@ -69,7 +70,6 @@ class TerminalModel(models.Model):
             self.save()
         else:
             pass
-
 
     @classmethod
     def get_online_list(cls):
