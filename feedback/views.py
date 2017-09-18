@@ -22,6 +22,8 @@ def write_contact(request):
 			                                       'next_url':'/'})
 		else:
 			firstTitle = u'留下你的建议'
+			k=feedback_form.errors
+			d=k.get('user_email',"")
 			firstTitle_content = u'可以报告BUG，提出需求和改进点。:D'
 			return render(request, 'feedback_contact.html', {'firstTitle': firstTitle, 'firstTitle_content': firstTitle_content,
 			                                         'next_url': '/', 'fb_form': feedback_form})

@@ -96,7 +96,7 @@ class VideoSettingTable(models.Model):
 	set_min_bitrate = models.IntegerField(max_length=10)
 	set_min_framerate = models.CharField(max_length=20)
 	# 操作类型，1：设置码流参数   2：设置码流参数并同步OSD显示
-	operate_type = models.IntegerField(max_length=2, default=1)
+	operate_type = models.IntegerField(max_length=2, default=2)
 
 	editor_name = models.CharField(max_length=20)
 	create_time = models.DateTimeField(auto_now_add=True)
