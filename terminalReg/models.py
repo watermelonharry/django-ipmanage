@@ -3,7 +3,7 @@ from django.db import models
 import time
 import datetime
 
-TERMINAL_BURN_TIME = 3600
+TERMINAL_BURN_TIME = 60
 
 
 class TerminalModel(models.Model):
@@ -57,10 +57,16 @@ class TerminalModel(models.Model):
         """
         # todo: compare edit time with localtime
         record = self.edit_time
+
+        try:
+            live_time = self.available_time
+        except Exception as e:
+            live_time = TERMINAL_BURN_TIME
+
         now = datetime.datetime.now(tz=record.tzinfo)
         time_gap = now - record
         tall = abs(time_gap.days * 60 * 60 * 24 + time_gap.seconds)
-        if tall < TERMINAL_BURN_TIME:
+        if tall < live_time:
             return True
         else:
             return False

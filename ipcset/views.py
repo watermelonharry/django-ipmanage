@@ -302,6 +302,7 @@ def api_add_put_discover_mission_detail(request, mid):
         data = JSONParser().parse(request)
 
         mac_addr = data.get('mac_addr')
+        user_name = data.get('user_name')
         model_name = data.pop('model_name')
 
         try:
@@ -314,7 +315,7 @@ def api_add_put_discover_mission_detail(request, mid):
             # 未索引型号不添加至VideoSetting
             try:
                 ##查找旧的VideoSetting
-                old_setting = VideoSettingTable.objects.get(mac_addr=mac_addr)
+                old_setting = VideoSettingTable.objects.get(mac_addr=mac_addr, user_name=user_name)
                 data['status'] = 1
                 serializer = VideoSettingSerializer(old_setting, data=data)
                 if serializer.is_valid():
@@ -339,7 +340,7 @@ def api_add_put_discover_mission_detail(request, mid):
 
         return JSONResponse(data, status=201)
 
-
+@login_required
 def api_get_same_type_by_id(request):
     """
     query the devices which have the same type
@@ -349,9 +350,10 @@ def api_get_same_type_by_id(request):
 
     if request.method == 'GET':
         src_id = request.GET.get('id')
+        user_name = request.user.username
         try:
             src_setting = VideoSettingTable.objects.get(id=src_id)
-            query_set = VideoSettingTable.objects.filter(type_id=src_setting.type_id).exclude(id=src_id)
+            query_set = VideoSettingTable.objects.filter(type_id=src_setting.type_id, user_name=user_name).exclude(id=src_id)
             serializer = VideoSettingSerializer(query_set, many=True)
             return JSONResponse(serializer.data, status=200)
         except Exception as e:
