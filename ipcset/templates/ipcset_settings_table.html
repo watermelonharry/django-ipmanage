@@ -184,60 +184,6 @@
         </div>
     </div>
 
-    <!--扫描窗口-->
-    <div class="modal fade" id="scan_modal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>扫描局域网</h3>
-
-                    <p>自动扫描局域网内的在线设备，获取其信息并添加到数据库</p>
-
-                    <p>点击“开始”后，系统会下发任务至终端，自动开始执行</p>
-                </div>
-                <div class="modal-body" id="scan_modal_body">
-                    <form class="form-horizontal" role="form" id="auto_scan_form" action="../api/mission/"
-                          method="post">
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label">起始IP</label>
-
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control" id="auto_start_ip" name="start_ip" value=""
-                                       placeholder="eg: 192.168.1.2" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label">扫描数量</label>
-
-                            <div class="col-sm-6">
-                                <input type="text" class="form-control" id="auto_total_count" name="total_count"
-                                       value=""
-                                       placeholder="eg: 254" required>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <div id="show_scan_progress" hidden>
-                        <p>请确认执行终端已开启，等待扫描完成</p>
-
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-striped active" role="progressbar"
-                                 id="auto_scan_probar" style="width: 0%"></div>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-success" id="show_scan_detail_btn" name="">查看详细</button>
-                    <button type="button" class="btn btn-sm btn-success" id="confirm_scan_btn">开始</button>
-                    <button type="button" class="btn btn-sm btn-danger btn_terminate" id="scan_terminate_btn">终止
-                    </button>
-                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_scan_btn"
-                            name="">关闭
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!--编辑单条记录-->
     <div class="modal fade" id="edit_modal">
         <div class="modal-dialog">
@@ -717,62 +663,6 @@
             });
         });
 
-        <!--开始自动扫描-->
-        $('#confirm_scan_btn').click(function () {
-            var m_data = {
-                'editor_name': $('#login_user_name').val(),
-                'mission_id': getTimeId(),
-                'start_ip': $('#auto_start_ip').val(),
-                'total_count': $('#auto_total_count').val(),
-                'mission_type': 2,
-                'progress': 0,
-                'run_status': 1,
-            };
-            if (m_data.start_ip.split('.').length != 4) {
-                alert("error:请输入合法IP地址！");
-                return;
-            }
-            ;
-            if (m_data.total_count == '') {
-                alert("error:请输入扫描数量");
-                return;
-            }
-
-            $.ajax({
-                type: "POST",
-                url: "/ipcset/api/mission/",
-                dataType: "json",
-                contentType: "application/json",
-                data: JSON.stringify(m_data),
-                success: function (msg) {
-                    console.log("success", msg);
-                    $('#show_scan_progress').show();
-                    $('#show_scan_detail_btn').attr("name", m_data.mission_id);
-                    $('#abort_scan_btn').attr("name", m_data.mission_id);
-                    timer_id = window.setInterval(on_time_check_scan, 5000);
-                    console.log('start timer:' + timer_id);
-                    $('#confirm_scan_btn').attr({'disabled': "disabled"});
-                    $('#scan_modal_body').hide();
-                    $('#confirm_scan_btn').hide();
-                    $('#scan_terminate_btn').show();
-                },
-                error: function (e) {
-                    console.log("failed", e);
-                    alert("添加失败！ error-" + e.status);
-                }
-            });
-        });
-
-        $('#show_scan_detail_btn').on('click', function () {
-            window.open('../missions/' + $('#show_scan_detail_btn').attr("name"));
-        })
-        $('#abort_scan_btn').click(function () {
-            $('#show_scan_progress').hide();
-            window.clearInterval(timer_id);
-            $('#suto_scan_probar').attr("style", "width: 0%");
-            location.reload();
-        });
-
         <!--添加新设备-->
         $('#add_new_btn').click(function () {
             $.getJSON('/ipcset/api/basic/model/', function (json_data) {
@@ -829,8 +719,8 @@
                     var choice = '<option>' + this.framerate + '</option>';
                     target.find('#set_min_framerate').append(choice);
                 });
-            })
-        }
+            });
+        };
 
         <!--开始设置-->
         $('#start_set_btn').click(function () {
@@ -947,10 +837,15 @@
                 'mission_type': 1,
                 'progress': 0,
                 'run_status': 1,
-                'remote_id': $("#start_set_modal #assign_terminal").val()
+                'remote_id': $("#start_set_modal #assign_terminal").val(),
+                'user_name':$("#login_user_name").val(),
             };
             $('#show_detail_btn').attr("name", json_data.mission_id);
             console.log(json_data);
+            if(json_data.remote_id == "" || json_data.remote_id==null){
+                alert("终端不能为空！");
+                return;
+            };
             if (json_data.total_count != 0) {
                 $.ajax({
                     type: "POST",
@@ -1206,7 +1101,7 @@
                 "set_min_framerate": target.find("form").find('#set_min_framerate').val(),
                 "operate_type": target.find("form").find("input[name='edit_radio']:checked").val(),
                 "editor_name": target.find("form").find('#editor_name').val(),
-                // "csrfmiddlewaretoken":$("input[name='csrfmiddlewaretoken']").val(),
+                "user_name": $("#login_user_name").val(),
             };
             return json;
         }

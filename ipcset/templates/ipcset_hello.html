@@ -148,18 +148,19 @@
                 'mission_type': 2,
                 'progress': 0,
                 'run_status': 1,
-                'remote_id':$('#assign_terminal').val()
+                'remote_id':$('#assign_terminal').val(),
+                'user_name':$('#login_user_name').val(),
             };
             if (m_data.start_ip.split('.').length != 4) {
-                alert("error:请输入合法IP地址！");
+                alert("错误:请输入合法IP地址！");
                 return;
             };
             if (m_data.total_count == '') {
-                alert("error:请输入扫描数量");
+                alert("错误:请输入扫描数量");
                 return;
             };
-            if (m_data.remote_id == ''){
-                alert("error:请选择运行终端");
+            if (m_data.remote_id == '' || m_data.remote_id == null){
+                alert("错误:终端不能为空！");
                 return;
             };
 

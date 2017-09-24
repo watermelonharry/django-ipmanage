@@ -154,6 +154,7 @@ class MissionInfoTable(models.Model):
 
     ##任务类型，1：设置设备  2：发现设备
     mission_type = models.IntegerField(max_length=2, blank=True)
+    user_name = models.CharField(max_length=20, null=True, blank=True)
 
     def __unicode__(self):
         return unicode(self.mission_id)
