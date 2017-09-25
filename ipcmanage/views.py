@@ -7,8 +7,8 @@ from django.shortcuts import render
 # Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import render_to_response, RequestContext
-from serializers import CnStaticIpTableSerializer, CnIpcLogDetailSerializer, CnOperateInfoSerializer
-from models import CnStaticIpcTable, CnIpcChangeLogDetail, CnIpcOperateInfo
+from serializers import StaticIpMacTableSerializer, CnIpcLogDetailSerializer, CnOperateInfoSerializer
+from models import StaticIpMacTable, CnIpcChangeLogDetail, IpMissionTable
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
@@ -43,7 +43,7 @@ def welcome(request):
 
 @login_required
 def show_ip_table(request):
-	ip_list = CnStaticIpcTable.objects.all()
+	ip_list = StaticIpMacTable.objects.all()
 	return render_to_response('ipc_mac_ip_table.html',
 	                          {'firstTitle': u'IP批量设置',
 	                           'firstTitle_content': u'开始设置后，系统会自动连接指定IP，查找其对应的IP，随后对设备进行“恢复出厂-设置至指定IP-更新OSD”的操作',
@@ -54,7 +54,7 @@ def show_ip_table(request):
 @login_required
 def show_mission_datail(request, operate_id):
 	detail_list = CnIpcChangeLogDetail.objects.filter(operate_id=operate_id)
-	create_time = CnIpcOperateInfo.objects.get(operate_id=operate_id).create_time
+	create_time = IpMissionTable.objects.get(operate_id=operate_id).create_time
 	return render_to_response('mission_detail_table.html', {'firstTitle': u'IP批量设置',
 	                                                        'firstTitle_content': u'查看任务明细',
 	                                                        'detail_list': detail_list,
@@ -64,7 +64,7 @@ def show_mission_datail(request, operate_id):
 
 @login_required
 def show_mission_info(request):
-	mission_info_list = CnIpcOperateInfo.objects.all()
+	mission_info_list = IpMissionTable.objects.all()
 	return render_to_response('mission_info.html', {'firstTitle': u'IP批量设置',
 	                                                'firstTitle_content': u'查看任务信息',
 	                                                'info_list': mission_info_list},
@@ -73,7 +73,7 @@ def show_mission_info(request):
 
 @login_required
 def download_iptables(reqeust):
-	ip_list = (k.get_content() for k in CnStaticIpcTable.objects.all())
+	ip_list = (k.get_content() for k in StaticIpMacTable.objects.all())
 	response = StreamingHttpResponse(ip_list, content_type='APPLICATION/OCTET=STREAM')
 	response['Content-Disposition'] = 'attachment; filename=ip_mac.dat'
 	return response
@@ -90,7 +90,7 @@ def api_plan_unfinished(request):
 	"""
 	if request.method == 'GET':
 		try:
-			wait_plan_info = CnIpcOperateInfo.objects.filter(progress=0)[0]
+			wait_plan_info = IpMissionTable.objects.filter(progress=0)[0]
 			serializer = CnOperateInfoSerializer(wait_plan_info)
 			return JSONResponse(serializer.data, status=200)
 		except:
@@ -104,7 +104,7 @@ def api_start_set_ipc(request):
 	eg.
 	"""
 	if request.method == 'GET':
-		all_operate_info = CnIpcOperateInfo.objects.all()
+		all_operate_info = IpMissionTable.objects.all()
 		serializer = CnOperateInfoSerializer(all_operate_info, many=True)
 		return JSONResponse(serializer.data)
 
@@ -124,8 +124,8 @@ def api_put_get_delete_operate_info(request, operate_id):
 	显示、更新任务信息
 	"""
 	try:
-		op_info = CnIpcOperateInfo.objects.get(operate_id=operate_id)
-	except CnIpcOperateInfo.DoesNotExist:
+		op_info = IpMissionTable.objects.get(operate_id=operate_id)
+	except IpMissionTable.DoesNotExist:
 		return HttpResponse(status=404)
 
 	if request.method == 'GET':
@@ -183,8 +183,8 @@ def api_ip_list(request):
 	展示所有的ip-mac映射，或者创建新的ip-mac映射关系
 	'''
 	if request.method == 'GET':
-		ip_macs = CnStaticIpcTable.objects.all()
-		serializer = CnStaticIpTableSerializer(ip_macs, many=True)
+		ip_macs = StaticIpMacTable.objects.all()
+		serializer = StaticIpMacTableSerializer(ip_macs, many=True)
 
 		# to json str
 		# j=JSONRenderer().render(serializer.data)
@@ -196,7 +196,7 @@ def api_ip_list(request):
 	elif request.method == 'POST':
 		data = JSONParser().parse(request)
 		data['mac_addr'] = data['mac_addr'].replace('-', '', 4)
-		serializer = CnStaticIpTableSerializer(data=data)
+		serializer = StaticIpMacTableSerializer(data=data)
 		if serializer.is_valid():
 			serializer.save()
 			return JSONResponse(serializer.data, status=201)
@@ -209,17 +209,17 @@ def api_ip_mac_detail(request, id):
 	显示、更新、删除一个ip-mac
 	'''
 	try:
-		ip_mac = CnStaticIpcTable.objects.get(id=id)
-	except CnStaticIpcTable.DoesNotExist:
+		ip_mac = StaticIpMacTable.objects.get(id=id)
+	except StaticIpMacTable.DoesNotExist:
 		return HttpResponse(status=404)
 
 	if request.method == 'GET':
-		serializer = CnStaticIpTableSerializer(ip_mac)
+		serializer = StaticIpMacTableSerializer(ip_mac)
 		return JSONResponse(serializer.data)
 
 	elif request.method == 'PUT':
 		data = JSONParser().parse(request)
-		serializer = CnStaticIpTableSerializer(ip_mac, data=data)
+		serializer = StaticIpMacTableSerializer(ip_mac, data=data)
 		if serializer.is_valid():
 			serializer.save()
 			return JSONResponse(serializer.data)
