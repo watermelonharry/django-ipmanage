@@ -4,19 +4,23 @@ from rest_framework import serializers
 from models import *
 
 
-class StaticIpMacTableSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = StaticIpMacTable
-		fields = ('id', 'mac_addr', 'static_ip', 'osd_text', 'editor_name')
+class IpMacTableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StaticIpMacTable
+        fields = ('id', 'mac_addr', 'ori_ip', 'new_ip', 'other_info',
+                  'lock', 'status', 'edit_time', 'editor_name', 'user_name')
 
 
-class CnOperateInfoSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = IpMissionTable
-		fields = ('id', 'operate_id', 'operator_name', 'operate_type', 'run_status', 'ip_start', 'ip_count', 'progress')
+class IpMissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IpMissionTable
+        fields = ('id', 'mission_id', 'mission_type', 'ip_start', 'ip_count',
+                  'progress', 'run_status', 'user_name',
+                  'editor_name', 'edit_time')
 
 
-class CnIpcLogDetailSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = CnIpcChangeLogDetail
-		fields = ('id', 'operate_id', 'ipc_id', 'mac_addr', 'static_ip', 'osd_text', 'ori_ip', 'status', 'edit_time')
+class IpMissionDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = IpMissionDetailTable
+        fields = ('id', 'mission_id', 'mac_addr', 'ori_ip', 'new_ip', 'other_info',
+                  'status', 'edit_time', 'editor_name', 'user_name')

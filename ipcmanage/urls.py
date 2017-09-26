@@ -31,7 +31,7 @@ urlpatterns = [
     url('^mission/$',views.show_mission_info),
 
     ##api urls
-    url(r'^api/tables/$', views.api_ip_list),
+    url(r'^api/tables/$', views.api_get_add_put_ip_mac_table),
     url(r'^api/tables/(?P<id>[0-9]+)/$', views.api_ip_mac_detail),
     url(r'^api/mission/$', views.api_start_set_ipc),
     url(r'^api/mission/wait/$', views.api_plan_unfinished),
