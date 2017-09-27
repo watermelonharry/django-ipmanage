@@ -8,7 +8,7 @@ class StaticIpMacTable(models.Model):
     """
     mac_addr = models.CharField(max_length=16)
     ori_ip = models.IPAddressField(blank=True, null=True)
-    new_ip = models.IPAddressField(blank=True, null=True)
+    set_ip = models.IPAddressField(blank=True, null=True)
     other_info = models.TextField(max_length=200, blank=True, null=True)
 
     # lock this record: 1-lock, 0-editable
@@ -27,7 +27,7 @@ class StaticIpMacTable(models.Model):
         return "{0}-{1}".format(self.mac_addr, self.user_name)
 
     def get_content(self):
-        content = u'\t'.join(map(unicode, [self.mac_addr, self.ori_ip])) + u'\r'
+        content = u'\t'.join(map(unicode, [self.mac_addr, self.ori_ip, self.set_ip])) + u'\r'
         return content
 
     @classmethod
@@ -80,7 +80,7 @@ class IpMissionDetailTable(models.Model):
 
     mac_addr = models.CharField(max_length=16)
     ori_ip = models.IPAddressField(blank=True, null=True)
-    new_ip = models.IPAddressField(blank=True, null=True)
+    set_ip = models.IPAddressField(blank=True, null=True)
     other_info = models.TextField(max_length=200, blank=True, null=True)
 
     # device status: 1-newly added, 2-been edited, 3-refreshed

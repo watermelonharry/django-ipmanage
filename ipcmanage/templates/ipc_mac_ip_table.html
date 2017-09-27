@@ -12,17 +12,23 @@
             <div class="col-lg-3">
                 <p><a class="btn btn-success" id="assign_ip_btn" data-toggle="modal" data-target="#start_scan_modal"
                       data-backdrop="static" role="button">开始执行 &raquo;</a></p>
-                <p>按照下表的MAC-IP-OSD设置局域网内的IPC。</p>
+                <p>按照下表的MAC-IP设置局域网内的IPC。</p>
             </div>
             <div class="col-lg-3">
                 <p><a class="btn btn-info" role="button" id="add_new_btn" data-toggle="modal" data-target="#add_modal"
-                      data-backdrop="static">添加IPC &raquo;</a></p>
+                      data-backdrop="static">手动添加 &raquo;</a></p>
                 <p>添加新的MAC-IP对应关系到数据库中。</p>
+            </div>
+            <div class="col-lg-3">
+                <p><a class="btn btn-info" role="button" id="auto_scan_btn" data-toggle="modal"
+                      data-target="#scan_modal"
+                      data-backdrop="static">自动扫描 &raquo;</a></p>
+                <p>自动扫描局域网内的IPC，并将其MAC-IP对应关系到数据库中。</p>
             </div>
 
         </div>
         <div class="row">
-                        <div class="col-lg-3">
+            <div class="col-lg-3">
                 <p><a class="btn btn-info" role="button" id="assign_ip_btn" data-toggle="modal"
                       data-target="#assign_ip_modal" data-backdrop="static">自动分配&raquo;</a></p>
                 <p>输入IP起始地址，自动按id分配IP。</p>
@@ -51,8 +57,10 @@
                 <tr>
                     <th>序号</th>
                     <th>MAC</th>
-                    <th>IP</th>
-                    <th>OSD前缀</th>
+                    <th>当前IP</th>
+                    <th>设置目标IP</th>
+                    <th>其他信息</th>
+                    <th>修改人</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -61,8 +69,10 @@
                     <tr>
                         <td>{{ forloop.counter }}</td>
                         <td>{{ ip.mac_addr }}</td>
-                        <td>{{ ip.static_ip }}</td>
-                        <td>{{ ip.osd_text }}</td>
+                        <td>{{ ip.ori_ip }}</td>
+                        <td>{{ ip.set_ip }}</td>
+                        <td>{{ ip.other_info }}</td>
+                        <td>{{ ip.editor_name }}</td>
                         <td><a data-toggle="modal" data-target="#edit_modal" data-backdrop="static"
                                class="btn-sm btn-primary btn-edit" name={{ ip.id }} role="button">修改</a>
                             <a class="btn-sm btn-danger btn-del" name={{ ip.id }} role="button">删除</a>
@@ -79,6 +89,7 @@
 
     </div>
     <hr>
+    <!--修改窗口-->
     <div class="modal fade" id="edit_modal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -86,26 +97,26 @@
                 <div class="modal-body">
                     <form class="form-horizontal" role="form" id="edit_old_ipc">
                         <div class="form-group">
-                            <label for="edit_mac" class="col-sm-2 control-label">MAC地址</label>
-                            <div class="col-sm-10">
+                            <label for="edit_mac" class="col-sm-4 control-label">MAC地址</label>
+                            <div class="col-sm-6">
                                 <input type="text" class="form-control" id="mac_addr" name="mac_addr" value="mac">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="edit_ip" class="col-sm-2 control-label">IP地址</label>
-                            <div class="col-sm-10">
+                            <label for="edit_ip" class="col-sm-4 control-label">IP地址</label>
+                            <div class="col-sm-6">
                                 <input type="text" class="form-control" id="static_ip" name="static_ip" value="ip">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="edit_osd" class="col-sm-2 control-label">OSD文字</label>
-                            <div class="col-sm-10">
+                            <label for="edit_osd" class="col-sm-4 control-label">OSD文字</label>
+                            <div class="col-sm-6">
                                 <input type="text" class="form-control" id="osd_text" name="osd_text" value="osd">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="edit_people" class="col-sm-2 control-label">修改人</label>
-                            <div class="col-sm-10">
+                            <label for="edit_people" class="col-sm-4 control-label">修改人</label>
+                            <div class="col-sm-6">
                                 <input type="text" class="form-control" id="editor_name" name="editor_name"
                                        value="editor">
                             </div>
@@ -120,7 +131,7 @@
             </div>
         </div>
     </div>
-    <!--添加IPC窗口-->
+    <!--添加窗口-->
     <div class="modal fade" id="add_modal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -128,33 +139,43 @@
                 <div class="modal-body">
                     <form class="form-horizontal" role="form" id="add_new_ipc">
                         <div class="form-group">
-                            <label for="edit_mac" class="col-sm-2 control-label">MAC地址 *</label>
-                            <div class="col-sm-10">
+                            <label for="edit_mac" class="col-sm-4 control-label">MAC地址 *</label>
+                            <div class="col-sm-6">
                                 <input type="text" class="form-control" id="mac_addr" name="mac_addr"
                                        placeholder="必填字段">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="edit_ip" class="col-sm-2 control-label">IP地址 *</label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="static_ip" name="static_ip"
-                                       placeholder="非必填字段">
+                            <label class="col-sm-4 control-label">当前IP地址：</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="ori_ip" name="ori_ip"
+                                       placeholder="当前IP地址">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="edit_osd" class="col-sm-2 control-label">OSD文字 </label>
-                            <div class="col-sm-10">
-                                <input type="text" class="form-control" id="osd_text" name="osd_text" placeholder="可空">
+                            <label class="col-sm-4 control-label">设置IP地址：</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="set_ip" name="set_ip"
+                                       placeholder="设置目标IP地址">
                             </div>
                         </div>
+
                         <div class="form-group">
-                            <label for="edit_people" class="col-sm-2 control-label">添加人 *</label>
-                            <div class="col-sm-10">
+                            <label class="col-sm-4 control-label">其他信息</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="other_info" name="other_info"
+                                       placeholder="其他信息">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="edit_people" class="col-sm-4 control-label">添加人 *</label>
+                            <div class="col-sm-6">
                                 <input type="text" class="form-control" id="editor_name" name="editor_name"
-                                       placeholder="必填字段">
+                                       placeholder="必填字段" value={{ user.username }}>
                             </div>
                         </div>
-                        <!-- <input type="hidden" class="form-control" id="id" name="id" value="id"> -->
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -335,7 +356,7 @@
                 'ip_start': $('#scan_start_str').val(),
                 'ip_count': $('#scan_count_str').val(),
                 'run_status': 1,
-                'progress':0
+                'progress': 0
             };
             $('#show_detail_btn').attr("name", json_data.operate_id);
             console.log(json_data);
@@ -521,8 +542,9 @@
             var json = {
                 "id": target.find("form").find('#id').val(),
                 "mac_addr": edit_mac,
-                "static_ip": target.find("form").find('#static_ip').val(),
-                "osd_text": target.find("form").find('#osd_text').val(),
+                "ori_ip": target.find("form").find('#ori_ip').val(),
+                "set_ip": target.find("form").find('#set_ip').val(),
+                "other_info": target.find("form").find('#other_info').val(),
                 "editor_name": target.find("form").find('#editor_name').val()
             };
             return json;
@@ -531,7 +553,10 @@
         function getTimeId() {
             var time = new Date().getTime();
             return String(time);
-        }
+        };
+        function get_user_name(){
+            return $("#login_user_name").val();
+        };
 
     </script>
 {% endblock %}

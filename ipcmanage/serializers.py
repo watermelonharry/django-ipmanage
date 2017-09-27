@@ -7,7 +7,7 @@ from models import *
 class IpMacTableSerializer(serializers.ModelSerializer):
     class Meta:
         model = StaticIpMacTable
-        fields = ('id', 'mac_addr', 'ori_ip', 'new_ip', 'other_info',
+        fields = ('id', 'mac_addr', 'ori_ip', 'set_ip', 'other_info',
                   'lock', 'status', 'edit_time', 'editor_name', 'user_name')
 
 
@@ -22,5 +22,5 @@ class IpMissionSerializer(serializers.ModelSerializer):
 class IpMissionDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = IpMissionDetailTable
-        fields = ('id', 'mission_id', 'mac_addr', 'ori_ip', 'new_ip', 'other_info',
+        fields = ('id', 'mission_id', 'mac_addr', 'ori_ip', 'set_ip', 'other_info',
                   'status', 'edit_time', 'editor_name', 'user_name')
