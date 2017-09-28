@@ -9,6 +9,10 @@ class StaticIpMacTable(models.Model):
     mac_addr = models.CharField(max_length=16)
     ori_ip = models.IPAddressField(blank=True, null=True)
     set_ip = models.IPAddressField(blank=True, null=True)
+
+    ori_password = models.CharField(max_length=32,blank=True,null=True)
+    set_password = models.CharField(max_length=32,blank=True,null=True)
+
     other_info = models.TextField(max_length=200, blank=True, null=True)
 
     # lock this record: 1-lock, 0-editable
@@ -27,7 +31,7 @@ class StaticIpMacTable(models.Model):
         return "{0}-{1}".format(self.mac_addr, self.user_name)
 
     def get_content(self):
-        content = u'\t'.join(map(unicode, [self.mac_addr, self.ori_ip, self.set_ip])) + u'\r'
+        content = u'\t'.join(map(unicode, [self.mac_addr, self.ori_ip, self.ori_password])) + u'\r'
         return content
 
     @classmethod
@@ -51,12 +55,13 @@ class IpMissionTable(models.Model):
     # 0:auto scan, 1:restore and set
     mission_type = models.IntegerField(max_length=2, blank=True)
     # mission_ID,以time.time()整数位为id
-    ip_start = models.IPAddressField(blank=True, null=True)
-    ip_count = models.IntegerField(max_length=3, blank=True, null=True)
+    start_ip = models.IPAddressField(blank=True, null=True)
+    total_count = models.IntegerField(max_length=3, blank=True, null=True)
     progress = models.IntegerField(max_length=3, blank=True, null=True)
 
     # 0-terminated, 1-normal, 2-scanning done, setting done
     run_status = models.IntegerField(max_length=1, blank=True)
+    remote_id = models.CharField(max_length=30,blank=True,null=True)
 
     user_name = models.CharField(max_length=20, blank=True, null=True)
     editor_name = models.CharField(max_length=20)
@@ -70,6 +75,14 @@ class IpMissionTable(models.Model):
     class Meta:
         ordering = ('-create_time',)
 
+    @classmethod
+    def get_mission_by_mission_id(cls, mid):
+        try:
+            mission = cls.objects.get(mission_id=mid)
+            return mission
+        except Exception as e:
+            return []
+
 
 class IpMissionDetailTable(models.Model):
     """
@@ -81,6 +94,10 @@ class IpMissionDetailTable(models.Model):
     mac_addr = models.CharField(max_length=16)
     ori_ip = models.IPAddressField(blank=True, null=True)
     set_ip = models.IPAddressField(blank=True, null=True)
+
+    ori_password = models.CharField(max_length=32, blank=True, null=True)
+    set_password = models.CharField(max_length=32, blank=True, null=True)
+
     other_info = models.TextField(max_length=200, blank=True, null=True)
 
     # device status: 1-newly added, 2-been edited, 3-refreshed

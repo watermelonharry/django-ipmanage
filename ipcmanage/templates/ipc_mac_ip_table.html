@@ -59,6 +59,8 @@
                     <th>MAC</th>
                     <th>当前IP</th>
                     <th>设置目标IP</th>
+                    <th>当前密码</th>
+                    <th>设置密码</th>
                     <th>其他信息</th>
                     <th>修改人</th>
                     <th>操作</th>
@@ -71,6 +73,8 @@
                         <td>{{ ip.mac_addr }}</td>
                         <td>{{ ip.ori_ip }}</td>
                         <td>{{ ip.set_ip }}</td>
+                        <td>{{ ip.ori_password }}</td>
+                        <td>{{ ip.set_password }}</td>
                         <td>{{ ip.other_info }}</td>
                         <td>{{ ip.editor_name }}</td>
                         <td><a data-toggle="modal" data-target="#edit_modal" data-backdrop="static"
@@ -97,28 +101,52 @@
                 <div class="modal-body">
                     <form class="form-horizontal" role="form" id="edit_old_ipc">
                         <div class="form-group">
-                            <label for="edit_mac" class="col-sm-4 control-label">MAC地址</label>
+                            <label for="edit_mac" class="col-sm-4 control-label">MAC地址 *</label>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control" id="mac_addr" name="mac_addr" value="mac">
+                                <input type="text" class="form-control" id="mac_addr" name="mac_addr"
+                                       placeholder="必填字段">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="edit_ip" class="col-sm-4 control-label">IP地址</label>
+                            <label class="col-sm-4 control-label">当前IP地址：</label>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control" id="static_ip" name="static_ip" value="ip">
+                                <input type="text" class="form-control" id="ori_ip" name="ori_ip"
+                                       placeholder="当前IP地址">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="edit_osd" class="col-sm-4 control-label">OSD文字</label>
+                            <label class="col-sm-4 control-label">设置IP地址：</label>
                             <div class="col-sm-6">
-                                <input type="text" class="form-control" id="osd_text" name="osd_text" value="osd">
+                                <input type="text" class="form-control" id="set_ip" name="set_ip"
+                                       placeholder="设置目标IP地址">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="edit_people" class="col-sm-4 control-label">修改人</label>
+                            <label class="col-sm-4 control-label">当前密码：</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="ori_password" name="ori_password"
+                                       placeholder="当前密码" disabled>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">设置密码：</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="set_password" name="set_password"
+                                       placeholder="设置目标密码">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">其他信息</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="other_info" name="other_info"
+                                       placeholder="其他信息">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_people" class="col-sm-4 control-label">添加人 *</label>
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="editor_name" name="editor_name"
-                                       value="editor">
+                                       placeholder="必填字段" value={{ user.username }}>
                             </div>
                         </div>
                         <input type="hidden" class="form-control" id="id" name="id" value="id">
@@ -157,6 +185,20 @@
                             <div class="col-sm-6">
                                 <input type="text" class="form-control" id="set_ip" name="set_ip"
                                        placeholder="设置目标IP地址">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">当前密码：</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="ori_password" name="ori_password"
+                                       placeholder="当前密码">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">设置密码：</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control" id="set_password" name="set_password"
+                                       placeholder="设置目标密码">
                             </div>
                         </div>
 
@@ -456,11 +498,15 @@
         $('.btn-edit').on('click', function () {
             $.getJSON('/ipcmanage/api/tables/' + this.name, function (data) {
                 console.log(data);
-                $('#edit_modal').find("form").find('#mac_addr').val(data.mac_addr);
-                $('#edit_modal').find("form").find('#static_ip').val(data.static_ip);
-                $('#edit_modal').find("form").find('#osd_text').val(data.osd_text);
-                $('#edit_modal').find("form").find('#editor_name').val(data.editor_name);
-                $('#edit_modal').find("form").find('#id').val(data.id);
+                content = data.data;
+                $('#edit_modal').find("form").find('#mac_addr').val(content.mac_addr);
+                $('#edit_modal').find("form").find('#ori_ip').val(content.ori_ip);
+                $('#edit_modal').find("form").find('#set_ip').val(content.set_ip);
+                $('#edit_modal').find("form").find('#other_info').val(content.other_info);
+                $('#edit_modal').find("form").find('#editor_name').val(content.editor_name);
+                $('#edit_modal').find("form").find('#ori_password').val(content.ori_password);
+                $('#edit_modal').find("form").find('#set_password').val(content.set_password);
+                $('#edit_modal').find("form").find('#id').val(content.id);
             })
         });
         <!--删除记录-->
@@ -545,7 +591,9 @@
                 "ori_ip": target.find("form").find('#ori_ip').val(),
                 "set_ip": target.find("form").find('#set_ip').val(),
                 "other_info": target.find("form").find('#other_info').val(),
-                "editor_name": target.find("form").find('#editor_name').val()
+                "editor_name": target.find("form").find('#editor_name').val(),
+                "ori_password": target.find("form").find('#ori_password').val(),
+                "set_password": target.find("form").find('#set_password').val(),
             };
             return json;
         }
@@ -554,7 +602,7 @@
             var time = new Date().getTime();
             return String(time);
         };
-        function get_user_name(){
+        function get_user_name() {
             return $("#login_user_name").val();
         };
 

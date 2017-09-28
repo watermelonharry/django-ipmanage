@@ -15,6 +15,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from basepkg.jsonreformat import FormatJsonParser, SuccessJsonResponse, ErrorJsonResponse
 
+
 class JSONResponse(HttpResponse):
     '''
     用来返回json数据
@@ -117,34 +118,34 @@ def api_start_set_ipc(request):
 
 
 @csrf_exempt
-def api_put_get_delete_operate_info(request, operate_id):
+def api_put_get_delete_mission_info(request, operate_id):
     """
     显示、更新任务信息
     """
     try:
-        op_info = IpMissionTable.objects.get(operate_id=operate_id)
-    except IpMissionTable.DoesNotExist:
-        return HttpResponse(status=404)
+        op_info = IpMissionTable.get_mission_by_mission_id(mid=operate_id)
+    except Exception as e:
+        return ErrorJsonResponse(data="{0}".format(e),status=400)
 
     if request.method == 'GET':
         serializer = IpMissionSerializer(op_info)
-        return JSONResponse(serializer.data)
+        return SuccessJsonResponse(data=serializer.data, status=200)
 
     elif request.method == 'PUT':
         data = JSONParser().parse(request)
         serializer = IpMissionSerializer(op_info, data=data)
 
         if data['operate_id'] != operate_id:
-            return JSONResponse(serializer.errors, status=400)
+            return ErrorJsonResponse(data="mission id not match")
 
         if serializer.is_valid():
             serializer.save()
-            return JSONResponse(serializer.data, status=200)
-        return JSONResponse(serializer.errors, status=400)
+            return SuccessJsonResponse(data=serializer.data, status=200)
+        return ErrorJsonResponse(data=serializer.errors, status=400)
 
     elif request.method == 'DELETE':
         op_info.delete()
-        return JSONResponse({'delete': 'success'}, status=200)
+        return SuccessJsonResponse(data='delete success', status=200)
 
 
 @csrf_exempt
@@ -208,29 +209,28 @@ def api_get_add_put_ip_mac_table(request):
                     serializer.save()
 
 
-
-
 @csrf_exempt
-def api_ip_mac_detail(request, id):
+def api_get_put_single_mac(request, id):
     '''
     显示、更新、删除一个ip-mac
     '''
     try:
         ip_mac = StaticIpMacTable.objects.get(id=id)
     except StaticIpMacTable.DoesNotExist:
-        return HttpResponse(status=404)
+        return ErrorJsonResponse(data="{0} not exist".format(id), status=400)
 
     if request.method == 'GET':
         serializer = IpMacTableSerializer(ip_mac)
-        return JSONResponse(serializer.data)
+        return SuccessJsonResponse(data=serializer.data, status=200)
 
     elif request.method == 'PUT':
         data = JSONParser().parse(request)
         serializer = IpMacTableSerializer(ip_mac, data=data)
         if serializer.is_valid():
             serializer.save()
-            return JSONResponse(serializer.data)
-        return JSONResponse(serializer.errors, status=400)
+            return SuccessJsonResponse(data=serializer.data, status=200)
+        else:
+            return ErrorJsonResponse(data=serializer.errors, status=400)
 
     elif request.method == 'DELETE':
         ip_mac.delete()

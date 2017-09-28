@@ -4,7 +4,7 @@
 
         <!-- Three columns of text below the carousel -->
         <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-4">
 
                 <h4>自动恢复</h4>
                 <p>按照默认设置开始执行重置设备、更改IP的操作</p>
@@ -13,16 +13,88 @@
 
             </div>
 
-            <div class="col-lg-6">
+            <div class="col-lg-4">
 
                 <h4>高级设置</h4>
                 <p>查看已保存的MAC-IP表格，可以进行修改、添加等自定义操作</p>
                 <p><a class="btn btn-info" href="/ipcmanage/iptables" role="button">高级设置&raquo;</a></p>
 
             </div>
+            <div class="col-lg-4">
+                <h4>自动扫描</h4>
+
+                <p>扫描局域网中的设备，添加或更新MAC-IP信息。</p>
+
+                <p><a class="btn btn-info" role="button" id="auto_scan_btn" data-toggle="modal"
+                      data-target="#scan_modal" data-backdrop="static">开始扫描 &raquo;</a></p>
+
+            </div>
+        </div>
+
+    </div>
+    <!--扫描窗口-->
+    <div class="modal fade" id="scan_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>扫描局域网</h3>
+
+                    <p>自动扫描局域网内的在线设备，获取其信息并添加到数据库</p>
+
+                    <p>点击“开始”后，系统会下发任务至终端，自动开始执行</p>
+
+                    <p><b>请填入所需的起始扫描地址、所需要的扫描数量</b></p>
+                </div>
+                <div class="modal-body" id="scan_modal_body">
+                    <form class="form-horizontal" role="form" id="auto_scan_form" action="../api/mission/"
+                          method="post">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">起始IP</label>
+
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="start_ip" name="start_ip"
+                                       value="192.168.1.2"
+                                       placeholder="eg: 192.168.1.2" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">扫描IP数量</label>
+
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="total_count" name="total_count"
+                                       value="254"
+                                       placeholder="eg: 254" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">分配终端</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" id="assign_terminal" name="assign_terminal">
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div id="show_scan_progress" hidden>
+                        <p>请确认执行终端已开启，等待扫描完成</p>
+
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped active" role="progressbar"
+                                 id="auto_scan_probar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-success" id="show_scan_detail_btn" name="">查看详细</button>
+                    <button type="button" class="btn btn-sm btn-success" id="confirm_scan_btn">开始</button>
+                    <button type="button" class="btn btn-sm btn-danger btn_terminate" id="scan_terminate_btn">终止
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_scan_btn"
+                            name="">关闭
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
-
 
     <!--开始执行窗口-->
     <div class="modal fade" id="start_scan_modal">
@@ -95,14 +167,108 @@
 
     <script>
         var timer_id;
+        var terminal_list;
+
+        $("#auto_scan_btn").on("click", function () {
+            refresh_terminal($("#scan_modal"));
+            $("#scan_terminate_btn").hide();
+            $("#show_scan_detail_btn").hide();
+            $('#confirm_scan_btn').show();
+
+        });
+        function refresh_terminal(target) {
+            target.find("option").remove();
+            $.ajax({
+                type: "GET",
+                url: "/terminal/api/inner/online/",
+                dataType: "json",
+                contentType: "application/json",
+                success: function (js_data) {
+                    terminal_list = js_data.data;
+                    console.log("success", js_data);
+                    $.each(js_data.data, function () {
+                        var choice = '<option>' + this.terminal_name + '</option>';
+                        target.find('#assign_terminal').append(choice);
+                        console.log(this.terminal_name);
+                    });
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                }
+            });
+        };
+
+        <!--开始自动扫描-->
+        $('#confirm_scan_btn').click(function () {
+            var m_data = {
+                'editor_name': $('#login_user_name').val(),
+                'mission_id': getTimeId(),
+                'start_ip': $('#start_ip').val(),
+                'total_count': $('#total_count').val(),
+                'mission_type': 2,
+                'progress': 0,
+                'run_status': 1,
+                'remote_id':$('#assign_terminal').val(),
+                'user_name':$('#login_user_name').val(),
+            };
+            if (m_data.start_ip.split('.').length != 4) {
+                alert("错误:请输入合法IP地址！");
+                return;
+            };
+            if (m_data.total_count == '') {
+                alert("错误:请输入扫描数量");
+                return;
+            };
+            if (m_data.remote_id == '' || m_data.remote_id == null){
+                alert("错误:终端不能为空！");
+                return;
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/ipcmanage/api/mission/",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(m_data),
+                success: function (msg) {
+                    console.log("push to server success", msg);
+
+                    push_to_terminal(module = "ipmanage",
+                            t_url=get_terminal_url_by_name(m_data.remote_id),
+                            mission_info=m_data,
+                            terminal_name=m_data.remote_id,
+                            m_url="/ipcmanage/api/mission/info/"+m_data.mission_id);
+
+                    $('#confirm_scan_btn').hide();
+                    $("#scan_terminate_btn").show();
+                    $("#show_scan_detail_btn").show();
+
+                    $('#show_scan_progress').show();
+                    $('#show_scan_detail_btn').attr("name", m_data.mission_id);
+                    $('#abort_scan_btn').attr("name", m_data.mission_id);
+                    timer_id = window.setInterval(on_time_check_scan, 5000);
+                    console.log('start timer:' + timer_id);
+                    $('#confirm_scan_btn').attr({'disabled': "disabled"});
+                    $('#scan_modal_body').hide();
+                    $('#confirm_scan_btn').hide();
+                    $('#scan_terminate_btn').show();
+                },
+                error: function (e) {
+                    console.log("failed", e);
+                    alert("添加失败！ error-" + e.status);
+                }
+            });
+        });
+
+
         <!--开始执行-->
         $('#confirm_scan_ip_btn').on('click', function () {
             var json_data = {
                 'operator_name': $('#scan_people_str').val(),
                 'operate_id': getTimeId(),
                 'operate_type': 3,
-                'ip_start': $('#scan_start_str').val(),
-                'ip_count': $('#scan_count_str').val(),
+                'start_ip': $('#scan_start_str').val(),
+                'total_count': $('#scan_count_str').val(),
                 'run_status': 1,
                 'progress': 0
             };
@@ -138,7 +304,7 @@
                 contentType: "application/json",
                 success: function (js_data) {
                     console.log("success", js_data);
-                    var total = Number(js_data.ip_count);
+                    var total = Number(js_data.total_count);
                     var fin = Number(js_data.progress);
                     var progress = String(fin * 100 / total) + "%";
                     console.log("request mission progress", progress, timer_id);
