@@ -81,7 +81,7 @@ class IpMissionTable(models.Model):
             mission = cls.objects.get(mission_id=mid)
             return mission
         except Exception as e:
-            return []
+            raise e
 
 
 class IpMissionDetailTable(models.Model):

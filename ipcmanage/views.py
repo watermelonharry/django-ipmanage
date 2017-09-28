@@ -97,16 +97,10 @@ def api_plan_unfinished(request):
 
 
 @csrf_exempt
-def api_start_set_ipc(request):
+def api_post_mission_info(request):
     """
-    接收开始任务的json
-    eg.
+    新建任务
     """
-    if request.method == 'GET':
-        all_operate_info = IpMissionTable.objects.all()
-        serializer = IpMissionSerializer(all_operate_info, many=True)
-        return JSONResponse(serializer.data)
-
     if request.method == 'POST':
         data = JSONParser().parse(request)
         serializer = IpMissionSerializer(data=data)
@@ -115,17 +109,19 @@ def api_start_set_ipc(request):
             return JSONResponse(serializer.data, status=201)
 
         return JSONResponse(serializer.errors, status=400)
+    else:
+        return ErrorJsonResponse(data="method not allowed", status=400)
 
 
 @csrf_exempt
 def api_put_get_delete_mission_info(request, operate_id):
     """
-    显示、更新任务信息
+    显示、更新单个任务信息
     """
     try:
         op_info = IpMissionTable.get_mission_by_mission_id(mid=operate_id)
     except Exception as e:
-        return ErrorJsonResponse(data="{0}".format(e),status=400)
+        return ErrorJsonResponse(data="id not exist")
 
     if request.method == 'GET':
         serializer = IpMissionSerializer(op_info)
@@ -136,7 +132,7 @@ def api_put_get_delete_mission_info(request, operate_id):
         serializer = IpMissionSerializer(op_info, data=data)
 
         if data['operate_id'] != operate_id:
-            return ErrorJsonResponse(data="mission id not match")
+            return ErrorJsonResponse(data="mission id not match", status=400)
 
         if serializer.is_valid():
             serializer.save()
@@ -145,7 +141,7 @@ def api_put_get_delete_mission_info(request, operate_id):
 
     elif request.method == 'DELETE':
         op_info.delete()
-        return SuccessJsonResponse(data='delete success', status=200)
+        return SuccessJsonResponse(data='data delete', status=200)
 
 
 @csrf_exempt

@@ -15,7 +15,7 @@ class IpMacTableSerializer(serializers.ModelSerializer):
 class IpMissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = IpMissionTable
-        fields = ('id', 'mission_id', 'mission_type', 'ip_start', 'ip_count',
+        fields = ('id', 'mission_id', 'mission_type', 'start_ip', 'total_count',
                   'progress', 'run_status', 'user_name',
                   'editor_name', 'edit_time')
 

@@ -11,12 +11,8 @@ class BaseResponse(HttpResponse):
     '''
 
     def __init__(self, data, *args, **kwargs):
-        if type(data) is str:
-            content = data
-        elif type(data) is dict:
-            content = self.init_content(data)
-        elif data is None:
-            content = self.init_content({"error":"please input dict"})
+        if data is None:
+            content = self.init_content({"error": "please input dict"})
         else:
             content = self.init_content(data)
 
@@ -34,7 +30,8 @@ class SuccessJsonResponse(BaseResponse):
     """
 
     def __init__(self, data, *args, **kwargs):
-        super(SuccessJsonResponse, self).__init__(data, *args, **kwargs)
+        status_code = kwargs.get("status", 200)
+        super(SuccessJsonResponse, self).__init__(data, status=status_code, *args, **kwargs)
 
     def init_content(self, data):
         content_dict = {}
@@ -51,7 +48,8 @@ class ErrorJsonResponse(BaseResponse):
 
     def __init__(self, data, *args, **kwargs):
         # todo: status_code modify
-        super(ErrorJsonResponse, self).__init__(data, *args, **kwargs)
+        status_code = kwargs.get("status", 400)
+        super(ErrorJsonResponse, self).__init__(data, status=status_code, *args, **kwargs)
 
     def init_content(self, data):
         content_dict = {}
