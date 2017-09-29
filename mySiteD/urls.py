@@ -15,12 +15,13 @@ urlpatterns = patterns('',
 
 
     url('^contact/', include('feedback.urls')),
-    url('^dnstest/', include('dnstest.urls')),
+    # url('^dnstest/', include('dnstest.urls')),
 
     url('^ipcmanage/', include('ipcmanage.urls')),
     url('^ipcset/', include('ipcset.urls')),
     url('^user/', include('userManage.urls')),
     url('^terminal/', include('terminalReg.urls')),
+    url('^iottest/', include('iottest.urls')),
 
     url(r'^admin/', admin.site.urls),
 )

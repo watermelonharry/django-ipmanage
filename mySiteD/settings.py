@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'userManage',
     'feedback',
     'terminalReg',
+    'iottest',
     'rest_framework',
 )
 
