@@ -148,21 +148,24 @@
                 'mission_type': 2,
                 'progress': 0,
                 'run_status': 1,
-                'remote_id':$('#assign_terminal').val(),
-                'user_name':$('#login_user_name').val(),
+                'remote_id': $('#assign_terminal').val(),
+                'user_name': $('#login_user_name').val(),
             };
             if (m_data.start_ip.split('.').length != 4) {
                 alert("错误:请输入合法IP地址！");
                 return;
-            };
+            }
+            ;
             if (m_data.total_count == '') {
                 alert("错误:请输入扫描数量");
                 return;
-            };
-            if (m_data.remote_id == '' || m_data.remote_id == null){
+            }
+            ;
+            if (m_data.remote_id == '' || m_data.remote_id == null) {
                 alert("错误:终端不能为空！");
                 return;
-            };
+            }
+            ;
 
             $.ajax({
                 type: "POST",
@@ -174,10 +177,10 @@
                     console.log("push to server success", msg);
 
                     push_to_terminal(module = "ipcset",
-                            t_url=get_terminal_url_by_name(m_data.remote_id),
-                            mission_info=m_data,
-                            terminal_name=m_data.remote_id,
-                            m_url="/ipcset/api/mission/info/"+m_data.mission_id);
+                        t_url = get_terminal_url_by_name(m_data.remote_id),
+                        mission_info = m_data,
+                        terminal_name = m_data.remote_id,
+                        m_url = "/ipcset/api/mission/info/" + m_data.mission_id);
 
                     $('#confirm_scan_btn').hide();
                     $("#scan_terminate_btn").show();
@@ -201,10 +204,10 @@
         });
 
         function get_terminal_url_by_name(t_name) {
-            var url= "";
+            var url = "";
             $.each(terminal_list, function () {
                 if (this.terminal_name == t_name) {
-                    url= "http://" + this.terminal_addr + ":" + this.terminal_port+"/";
+                    url = "http://" + this.terminal_addr + ":" + this.terminal_port + "/";
                 }
             });
             return url;
@@ -299,7 +302,7 @@
             });
         };
 
-        $("#auto_scan_btn").on("click",function () {
+        $("#auto_scan_btn").on("click", function () {
             refresh_terminal($("#scan_modal"));
             $("#scan_terminate_btn").hide();
             $("#show_scan_detail_btn").hide();

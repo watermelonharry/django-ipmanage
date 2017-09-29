@@ -15,18 +15,6 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from basepkg.jsonreformat import FormatJsonParser, SuccessJsonResponse, ErrorJsonResponse
 
-
-class JSONResponse(HttpResponse):
-    '''
-    用来返回json数据
-    '''
-
-    def __init__(self, data, **kwargs):
-        content = JSONRenderer().render(data)
-        kwargs['content_type'] = 'application/json'
-        super(JSONResponse, self).__init__(content, **kwargs)
-
-
 """
 views
 
@@ -52,7 +40,7 @@ def show_ip_table(request):
 
 @login_required
 def show_mission_datail(request, operate_id):
-    detail_list = CnIpcChangeLogDetail.objects.filter(operate_id=operate_id)
+    detail_list = IpMissionDetailTable.objects.filter(operate_id=operate_id)
     create_time = IpMissionTable.objects.get(operate_id=operate_id).create_time
     return render_to_response('mission_detail_table.html', {'firstTitle': u'IP批量设置',
                                                             'firstTitle_content': u'查看任务明细',
@@ -106,11 +94,11 @@ def api_post_mission_info(request):
         serializer = IpMissionSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return JSONResponse(serializer.data, status=201)
+            return SuccessJsonResponse(data=serializer.data, status=201)
 
-        return JSONResponse(serializer.errors, status=400)
+        return ErrorJsonResponse(data=serializer.errors)
     else:
-        return ErrorJsonResponse(data="method not allowed", status=400)
+        return ErrorJsonResponse(data="method not allowed")
 
 
 @csrf_exempt
@@ -145,31 +133,22 @@ def api_put_get_delete_mission_info(request, operate_id):
 
 
 @csrf_exempt
-def api_operate_detail(request):
+def api_post_mission_detail(request):
     """
     任务的详细条目，每个IP的状态
     :param request:
     :return:
     """
     data = JSONParser().parse(request)
-    if request.method == 'GET':
-        operate_id = data.get('operate_id')
-        all_detail_info = CnIpcChangeLogDetail.objects.filter(operate_id=operate_id)
-        if type(all_detail_info) is QuerySet:
-            serializer = IpMissionDetailSerializer(all_detail_info, many=True)
-        else:
-            serializer = IpMissionDetailSerializer(all_detail_info)
-
-        return JSONResponse(serializer.data)
-
-    # todo:获取指定op_id对应的log_list
     if request.method == 'POST':
         # todo:将记录添加至数据库
         serializer = IpMissionDetailSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return JSONResponse(serializer.data, status=201)
-        return JSONResponse(serializer.errors, status=400)
+            return SuccessJsonResponse(data=serializer.data, status=201)
+        return ErrorJsonResponse(data=serializer.errors, status=400)
+    else:
+        return ErrorJsonResponse(data='method not allowed')
 
 
 @csrf_exempt

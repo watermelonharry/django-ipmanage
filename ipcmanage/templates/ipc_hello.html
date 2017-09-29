@@ -5,30 +5,24 @@
         <!-- Three columns of text below the carousel -->
         <div class="row">
             <div class="col-lg-4">
-
-                <h4>自动恢复</h4>
-                <p>按照默认设置开始执行重置设备、更改IP的操作</p>
-                <p><a class="btn btn-success" role="button" data-toggle="modal"
-                      data-target="#start_scan_modal" data-backdrop="static">自动设置&raquo;</a></p>
-
-            </div>
-
-            <div class="col-lg-4">
-
-                <h4>高级设置</h4>
-                <p>查看已保存的MAC-IP表格，可以进行修改、添加等自定义操作</p>
-                <p><a class="btn btn-info" href="/ipcmanage/iptables" role="button">高级设置&raquo;</a></p>
-
-            </div>
-            <div class="col-lg-4">
-                <h4>自动扫描</h4>
-
-                <p>扫描局域网中的设备，添加或更新MAC-IP信息。</p>
-
                 <p><a class="btn btn-info" role="button" id="auto_scan_btn" data-toggle="modal"
                       data-target="#scan_modal" data-backdrop="static">开始扫描 &raquo;</a></p>
+                <p>扫描局域网中的设备，添加或更新MAC-IP信息。</p>
+            </div>
+            <div class="col-lg-4">
+                <p><a class="btn btn-success" role="button" data-toggle="modal"
+                      data-target="#start_scan_modal" data-backdrop="static">自动设置&raquo;</a></p>
+                <p>按照默认设置开始执行重置设备、更改IP的操作</p>
+
 
             </div>
+
+            <div class="col-lg-4">
+                <p><a class="btn btn-info" href="/ipcmanage/iptables" role="button">高级设置&raquo;</a></p>
+                <p>查看已保存的MAC-IP表格，可以进行修改、添加等自定义操作</p>
+
+            </div>
+
         </div>
 
     </div>
@@ -208,21 +202,24 @@
                 'mission_type': 2,
                 'progress': 0,
                 'run_status': 1,
-                'remote_id':$('#assign_terminal').val(),
-                'user_name':$('#login_user_name').val(),
+                'remote_id': $('#assign_terminal').val(),
+                'user_name': $('#login_user_name').val(),
             };
             if (m_data.start_ip.split('.').length != 4) {
                 alert("错误:请输入合法IP地址！");
                 return;
-            };
+            }
+            ;
             if (m_data.total_count == '') {
                 alert("错误:请输入扫描数量");
                 return;
-            };
-            if (m_data.remote_id == '' || m_data.remote_id == null){
+            }
+            ;
+            if (m_data.remote_id == '' || m_data.remote_id == null) {
                 alert("错误:终端不能为空！");
                 return;
-            };
+            }
+            ;
 
             $.ajax({
                 type: "POST",
@@ -234,10 +231,10 @@
                     console.log("push to server success", msg);
 
                     push_to_terminal(module = "ipmanage",
-                            t_url=get_terminal_url_by_name(m_data.remote_id),
-                            mission_info=m_data,
-                            terminal_name=m_data.remote_id,
-                            m_url="/ipcmanage/api/mission/info/"+m_data.mission_id);
+                        t_url = get_terminal_url_by_name(m_data.remote_id),
+                        mission_info = m_data,
+                        terminal_name = m_data.remote_id,
+                        m_url = "/ipcmanage/api/mission/" + m_data.mission_id);
 
                     $('#confirm_scan_btn').hide();
                     $("#scan_terminate_btn").show();
@@ -260,6 +257,89 @@
             });
         });
 
+        function on_time_check_scan() {
+            var op_id = $('#abort_scan_btn').attr("name");
+            $.ajax({
+                type: "GET",
+                url: "/ipcmanage/api/mission/",
+                data: {"mission_id": op_id},
+                dataType: "json",
+                contentType: "application/json",
+                success: function (js_data) {
+                    js_data = js_data[0];
+                    console.log("success", js_data);
+                    var total = Number(js_data.total_count);
+                    var fin = Number(js_data.progress);
+                    var progress = String(fin * 100 / total) + "%";
+                    console.log("request mission progress", progress, timer_id);
+                    $('#auto_scan_probar').attr("style", "width: " + progress);
+                    if (total == fin) {
+                        window.clearInterval(timer_id);
+                        console.log("clear interval");
+                        alert('设置完成！')
+                    }
+                },
+                error: function (e) {
+                    console.log("failed to get misson progress", e);
+                    alert("无法获取任务进度信息，请检查网络.error-" + e.status);
+                }
+            });
+        };
+
+        function get_terminal_url_by_name(t_name) {
+            var url = "";
+            $.each(terminal_list, function () {
+                if (this.terminal_name == t_name) {
+                    url = "http://" + this.terminal_addr + ":" + this.terminal_port + "/";
+                }
+            });
+            return url;
+        };
+
+        function push_to_terminal(module, t_url, mission_info, terminal_name, m_url) {
+            var push_data = {
+                "module": module,
+                "data": mission_info,
+            };
+            $.ajax({
+                type: "POST",
+                url: t_url,
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(push_data),
+                success: function (msg) {
+                    console.log("successed push to terminal:" + msg);
+                },
+                error: function (e) {
+                    console.log("failed to push to terminal", e);
+                    push_to_mission_queue(terminal_name, mission_info.mission_id, module, m_url)
+
+                }
+            });
+        };
+
+        function push_to_mission_queue(terminal_name, mission_id, mission_from, mission_url) {
+            var mission_info = {
+                "terminal_name": terminal_name,
+                "mission_id": mission_id,
+                "mission_from": mission_from,
+                "mission_url": mission_url,
+                "mission_status": 1
+            };
+            $.ajax({
+                type: "POST",
+                url: "/terminal/api/inner/bindterminal/",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(mission_info),
+                success: function (msg) {
+                    console.log("push to mission queue", msg);
+                },
+                error: function (e) {
+                    console.log("failed to push to mission queue", e);
+                }
+            });
+        };
 
         <!--开始执行-->
         $('#confirm_scan_ip_btn').on('click', function () {

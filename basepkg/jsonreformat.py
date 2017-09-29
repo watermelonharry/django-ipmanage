@@ -30,8 +30,10 @@ class SuccessJsonResponse(BaseResponse):
     """
 
     def __init__(self, data, *args, **kwargs):
-        status_code = kwargs.get("status", 200)
-        super(SuccessJsonResponse, self).__init__(data, status=status_code, *args, **kwargs)
+        if 'status' in kwargs:
+            super(SuccessJsonResponse, self).__init__(data, *args, **kwargs)
+        else:
+            super(SuccessJsonResponse, self).__init__(data, status=200, *args, **kwargs)
 
     def init_content(self, data):
         content_dict = {}
@@ -48,8 +50,10 @@ class ErrorJsonResponse(BaseResponse):
 
     def __init__(self, data, *args, **kwargs):
         # todo: status_code modify
-        status_code = kwargs.get("status", 400)
-        super(ErrorJsonResponse, self).__init__(data, status=status_code, *args, **kwargs)
+        if 'status' in kwargs:
+            super(ErrorJsonResponse, self).__init__(data, *args, **kwargs)
+        else:
+            super(ErrorJsonResponse, self).__init__(data, status=400, *args, **kwargs)
 
     def init_content(self, data):
         content_dict = {}

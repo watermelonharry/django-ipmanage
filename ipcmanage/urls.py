@@ -36,5 +36,5 @@ urlpatterns = [
     url(r'^api/mission/$', views.api_post_mission_info),
     url(r'^api/mission/wait/$', views.api_plan_unfinished),
     url(r'^api/mission/(?P<operate_id>[0-9]+)/$', views.api_put_get_delete_mission_info),
-    url(r'^api/mission/detail/$', views.api_operate_detail),
+    url(r'^api/mission/detail/$', views.api_post_mission_detail),
 ]
