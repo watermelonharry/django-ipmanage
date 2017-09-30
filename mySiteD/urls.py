@@ -12,6 +12,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url('^hello/$', views.hello),
     url('^$', views.hello),
+    url('^instools/$',views.show_instance_tool, name='instant_tool'),
 
 
     url('^contact/', include('feedback.urls')),

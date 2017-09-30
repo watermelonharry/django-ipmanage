@@ -1,0 +1,245 @@
+{% extends "banner.html" %}
+{% block content %}
+    <div class="container">
+        <div class="page-header">
+            <h3>>>> IPC工具列表</h3>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="panel panel-default" id="reboot_panel" data-toggle="modal"
+                     data-target="#reboot_modal">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">重启</h3>
+                    </div>
+                    <div class="panel-body">
+                        重启指定网段内的设备
+                    </div>
+                </div>
+                <div class="panel panel-default" data-toggle="modal"
+                     data-target="#restore_modal">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">恢复出厂</h3>
+                    </div>
+                    <div class="panel-body">
+                        将指定网段内的设备恢复出厂
+                    </div>
+                </div>
+            </div><!-- /.col-sm-4 -->
+            <div class="col-sm-4">
+                <div class="panel panel-info" data-toggle="modal"
+                     data-target="#set_password_modal">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">修改密码</h3>
+                    </div>
+                    <div class="panel-body">
+                        修改指定网段内的设备密码
+                    </div>
+                </div>
+            </div><!-- /.col-sm-4 -->
+        </div>
+
+    </div>
+
+    <!--1-重启modal-->
+    <div class="modal fade" id="reboot_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>重启设备</h3>
+                    <p><b>请填入所在设备的起始地址、地址增长数量</b></p>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">起始IP</label>
+
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="start_ip" name="start_ip"
+                                       value="192.168.1.2"
+                                       placeholder="eg: 192.168.1.2" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">IP地址增量</label>
+
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="total_count" name="total_count"
+                                       value="254"
+                                       placeholder="eg: 254" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">分配终端</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" id="terminal_name" name="terminal_name">
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-success" id="confirm_reboot_btn">开始</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--1-重置modal-->
+    <div class="modal fade" id="restore_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>将设备恢复出厂</h3>
+                    <p><b>请填入所在设备的起始地址、地址增长数量</b></p>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">起始IP</label>
+
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="start_ip" name="start_ip"
+                                       value="192.168.1.2"
+                                       placeholder="eg: 192.168.1.2" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">IP地址增量</label>
+
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="total_count" name="total_count"
+                                       value="254"
+                                       placeholder="eg: 254" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">分配终端</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" id="terminal_name" name="terminal_name">
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-success" id="confirm_reboot_btn">开始</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--1-设置密码modal-->
+    <div class="modal fade" id="set_password_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>设置设备密码</h3>
+                    <p><b>请填入所在设备的起始地址、地址增长数量、密码</b></p>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">起始IP</label>
+
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="start_ip" name="start_ip"
+                                       value="192.168.1.2"
+                                       placeholder="eg: 192.168.1.2" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">IP地址增量</label>
+
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="total_count" name="total_count"
+                                       value="254"
+                                       placeholder="eg: 254" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">设置密码</label>
+
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="set_password" name="set_password"
+                                       placeholder="eg: 123456, 无密码则为空">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">分配终端</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" id="terminal_name" name="terminal_name">
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-success" id="confirm_set_password_btn">开始</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var terminal_list;
+
+        $("#confirm_reboot_btn").click(function () {
+            push_to_terminal(module = "instool",
+                t_url = get_terminal_url_by_name(m_data.remote_id),
+                mission_info = m_data,
+                terminal_name = m_data.remote_id,
+                m_url = "/ipcset/api/mission/info/" + m_data.mission_id);
+        })
+
+        function getJsonForm(target) {
+            var json = {
+                "start_ip": target.find("#start_ip").val(),
+                "total_count": target.find("#total_count").val(),
+                "terminal_name": target.find("#terminal_name").val(),
+                "set_password": target.find("#set_passwrod").val(),
+            };
+            return json;
+        };
+
+        function push_to_terminal(module, t_url, mission_info, terminal_name, m_url) {
+            var push_data = {
+                "module": module,
+                "data": mission_info,
+            };
+            $.ajax({
+                type: "POST",
+                url: t_url,
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify(push_data),
+                success: function (msg) {
+                    console.log("successed push to terminal:" + msg);
+                },
+                error: function (e) {
+                    console.log("failed to push to terminal", e);
+                    push_to_mission_queue(terminal_name, mission_info.mission_id, module, m_url)
+
+                }
+            });
+        };
+
+        function get_terminal_url_by_name(t_name) {
+            var url = "";
+            $.each(terminal_list, function () {
+                if (this.terminal_name == t_name) {
+                    url = "http://" + this.terminal_addr + ":" + this.terminal_port + "/";
+                }
+            });
+            return url;
+        };
+
+
+    </script>
+
+{% endblock %}
