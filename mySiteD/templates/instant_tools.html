@@ -79,7 +79,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-success" id="confirm_reboot_btn">开始</button>
-                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">关闭
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="close_modal_btn">关闭
                     </button>
                 </div>
             </div>
@@ -124,8 +124,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-sm btn-success" id="confirm_reboot_btn">开始</button>
-                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">关闭
+                    <button type="button" class="btn btn-sm btn-success" id="confirm_reset_btn">开始</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="close_modal_btn">关闭
                     </button>
                 </div>
             </div>
@@ -179,7 +179,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-success" id="confirm_set_password_btn">开始</button>
-                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">关闭
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="close_modal_btn">关闭
                     </button>
                 </div>
             </div>
@@ -188,14 +188,43 @@
 
     <script>
         var terminal_list;
+        $(".modal.fade").on("show.bs.modal", function (e) {
+            refresh_terminal($(this));
+        });
 
+
+        <!--确认重启-->
         $("#confirm_reboot_btn").click(function () {
-            push_to_terminal(module = "instool",
-                t_url = get_terminal_url_by_name(m_data.remote_id),
+            m_data = getJsonForm($("#reboot_modal"));
+            m_data.operate_type = 0;
+            push_to_terminal(module = "batch_tools",
+                t_url = get_terminal_url_by_name(m_data.terminal_name),
                 mission_info = m_data,
                 terminal_name = m_data.remote_id,
-                m_url = "/ipcset/api/mission/info/" + m_data.mission_id);
-        })
+                m_url = null);
+        });
+
+        <!--确认重置-->
+        $("#confirm_reset_btn").click(function () {
+            m_data = getJsonForm($("#restore_modal"));
+            m_data.operate_type = 1;
+            push_to_terminal(module = "batch_tools",
+                t_url = get_terminal_url_by_name(m_data.terminal_name),
+                mission_info = m_data,
+                terminal_name = m_data.remote_id,
+                m_url = null);
+        });
+
+        <!--确认设置密码-->
+        $("#confirm_set_password_btn").click(function () {
+            m_data = getJsonForm($("#restore_modal"));
+            m_data.operate_type = 2;
+            push_to_terminal(module = "batch_tools",
+                t_url = get_terminal_url_by_name(m_data.terminal_name),
+                mission_info = m_data,
+                terminal_name = m_data.remote_id,
+                m_url = null);
+        });
 
         function getJsonForm(target) {
             var json = {
@@ -204,10 +233,16 @@
                 "terminal_name": target.find("#terminal_name").val(),
                 "set_password": target.find("#set_passwrod").val(),
             };
+            console.log("get form,", json);
             return json;
         };
 
         function push_to_terminal(module, t_url, mission_info, terminal_name, m_url) {
+            console.log("choose terminal name", mission_info.terminal_name);
+            if(mission_info.terminal_name == null){
+                alert("错误：请选择执行终端！");
+                return;
+            }
             var push_data = {
                 "module": module,
                 "data": mission_info,
@@ -220,11 +255,12 @@
                 data: JSON.stringify(push_data),
                 success: function (msg) {
                     console.log("successed push to terminal:" + msg);
+                    alert("推送到终端成功。");
+                    $('.modal.fade').modal("hide");
                 },
                 error: function (e) {
                     console.log("failed to push to terminal", e);
-                    push_to_mission_queue(terminal_name, mission_info.mission_id, module, m_url)
-
+                    alert("推送到终端失败。", e);
                 }
             });
         };
@@ -238,6 +274,28 @@
             });
             return url;
         };
+
+        function refresh_terminal(target) {
+            target.find("option").remove();
+            $.ajax({
+                type: "GET",
+                url: "/terminal/api/inner/online/",
+                dataType: "json",
+                contentType: "application/json",
+                success: function (js_data) {
+                    terminal_list = js_data.data;
+                    console.log("get terminal success", js_data);
+                    $.each(js_data.data, function () {
+                        var choice = '<option>' + this.terminal_name + '</option>';
+                        target.find('#terminal_name').append(choice);
+                        console.log(this.terminal_name);
+                    });
+                },
+                error: function (e) {
+                    console.log("get terminal failed", e);
+                }
+            });
+        }
 
 
     </script>
