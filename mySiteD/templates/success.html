@@ -1,8 +1,16 @@
 {% extends "banner.html" %}
-  {% block content %}
+{% block title_content %}
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/static/image/main_ico.png">
+    <title>测试工具集合</title>
+{% endblock %}
+{% block global_banner_content %}
     {% if next_url %}
-    <script>
-    setTimeout(function(){location.href='{{ next_url }}'}, 2000);
+        <script>
+        setTimeout(function () {
+            location.href = '{{ next_url }}'
+        }, 2000);
     {% endif %}
-    </script>
-  {% endblock %}
+</script>
+{% endblock %}

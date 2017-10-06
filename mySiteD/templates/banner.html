@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% csrf_token %}
     {% load staticfiles %}
     <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap-theme.css">
@@ -12,10 +13,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="/static/image/main_ico.png">
-    <title>测试工具集合</title>
+    {% block title_content %}
+    {% endblock %}
 </head>
 <body>
 <div class="container">
@@ -48,9 +47,12 @@
                             <li><a href="/ipcset">-码流参数批量设置</a></li>
                             {#                      <li><a href="#">-其他工具</a></li>#}
                             <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">快速应用工具</li>
+                            <li><a href={% url "instant_tool" %}>-重启/重置/修改密码</a></li>
+
+                            <li role="separator" class="divider"></li>
                             <li class="dropdown-header">其他</li>
-                            <li><a href="/terminal/">-查看注册终端</a></li>
-                            {#                      <li><a href="#">tool2</a></li>#}
+                            <li><a href={% url "show_terminal_list" %}>-查看已注册终端</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -87,7 +89,7 @@
 </div>
 <!-- /container -->
 
-{% block content %}
+{% block global_banner_content %}
 {% endblock %}
 <hr>
 <div id="footer">
