@@ -13,10 +13,11 @@ urlpatterns = patterns('',
     url('^hello/$', views.hello),
     url('^$', views.hello),
     url('^instools/$',views.show_instance_tool, name='instant_tool'),
+    url('^files/',include('filemanage.urls')),
+    url('^iottest/',include('iottest.urls')),
 
 
     url('^contact/', include('feedback.urls')),
-    # url('^dnstest/', include('dnstest.urls')),
 
     url('^ipcmanage/', include('ipcmanage.urls')),
     url('^ipcset/', include('ipcset.urls')),

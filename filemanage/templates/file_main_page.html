@@ -1,0 +1,25 @@
+{% extends "file_banner.html" %}
+{% block global_banner_content %}
+    <div class="container">
+        <div class="page-header">
+            <h4>>>> 执行终端</h4>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="panel panel-default" id="download_terminal_package">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">终端执行程序下载</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p>最新版本V1.0.1 <a class="btn-sm btn-info" href={% url "download_terminal_package" %}>下载</a></p>
+                    </div>
+                </div>
+            </div><!-- /.col-sm-4 -->
+        </div>
+        <div class="page-header">
+            <h4>>>> 其他下载</h4>
+        </div>
+
+    </div>
+
+{% endblock %}

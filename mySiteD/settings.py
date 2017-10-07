@@ -36,13 +36,13 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'dnstest',
     'ipcmanage',
     'ipcset',
     'userManage',
     'feedback',
     'terminalReg',
     'iottest',
+    'filemanage',
     'rest_framework',
 )
 
