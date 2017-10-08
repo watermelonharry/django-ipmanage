@@ -35,16 +35,16 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="/">主页</a></li>
-                    <li><a href="#">关于</a></li>
+                    <li><a href={% url "global_about_page" %}>关于</a></li>
                     <li><a href={% url 'feedback_submit' %}>联系我</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                            aria-expanded="false">工具列表<span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li class="dropdown-header">已有工具</li>
-                            <li><a href="/ipcmanage">-IP批量管理工具</a></li>
+                            <li><a href="/ipcmanage">-IP批量管理工具 [更新中]</a></li>
                             <li><a href="/ipcset">-码流参数批量设置</a></li>
-                            <li><a href={% url "iot_main_page" %}>-兼容性测试</a></li>
+                            <li><a href={% url "iot_main_page" %}>-兼容性测试 [未上线]</a></li>
                             <li role="separator" class="divider"></li>
                             <li class="dropdown-header">快速应用工具</li>
                             <li><a href={% url "instant_tool" %}>-重启/重置/修改密码</a></li>

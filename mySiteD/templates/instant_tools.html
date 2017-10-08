@@ -203,8 +203,8 @@
         <!--确认重启-->
         $("#confirm_reboot_btn").click(function () {
             m_data = getJsonForm($("#reboot_modal"));
-            m_data.operate_type = 0;
-            push_to_terminal(module = "batch_tools",
+            m_data.operate_type = 1;
+            push_to_terminal(module = "instanttools",
                 t_url = get_terminal_url_by_name(m_data.terminal_name),
                 mission_info = m_data,
                 terminal_name = m_data.remote_id,
@@ -214,8 +214,8 @@
         <!--确认重置-->
         $("#confirm_reset_btn").click(function () {
             m_data = getJsonForm($("#restore_modal"));
-            m_data.operate_type = 1;
-            push_to_terminal(module = "batch_tools",
+            m_data.operate_type = 2;
+            push_to_terminal(module = "instanttools",
                 t_url = get_terminal_url_by_name(m_data.terminal_name),
                 mission_info = m_data,
                 terminal_name = m_data.remote_id,
@@ -225,8 +225,8 @@
         <!--确认设置密码-->
         $("#confirm_set_password_btn").click(function () {
             m_data = getJsonForm($("#restore_modal"));
-            m_data.operate_type = 2;
-            push_to_terminal(module = "batch_tools",
+            m_data.operate_type = 3;
+            push_to_terminal(module = "instanttools",
                 t_url = get_terminal_url_by_name(m_data.terminal_name),
                 mission_info = m_data,
                 terminal_name = m_data.remote_id,

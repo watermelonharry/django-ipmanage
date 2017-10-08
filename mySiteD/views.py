@@ -18,3 +18,8 @@ def show_instance_tool(request):
     return render_to_response('instant_tools.html', {'firstTitle': u'即时工具',
                                                           'firstTitle_content': u'快速设置，无需等待。只管下发，不管结果。'},
                               context_instance=RequestContext(request))
+
+def show_about_page(request):
+    return render_to_response('about.html', {'firstTitle': u'关于本站',
+                                                          'firstTitle_content': u'- 还没想好写什么hhhhh'},
+                              context_instance=RequestContext(request))
