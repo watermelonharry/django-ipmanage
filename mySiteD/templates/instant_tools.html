@@ -224,7 +224,7 @@
 
         <!--确认设置密码-->
         $("#confirm_set_password_btn").click(function () {
-            m_data = getJsonForm($("#restore_modal"));
+            m_data = getJsonForm($("#set_password_modal"));
             m_data.operate_type = 3;
             push_to_terminal(module = "instanttools",
                 t_url = get_terminal_url_by_name(m_data.terminal_name),
@@ -238,7 +238,7 @@
                 "start_ip": target.find("#start_ip").val(),
                 "total_count": target.find("#total_count").val(),
                 "terminal_name": target.find("#terminal_name").val(),
-                "set_password": target.find("#set_passwrod").val(),
+                "set_password": target.find("#set_password").val(),
             };
             console.log("get form,", json);
             return json;
