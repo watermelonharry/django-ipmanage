@@ -168,6 +168,14 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label class="col-sm-4 control-label">原密码</label>
+
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="ori_password" name="ori_password"
+                                       placeholder="eg: 123456, 无密码则为空">
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label class="col-sm-4 control-label">设置密码</label>
 
                             <div class="col-sm-5">
@@ -238,6 +246,7 @@
                 "start_ip": target.find("#start_ip").val(),
                 "total_count": target.find("#total_count").val(),
                 "terminal_name": target.find("#terminal_name").val(),
+                "ori_password": target.find("#ori_password").val(),
                 "set_password": target.find("#set_password").val(),
             };
             console.log("get form,", json);
