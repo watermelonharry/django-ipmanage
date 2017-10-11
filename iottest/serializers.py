@@ -13,6 +13,19 @@ class IotDeviceSerializer(serializers.ModelSerializer):
                   'other_info', 'editor_name', 'edit_time')
 
 
+class MissionTableSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MissionTable
+        fields = ('id', 'mission_id', 'dut_name', 'dut_version', 'dut_addr',
+                  'dut_type', 'dut_username', 'dut_password', 'dut_cmp_lock', 'other_info', 'editor_name',
+                  'mission_status', 'create_time')
+
+
+class MissionDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MissionDetailTable
+        fields = ()
+
 # class BaseFrameSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = BaseFramerateTable

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.db import models
 
 
@@ -16,13 +18,13 @@ class IotDeviceTable(models.Model):
 
     other_info = models.TextField(blank=True, null=True)
     editor_name = models.CharField(max_length=20, blank=True)
-    username = models.CharField(max_length=20,blank=True,null=True)
+    username = models.CharField(max_length=20, blank=True, null=True)
 
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return "{0}-{1}".format(self.device_name, self.device_type)
+        return u"{0}-{1}".format(self.device_name, self.device_type)
 
     class Meta:
         ordering = ("device_addr",)
@@ -30,6 +32,7 @@ class IotDeviceTable(models.Model):
 
 class MissionTable(models.Model):
     TYPE_CHOICE = (('h264', u'H264'), ('h265', u'H265'))
+    STATUS_CHOICE = ((0, u'执行中'), (1, u'完成'), (2, u'终止'))
 
     mission_id = models.CharField(max_length=40, unique=True, blank=True)
 
@@ -43,14 +46,15 @@ class MissionTable(models.Model):
 
     dut_cmp_lock = models.IntegerField(max_length=5, blank=True, null=True)
     other_info = models.TextField(blank=True, null=True)
+    mission_status = models.IntegerField(max_length=5, choices=STATUS_CHOICE, blank=True)
 
-    username = models.CharField(max_length=20,blank=True,null=True)
+    username = models.CharField(max_length=20, blank=True, null=True)
     editor_name = models.CharField(max_length=20, blank=True)
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return "{0}-{1}".format(self.dut_name, self.dut_versiion)
+        return u"{0}-{1}".format(self.dut_name, self.dut_version)
 
     class Meta:
         ordering = ("-create_time",)
@@ -86,14 +90,13 @@ class MissionDetailTable(models.Model):
     other_info = models.TextField(blank=True, null=True)
     dut_cmp_lock = models.IntegerField(max_length=5, blank=True, null=True)
 
-    username = models.CharField(max_length=20,blank=True,null=True)
+    username = models.CharField(max_length=20, blank=True, null=True)
 
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 
-
     def __unicode__(self):
-        return "{0}-{1}".format(self.mission_id, self.iot_device.device_name)
+        return u"{0}-{1}".format(self.mission_id, self.iot_device.device_name)
 
     class Meta:
         ordering = ("id",)

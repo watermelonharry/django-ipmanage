@@ -1,4 +1,42 @@
-{% extends "iot_banner.html"%}
+{% extends "iot_banner.html" %}
 {% block iot_content %}
-    <p>进入IOT测试页面</p>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <h4>陪测设备列表</h4>
+
+                <p>查看已有陪测设备详细参数</p>
+
+                <p><a class="btn btn-info" role="button" href={% url "iot_sut_list_page" %}>查看设备&raquo;</a></p>
+            </div>
+            <div class="col-lg-4">
+                <h4>新建任务</h4>
+
+                <p>新增IOT测试任务</p>
+
+                <p><a class="btn btn-success" role="button" data-toggle="modal"
+                      data-target="#new_mission_modal" data-backdrop="static">新建任务 &raquo;</a></p>
+
+            </div>
+            <div class="col-lg-4">
+                <h4>任务信息</h4>
+
+                <p>查看历史任务信息、执行状态。</p>
+
+                <p><a class="btn btn-info" href={% url 'iot_mission_list_page' %} role="button">查看任务&raquo;</a></p>
+
+            </div>
+        </div>
+        <p></p>
+        <div class="row">
+            <div class="col-lg-4">
+                <h4>比较结果</h4>
+                <p>对比两次任务结果。</p>
+                <p><a class="btn btn-info" href={% url 'iot_mission_list_page' %} role="button">对比结果&raquo;</a></p>
+
+            </div>
+
+        </div>
+    </div>
+
 {% endblock %}
