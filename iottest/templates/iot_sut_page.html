@@ -1,6 +1,46 @@
-{% extends "iot_banner.html"%}
+{% extends "iot_banner.html" %}
 {% block iot_content %}
     <div class="container">
-        <p>iot 设备列表</p>
+        <div class="table-responsive" id="v_sut_table">
+            <table class="table table-striped" id="sut_table">
+                <thead>
+                <tr class=locktop>
+                    <th>设备名称</th>
+                    <th>设备地址</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% verbatim %}
+                <tr v-for="sut in sut_list">
+                    <td>{{ sut.device_name }}</td>
+                    <td>{{ sut.device_addr }}</td>
+                </tr>
+                {% endverbatim %}
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    <script>
+        var sut_list = [{"device_name":"测试", "device_addr":"123456"},{"device_name":"测试33332", "device_addr":"!(@#)!#!"}];
+        var table_head_list=[];
+        var v_sut_table = new Vue({
+            el: '#v_sut_table',
+            data: {
+                table_head_list: table_head_list,
+                sut_list: sut_list,
+            }
+        })
+
+        $(document).ready(update_sut_list());
+
+        function update_sut_list(){
+            $.getJSON("../api/inner/sutlist/", function(ret_data){
+                console.log(ret_data);
+                v_sut_table.sut_list=ret_data.data;
+                }
+            )
+        }
+
+    </script>
 {% endblock %}

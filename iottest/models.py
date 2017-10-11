@@ -9,13 +9,14 @@ class IotDeviceTable(models.Model):
     device_type = models.CharField(max_length=10, choices=TYPE_CHOICE, blank=True)
 
     device_addr = models.IPAddressField(blank=True)
-    username = models.CharField(max_length=40, blank=True)
-    ov_password = models.CharField(max_length=40, null=True, blank=True)
-    web_password = models.CharField(max_length=40, null=True, blank=True)
-    software_version = models.CharField(max_length=40, null=True, blank=True)
+    device_username = models.CharField(max_length=40, blank=True)
+    device_ov_password = models.CharField(max_length=40, null=True, blank=True)
+    device_web_password = models.CharField(max_length=40, null=True, blank=True)
+    device_software_version = models.CharField(max_length=40, null=True, blank=True)
 
     other_info = models.TextField(blank=True, null=True)
     editor_name = models.CharField(max_length=20, blank=True)
+    username = models.CharField(max_length=20,blank=True,null=True)
 
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
@@ -43,6 +44,7 @@ class MissionTable(models.Model):
     dut_cmp_lock = models.IntegerField(max_length=5, blank=True, null=True)
     other_info = models.TextField(blank=True, null=True)
 
+    username = models.CharField(max_length=20,blank=True,null=True)
     editor_name = models.CharField(max_length=20, blank=True)
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
@@ -84,8 +86,11 @@ class MissionDetailTable(models.Model):
     other_info = models.TextField(blank=True, null=True)
     dut_cmp_lock = models.IntegerField(max_length=5, blank=True, null=True)
 
+    username = models.CharField(max_length=20,blank=True,null=True)
+
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
+
 
     def __unicode__(self):
         return "{0}-{1}".format(self.mission_id, self.iot_device.device_name)
