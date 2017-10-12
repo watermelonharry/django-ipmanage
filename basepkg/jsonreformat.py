@@ -62,14 +62,13 @@ class ErrorJsonResponse(BaseResponse):
         return JSONRenderer().render(content_dict)
 
 
-class FormatJsonParser(JSONParser):
+class FormatJsonParser(object):
     """
     specific parser for post data
     """
 
     def __init__(self, stream, *args, **kwargs):
-        super(FormatJsonParser, self).__init__()
-        self.json_content = super(FormatJsonParser, self).parse(stream)
+        self.json_content = JSONParser().parse(stream)
 
     def get_ak(self):
         return self.json_content.get('ak', None)

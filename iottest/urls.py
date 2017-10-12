@@ -12,4 +12,6 @@ urlpatterns = [
 
     url('^api/inner/sutlist/$', views.api_get_add_iot_sut_list, name='api_iot_sut_list'),
     url('^api/inner/missionlist/$', views.api_get_mission_list, name='api_mission_list'),
+
+    url('^api/test/$', views.api_test_receive_url, name='test_api_url'),
 ]
