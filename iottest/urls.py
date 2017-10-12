@@ -10,6 +10,6 @@ urlpatterns = [
     url('^missionlist/$', views.show_mission_list, name='iot_mission_list_page'),
 
 
-    url('^api/inner/sutlist/$', views.api_get_iot_sut_list, name='api_iot_sut_list'),
+    url('^api/inner/sutlist/$', views.api_get_add_iot_sut_list, name='api_iot_sut_list'),
     url('^api/inner/missionlist/$', views.api_get_mission_list, name='api_mission_list'),
 ]

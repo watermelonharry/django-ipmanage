@@ -38,7 +38,7 @@ apis here
 """
 
 
-def api_get_iot_sut_list(request):
+def api_get_add_iot_sut_list(request):
     if request.method == "GET":
         sut_ids = request.GET.get('id', [])
         if not sut_ids:
@@ -47,6 +47,22 @@ def api_get_iot_sut_list(request):
             sut_list = IotDeviceTable.objects.filter(id__in=sut_ids)
         serializer = IotDeviceSerializer(sut_list, many=True)
         return SuccessJsonResponse(serializer.data)
+
+    elif request.method == "POST":
+        data = FormatJsonParser(request).get_data()
+        if isinstance(data, list):
+            serializer = IotDeviceSerializer(data=data, many=True)
+        elif isinstance(data, dict):
+            serializer = IotDeviceSerializer(data=data)
+        else:
+            return ErrorJsonResponse(data="worng format")
+
+        if serializer.is_valid():
+            serializer.save()
+            return SuccessJsonResponse(data=serializer.data)
+        else:
+            return ErrorJsonResponse(data=serializer.errors)
+
     else:
         return ErrorJsonResponse(data="method not supported")
 

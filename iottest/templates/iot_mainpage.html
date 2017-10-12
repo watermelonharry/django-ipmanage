@@ -39,4 +39,143 @@
         </div>
     </div>
 
+    <!--新增任务弹框-->
+    {% verbatim %}
+    <div class="modal fade" id="new_mission_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" v-if="show_new_label">
+                    <h3>新建IOT任务</h3>
+                    <p>新建一项IOT测试任务</p>
+                    <p>点击“开始”后，系统会下发任务至终端，自动开始执行</p>
+                </div>
+                <div class="modal-body" id="scan_modal_body" v-if="show_new_label">
+                    <form class="form-horizontal" role="form" id="new_mission_form">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">DUT型号</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" v-model="mission_form.dut_name"
+                                       placeholder="输入DUT型号" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">DUT版本</label>
+
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" v-model="mission_form.dut_version"
+                                       placeholder="输入DUT软件版本" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">DUT地址</label>
+
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" v-model="mission_form.dut_addr"
+                                       placeholder="输入DUT的IP地址" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">DUT用户名</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" v-model="mission_form.dut_username"
+                                       placeholder="输入DUT的登录名" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">DUT登录密码</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" v-model="mission_form.dut_password"
+                                       placeholder="输入DUT的登录密码" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">DUT类型</label>
+                            <div class="col-lg-5">
+                                <select class="form-control" v-model="mission_form.dut_type">
+                                    <option>h264</option>
+                                    <option>h265</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">备注信息</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" v-model="mission_form.other_info"
+                                       placeholder="请输入任务备注信息" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">编辑人</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" v-model="mission_form.editor_name"
+                                       placeholder="任务所有人名称" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">分配终端</label>
+                            <div class="col-sm-5">
+                                <select class="form-control" v-model="mission_form.terminal_name">
+                                    <template v-for="terminal of terminal_list">
+                                        <option>{{ terminal.terminal_name }}</option>
+                                    </template>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div id="show_scan_progress" v-if="show_progress_label">
+                        <p>请确认执行终端已开启，等待扫描完成</p>
+
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped active" role="progressbar"
+                                 id="auto_scan_probar" v-bind:style="progress_percent"></div>
+                        </div>
+                    </div>
+                    <button type="button" v-if="show_progress_label" class="btn btn-sm btn-success"
+                            id="show_scan_detail_btn" name="">查看详细
+                    </button>
+                    <button type="button" v-if="show_new_label" class="btn btn-sm btn-success" id="confirm_scan_btn">
+                        开始
+                    </button>
+                    <button type="button" v-if="show_progress_label" class="btn btn-sm btn-danger btn_terminate"
+                            id="scan_terminate_btn">终止
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_scan_btn"
+                            name="">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endverbatim %}
+
+    <script>
+        var v_new_mission_form = new Vue({
+            el: '#new_mission_modal',
+            data: {
+                show_new_label: true,
+                mission_form: {
+                    "mission_id": null,
+                    "dut_name": null,
+                    "dut_version": null,
+                    "dut_addr": null,
+                    "dut_type": null,
+                    "dut_username": "admin",
+                    "dut_password": "qqqqqq",
+                    "other_info": null,
+                    "editor_name": null,
+                    "username": null,
+                    "terminal_name": null,
+                },
+                show_progress_label: true,
+                progress_percent: "width: 0%",
+                terminal_list: [],
+            }
+        })
+    </script>
 {% endblock %}
