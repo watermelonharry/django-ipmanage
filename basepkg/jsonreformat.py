@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
+import json
 
 
 class BaseResponse(HttpResponse):
@@ -68,16 +69,40 @@ class FormatJsonParser(object):
     """
 
     def __init__(self, stream, *args, **kwargs):
-        self.json_content = JSONParser().parse(stream)
+        self.content = {}
+        for method in ("GET", "POST", "PUT", "DELETE"):
+            try:
+                setattr(self, u'{0}_content'.format(method), eval('stream.{0}'.format(method)))
+            except Exception as e:
+                setattr(self, u'{0}_content'.format(method), {})
+            self.content.update(eval("self.{0}_content".format(method)))
+
+        try:
+            self.body_content = JSONParser().parse(stream)
+            if isinstance(self.body_content, (str, unicode)):
+                self.body_content = json.loads(self.body_content)
+        except Exception as e:
+            self.body_content = {}
+
+        self.content.update(self.body_content)
 
     def get_ak(self):
-        return self.json_content.get('ak', None)
+        return self.content.get('ak', None)
 
     def get_terminal_name(self):
-        return self.json_content.get('terminal_name', None)
+        return self.content.get('terminal_name', None)
 
     def get_content(self):
-        return self.json_content
+        temp_dict = {}
+        temp_dict.update(self.content)
+        return temp_dict
 
     def get_data(self):
-        return self.json_content.get('data', None)
+        return self.get('data', None)
+
+    def __getattr__(self, item):
+        if hasattr(self, item):
+            return getattr(self, item)
+        else:
+            val = self.content.get(item, None)
+            return val

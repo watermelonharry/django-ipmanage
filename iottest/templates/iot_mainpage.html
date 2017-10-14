@@ -175,6 +175,15 @@
                 show_progress_label: true,
                 progress_percent: "width: 0%",
                 terminal_list: [],
+            },
+            methods:{
+                update_progress:function (num) {
+                    this.progress_percent = "width: "+num+"%";
+                },
+                get_form_data:function(){
+                    return JSON.stringify(this.mission_form);
+                },
+                
             }
         })
     </script>

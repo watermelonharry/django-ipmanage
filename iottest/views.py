@@ -11,28 +11,34 @@ from basepkg.jsonreformat import FormatJsonParser, SuccessJsonResponse, ErrorJso
 from models import IotDeviceTable, MissionTable, MissionDetailTable
 from serializers import IotDeviceSerializer, MissionTableSerializer, MissionDetailSerializer
 
+
 @csrf_exempt
 def api_test_receive_url(request):
     k = request
-    if request.method == "POST":
-        post_content = FormatJsonParser(request).get_content()
-        print("receive post data:{0}".format(post_content))
-        return SuccessJsonResponse(data=post_content)
-    if request.method == "GET":
-        get_content = request.GET
-        # get_content = FormatJsonParser(request).get_content()
-        print("receive GET data:{0}".format(get_content))
-        print("receive GET data:{0}".format(get_content.get("v1","no")))
-        return SuccessJsonResponse(data=get_content)
-    if request.method == "PUT":
-        # put_content = request.PUT
-        put_content = FormatJsonParser(request).get_content()
-        print("receive PUT data:{0}".format(put_content))
-        return SuccessJsonResponse(data=put_content)
-    if request.method == "DELETE":
-        del_content = FormatJsonParser(request).get_content()
-        print("receive DELETE data:{0}".format(del_content))
-        return SuccessJsonResponse(data=del_content)
+    formatter = FormatJsonParser(request)
+    content = formatter.get_content()
+    print("receive {0} data, type {1}, content {2}".format(request.method, type(content), content))
+    return SuccessJsonResponse(data=content)
+    #
+    # if request.method == "POST":
+    #     post_content = FormatJsonParser(request).get_content()
+    #     print("receive post data:{0}".format(post_content))
+    #     return SuccessJsonResponse(data=post_content)
+    # if request.method == "GET":
+    #     # get_content = request.GET
+    #     get_content = FormatJsonParser(request).get_content()
+    #     print("receive GET data:{0}".format(get_content))
+    #     print("receive GET data:{0}".format(get_content.get("v1","no")))
+    #     return SuccessJsonResponse(data=get_content)
+    # if request.method == "PUT":
+    #     # put_content = request.PUT
+    #     put_content = FormatJsonParser(request).get_content()
+    #     print("receive PUT data:{0}".format(put_content))
+    #     return SuccessJsonResponse(data=put_content)
+    # if request.method == "DELETE":
+    #     del_content = FormatJsonParser(request).get_content()
+    #     print("receive DELETE data:{0}".format(del_content))
+    #     return SuccessJsonResponse(data=del_content)
 
 
 @login_required
