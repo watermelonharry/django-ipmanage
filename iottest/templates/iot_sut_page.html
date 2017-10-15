@@ -50,7 +50,7 @@
         $(document).ready(update_sut_list());
 
         function update_sut_list(){
-            $.getJSON("../api/inner/sutlist/", function(ret_data){
+            $.getJSON("../api/v1/inner/suts/", function(ret_data){
                 console.log(ret_data);
                 v_sut_table.sut_list=ret_data.data;
                 }

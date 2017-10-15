@@ -60,14 +60,19 @@ def show_mission_list(request):
     return render_to_response('iot_mission_list.html', {'firstTitle': u'IOT测试',
                                                         'firstTitle_content': u'-查看历史任务'},
                               context_instance=RequestContext(request))
+@login_required
+def show_mission_detail(request):
+    return render_to_response('iot_mission_list.html', {'firstTitle': u'IOT测试',
+                                                        'firstTitle_content': u'-查看历史任务'},
+                              context_instance=RequestContext(request))
 
 
 """
 apis here
 """
 
-
-def api_get_add_iot_sut_list(request):
+@csrf_exempt
+def api_get_add_iot_suts(request):
     if request.method == "GET":
         sut_ids = request.GET.get('id', [])
         if not sut_ids:
@@ -95,8 +100,8 @@ def api_get_add_iot_sut_list(request):
     else:
         return ErrorJsonResponse(data="method not supported")
 
-
-def api_get_mission_list(request):
+@csrf_exempt
+def api_get_add_missions(request):
     if request.method == "GET":
         mission_ids = request.GET.get('id', [])
         if not mission_ids:
@@ -106,5 +111,38 @@ def api_get_mission_list(request):
 
         serializer = MissionTableSerializer(mission_list, many=True)
         return SuccessJsonResponse(serializer.data)
+
+    elif request.method == "POST":
+        m_data=FormatJsonParser(request).get_data()
+        if m_data:
+            serializer = MissionTableSerializer(data=m_data)
+            if serializer.is_valid():
+                serializer.save()
+                return SuccessJsonResponse(data=m_data)
+            else:
+                return ErrorJsonResponse(data=serializer.errors)
+        else:
+            return ErrorJsonResponse(data="post data is empty")
+
     else:
         return ErrorJsonResponse(data="method not supported")
+
+
+@csrf_exempt
+def api_get_add_mission_details(request, m_id):
+    if request.method == "GET" and m_id:
+        m_details = MissionDetailTable.get_details_by_mission_id(m_id)
+        serializer = MissionDetailSerializer(m_details, many=True)
+        return SuccessJsonResponse(data=serializer.data)
+
+    elif request.method == "POST":
+        post_data = FormatJsonParser(request)
+        serializer = MissionDetailSerializer(data=post_data.get_data())
+        if serializer.is_valid():
+            serializer.save()
+            return SuccessJsonResponse(data=serializer.data)
+        else:
+            return ErrorJsonResponse(data=serializer.errors)
+
+    else:
+        return ErrorJsonResponse(data="{0} is not supported".format(request.method))

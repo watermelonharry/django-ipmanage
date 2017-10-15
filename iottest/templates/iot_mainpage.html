@@ -14,7 +14,7 @@
 
                 <p>新增IOT测试任务</p>
 
-                <p><a class="btn btn-success" role="button" data-toggle="modal"
+                <p><a class="btn btn-success" role="button" data-toggle="modal" id="new_mission_btn"
                       data-target="#new_mission_modal" data-backdrop="static">新建任务 &raquo;</a></p>
 
             </div>
@@ -155,6 +155,22 @@
     {% endverbatim %}
 
     <script>
+        $("#new_mission_btn").click(function () {
+            $.ajax({
+                type: "GET",
+                url: "/terminal/api/inner/online/",
+                dataType: "json",
+                contentType: "application/json",
+                success: function (js_data) {
+                    v_new_mission_form.terminal_list = js_data.data;
+                    console.log("get terminal success", js_data);
+                },
+                error: function (e) {
+                    console.log("get terminal failed", e);
+                }
+            });
+        });
+
         var v_new_mission_form = new Vue({
             el: '#new_mission_modal',
             data: {
@@ -176,14 +192,42 @@
                 progress_percent: "width: 0%",
                 terminal_list: [],
             },
-            methods:{
-                update_progress:function (num) {
-                    this.progress_percent = "width: "+num+"%";
+            methods: {
+                update_progress: function (num) {
+                    this.progress_percent = "width: " + num + "%";
                 },
-                get_form_data:function(){
+                get_form_json_data: function () {
                     return JSON.stringify(this.mission_form);
                 },
-                
+                show_before_submmit: function () {
+                    this.update_progress(0);
+                    this.show_new_label = true;
+                    this.show_progress_label = false;
+                },
+                show_after_submmit: function () {
+                    this.show_new_label = false;
+                    this.show_progress_label = true;
+                },
+                get_terminal_url: function (t_name) {
+{#                    var url = "";#}
+{#                    $.each(this.terminal_list, function () {#}
+{#                        if (this.terminal_name == t_name) {#}
+{#                            url = "http://" + this.terminal_addr + ":" + this.terminal_port + "/";#}
+{#                        }#}
+{#                    });#}
+{#                    return url;#}
+                    for (t in this.terminal_list){
+                        var temp = this.terminal_list[t];
+                        if(temp.terminal_name == t_name){
+                            return "http://" + temp.terminal_addr + ":" + temp.terminal_port + "/"
+                        }
+                    };
+                    return ""
+                },
+                push_to_terminal: function () {
+                    $.ajax(
+                    )
+                },
             }
         })
     </script>

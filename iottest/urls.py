@@ -3,15 +3,17 @@ from django.contrib import admin
 import views
 from rest_framework import routers
 
-app_name='iottest'
+app_name = 'iottest'
 urlpatterns = [
-    url('^$', views.show_iot_main_page, name='iot_main_page'),
-    url('^sutlist/$', views.show_iot_sut_page, name='iot_sut_list_page'),
-    url('^missionlist/$', views.show_mission_list, name='iot_mission_list_page'),
+	url('^$', views.show_iot_main_page, name='iot_main_page'),
+	url('^sutlist/$', views.show_iot_sut_page, name='iot_sut_list_page'),
+	url('^missionlist/$', views.show_mission_list, name='iot_mission_list_page'),
+	url('^missiondetail/(?P<m_id>[0-9]+)/$', views.show_mission_detail, name='iot_mission_detail_page'),
 
+	url('^api/v1/inner/suts/$', views.api_get_add_iot_suts, name='api_get_add_iot_suts'),
+	url('^api/v1/inner/missions/$', views.api_get_add_missions, name='api_get_add_missions'),
+	url('^api/v1/inner/missiondetails/(?P<m_id>[0-9]+)/$', views.api_get_add_mission_details,
+	    name='api_get_add_mission_details'),
 
-    url('^api/inner/sutlist/$', views.api_get_add_iot_sut_list, name='api_iot_sut_list'),
-    url('^api/inner/missionlist/$', views.api_get_mission_list, name='api_mission_list'),
-
-    url('^api/test/$', views.api_test_receive_url, name='test_api_url'),
+	url('^api/v1/test/$', views.api_test_receive_url, name='test_api_url'),
 ]

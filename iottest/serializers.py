@@ -5,26 +5,29 @@ from models import *
 
 
 class IotDeviceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = IotDeviceTable
-        fields = ('id', 'device_name', 'device_type',
-                  'device_addr', 'device_username', 'device_ov_password', 'device_web_password',
-                  'device_software_version',
-                  'other_info', 'editor_name', 'edit_time')
+	class Meta:
+		model = IotDeviceTable
+		fields = ('id', 'device_name', 'device_type',
+		          'device_addr', 'device_username', 'device_ov_password', 'device_web_password',
+		          'device_software_version',
+		          'other_info', 'editor_name', 'edit_time')
 
 
 class MissionTableSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MissionTable
-        fields = ('id', 'mission_id', 'dut_name', 'dut_version', 'dut_addr',
-                  'dut_type', 'dut_username', 'dut_password', 'dut_cmp_lock', 'other_info', 'editor_name',
-                  'mission_status', 'create_time')
+	class Meta:
+		model = MissionTable
+		fields = ('id', 'dut_name', 'dut_version', 'dut_addr',
+		          'dut_type', 'dut_username', 'dut_password', 'dut_cmp_lock', 'other_info', 'editor_name', "sut_ids",
+		          'mission_status', 'create_time')
 
 
 class MissionDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MissionDetailTable
-        fields = ()
+	mission_id = serializers.PrimaryKeyRelatedField(blank=True)
+	iot_device_id = serializers.PrimaryKeyRelatedField(blank=True)
+
+	class Meta:
+		model = MissionDetailTable
+		exclude = ('edit_time',)
 
 # class BaseFrameSerializer(serializers.ModelSerializer):
 #     class Meta:
