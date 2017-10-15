@@ -54,7 +54,7 @@
         $(document).ready(update_mission_list());
 
         function update_mission_list() {
-            $.getJSON("../api/inner/missionlist/", function (ret_data) {
+            $.getJSON("../api/v1/inner/missions/", function (ret_data) {
                     console.log(ret_data);
                     v_mission_table.mission_list = ret_data.data;
                 }
