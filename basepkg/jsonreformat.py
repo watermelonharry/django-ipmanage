@@ -13,14 +13,14 @@ class BaseResponse(HttpResponse):
 
 	def __init__(self, data, *args, **kwargs):
 		if data is None:
-			content = self.init_content({"error": "please input dict"})
+			content = self.init_content({"error": "please input dict"},**kwargs)
 		else:
-			content = self.init_content(data)
+			content = self.init_content(data, **kwargs)
 
 		kwargs['content_type'] = 'application/json'
 		super(BaseResponse, self).__init__(content, **kwargs)
 
-	def init_content(self, data):
+	def init_content(self, data, **kwargs):
 		return JSONRenderer().render(data)
 
 
@@ -36,7 +36,7 @@ class SuccessJsonResponse(BaseResponse):
 		else:
 			super(SuccessJsonResponse, self).__init__(data, status=200, *args, **kwargs)
 
-	def init_content(self, data):
+	def init_content(self, data, **kwargs):
 		content_dict = {}
 		content_dict['data'] = data
 		content_dict['result'] = u'success'
@@ -56,8 +56,10 @@ class ErrorJsonResponse(BaseResponse):
 		else:
 			super(ErrorJsonResponse, self).__init__(data, status=400, *args, **kwargs)
 
-	def init_content(self, data):
+	def init_content(self, data, **kwargs):
 		content_dict = {}
+		# for key, val in kwargs.items():
+		# 	content_dict.update(key=val)
 		content_dict['errors'] = data
 		content_dict['result'] = u'error'
 		return JSONRenderer().render(content_dict)
