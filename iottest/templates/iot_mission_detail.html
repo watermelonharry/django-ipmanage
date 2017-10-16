@@ -1,0 +1,66 @@
+{% extends "iot_banner.html" %}
+{% block iot_content %}
+    <div class="container">
+        <h4>当前位置：<a href={% url "iot_main_page" %}>IOT测试</a> >> 查看任务明细</h4>
+        <div class="table-responsive" id="v_mission_detail_table">
+            <table class="table table-striped">
+                <thead>
+                <tr class=locktop>
+                    <th>序号</th>
+                    <th>SUT地址</th>
+                    <th>SUT名称</th>
+                    <th>SUT类型</th>
+                    <th>测试结果</th>
+                    <th>其他</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% verbatim %}
+                <tr v-for="(mission, index) in mission_list">
+                    <td>{{ index+1 }}</td>
+                    <td>{{ addr }}</td>
+                    <td>{{ name }}</td>
+                    <td>{{ type }}</td>
+                    <td>{{  }}</td>
+                    <td>{{ mission.other }}</td>
+                    <td>{{ mission.editor_name }}</td>
+                    <td>{{ mission.mission_status }}</td>
+                    <td><a class="btn-sm btn-success btn-show-detail" role="button" v-bind:name="mission.id">查看详细</a>
+                    </td>
+                </tr>
+                {% endverbatim %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        var mission_list = [{"device_name": "测试", "device_addr": "123456"}, {
+            "device_name": "测试33332",
+            "device_addr": "!(@#)!#!"
+        }];
+        var v_mission_detail_table = new Vue({
+            el: '#v_mission_detail_table',
+            data: {
+                detail_list: [],
+                sut_list: [],
+            },
+            methods: {
+                update_progress: function (num) {
+                    this.progress_percent = "width: " + num + "%";
+                },
+            }
+        })
+
+        $(document).ready(update_mission_detail_list());
+
+        function update_mission_detail_list() {
+            $.getJSON("../api/v1/inner/missions/", function (ret_data) {
+                    console.log(ret_data);
+                    v_mission_table.mission_list = ret_data.data;
+                }
+            )
+        }
+
+    </script>
+{% endblock %}

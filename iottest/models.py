@@ -49,7 +49,7 @@ class MissionTable(models.Model):
 	other_info = models.TextField(blank=True, null=True)
 	mission_status = models.IntegerField(max_length=5, choices=STATUS_CHOICE, blank=True)
 	mission_progress = models.IntegerField(max_length=5, blank=True, null=True)
-	sut_ids = models.TextField(blank=True, null=True)
+	sut_ids = models.ManyToManyField(IotDeviceTable,blank=True, null=True)
 
 	username = models.CharField(max_length=20, blank=True, null=True)
 	editor_name = models.CharField(max_length=20, blank=True)
