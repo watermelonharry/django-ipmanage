@@ -30,9 +30,19 @@ class MissionTablePostSerializer(serializers.ModelSerializer):
                   'dut_type', 'dut_username', 'dut_password', 'dut_cmp_lock', 'other_info', 'editor_name', "sut_ids",
                   'mission_status', 'create_time')
 
-class MissionDetailSerializer(serializers.ModelSerializer):
+class MissionDetailGetSerializer(serializers.ModelSerializer):
+    mission_id = serializers.PrimaryKeyRelatedField(blank=True)
+    # iot_device_id = serializers.PrimaryKeyRelatedField(blank=True)
+    iot_device_id = IotDeviceSerializer(blank=True)
+
+    class Meta:
+        model = MissionDetailTable
+        exclude = ('edit_time',)
+
+class MissionDetailPostSerializer(serializers.ModelSerializer):
     mission_id = serializers.PrimaryKeyRelatedField(blank=True)
     iot_device_id = serializers.PrimaryKeyRelatedField(blank=True)
+    # iot_device_id = IotDeviceSerializer(blank=True)
 
     class Meta:
         model = MissionDetailTable

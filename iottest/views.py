@@ -9,7 +9,8 @@ from rest_framework.parsers import JSONParser
 
 from basepkg.jsonreformat import FormatJsonParser, SuccessJsonResponse, ErrorJsonResponse
 from models import IotDeviceTable, MissionTable, MissionDetailTable
-from serializers import IotDeviceSerializer, MissionTableGetSerializer, MissionDetailSerializer,MissionTablePostSerializer
+from serializers import IotDeviceSerializer, MissionTableGetSerializer, MissionDetailGetSerializer, \
+    MissionDetailPostSerializer, MissionTablePostSerializer
 
 
 @csrf_exempt
@@ -36,14 +37,17 @@ def show_iot_sut_page(request):
 
 
 @login_required
-def show_mission_list(request):
-    return render_to_response('iot_mission_list.html', {'firstTitle': u'IOT测试',
-                                                        'firstTitle_content': u'-查看历史任务'},
+def show_mission_detail(request, m_id):
+    detail_list = MissionDetailTable.get_details_by_mission_id(m_id)
+    return render_to_response('iot_mission_detail.html', {'firstTitle': u'IOT测试',
+                                                          'firstTitle_content': u'-查看任务详细',
+                                                          'mission_id': m_id,
+                                                          'mission_detail_list':detail_list},
                               context_instance=RequestContext(request))
 
 
 @login_required
-def show_mission_detail(request):
+def show_mission_list(request):
     return render_to_response('iot_mission_list.html', {'firstTitle': u'IOT测试',
                                                         'firstTitle_content': u'-查看历史任务'},
                               context_instance=RequestContext(request))
@@ -102,7 +106,7 @@ def api_get_add_put_delete_missions(request):
             serializer = MissionTablePostSerializer(data=m_data)
             if serializer.is_valid():
                 serializer.save()
-                return SuccessJsonResponse(data=m_data)
+                return SuccessJsonResponse(data=serializer.data)
             else:
                 return ErrorJsonResponse(data=serializer.errors)
         else:
@@ -162,12 +166,12 @@ def api_get_add_put_delete_missions(request):
 def api_get_add_mission_details(request, m_id):
     if request.method == "GET" and m_id:
         m_details = MissionDetailTable.get_details_by_mission_id(m_id)
-        serializer = MissionDetailSerializer(m_details, many=True)
+        serializer = MissionDetailGetSerializer(m_details, many=True)
         return SuccessJsonResponse(data=serializer.data)
 
     elif request.method == "POST":
         post_data = FormatJsonParser(request)
-        serializer = MissionDetailSerializer(data=post_data.get_data())
+        serializer = MissionDetailPostSerializer(data=post_data.get_data())
         if serializer.is_valid():
             serializer.save()
             return SuccessJsonResponse(data=serializer.data)

@@ -51,8 +51,11 @@
             }
         })
 
-        $(document).ready(update_mission_list());
+        $('.btn-show-detail').on('click', function () {
+            window.open('/iottest/missiondetail/' + this.name);
+        });
 
+        $(document).ready(update_mission_list());
         function update_mission_list() {
             $.getJSON("../api/v1/inner/missions/", function (ret_data) {
                     console.log(ret_data);
