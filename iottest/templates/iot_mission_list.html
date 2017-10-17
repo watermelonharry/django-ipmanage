@@ -1,6 +1,6 @@
 {% extends "iot_banner.html" %}
 {% block iot_content %}
-    <div class="container">
+    <div class="container" xmlns:v-bind="http://www.w3.org/1999/xhtml">
         <h4>当前位置：<a href={% url "iot_main_page" %}>IOT测试</a> >> 历史任务查看</h4>
         <div class="table-responsive" id="v_mission_table">
             <table class="table table-striped">

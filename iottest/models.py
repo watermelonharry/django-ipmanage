@@ -30,6 +30,19 @@ class IotDeviceTable(models.Model):
 		ordering = ("device_addr",)
 		unique_together = (("device_addr", "username"),)
 
+	@classmethod
+	def get_sut_ids(cls):
+		id_list = []
+		try:
+			suts = cls.objects.all()
+			for sut in suts:
+				id_list.append(sut.id)
+		except Exception as e:
+			pass
+		finally:
+			id_list.sort()
+			return id_list
+
 
 class MissionTable(models.Model):
 	TYPE_CHOICE = (('h264', u'H264'), ('h265', u'H265'))
