@@ -139,7 +139,7 @@
                     <button type="button" v-if="show_progress_label" class="btn btn-sm btn-success"
                             id="show_scan_detail_btn" name="">查看详细
                     </button>
-                    <button type="button" v-if="show_new_label" class="btn btn-sm btn-success" id="confirm_scan_btn">
+                    <button type="button" v-on:click="push_to_server()" v-if="show_new_label" class="btn btn-sm btn-success" id="confirm_scan_btn">
                         开始
                     </button>
                     <button type="button" v-if="show_progress_label" class="btn btn-sm btn-danger btn_terminate"
@@ -172,63 +172,196 @@
         });
 
         var v_new_mission_form = new Vue({
-            el: '#new_mission_modal',
-            data: {
-                show_new_label: true,
-                mission_form: {
-                    "mission_id": null,
-                    "dut_name": null,
-                    "dut_version": null,
-                    "dut_addr": null,
-                    "dut_type": null,
-                    "dut_username": "admin",
-                    "dut_password": "qqqqqq",
-                    "other_info": null,
-                    "editor_name": null,
-                    "username": null,
-                    "terminal_name": null,
+                el: '#new_mission_modal',
+                data: {
+                    show_new_label: true,
+                    mission_form: {
+                        "dut_name": null,
+                        "dut_version": null,
+                        "dut_addr": null,
+                        "dut_type": null,
+                        "dut_username": "admin",
+                        "dut_password": "qqqqqq",
+                        "other_info": null,
+                        "editor_name": null,
+                        "username": null,
+                        "terminal_name": null,
+                    },
+                    show_progress_label: false,
+                    progress_percent: "width: 0%",
+                    terminal_list: [],
                 },
-                show_progress_label: true,
-                progress_percent: "width: 0%",
-                terminal_list: [],
-            },
-            methods: {
-                update_progress: function (num) {
-                    this.progress_percent = "width: " + num + "%";
-                },
-                get_form_json_data: function () {
-                    return JSON.stringify(this.mission_form);
-                },
-                show_before_submmit: function () {
-                    this.update_progress(0);
-                    this.show_new_label = true;
-                    this.show_progress_label = false;
-                },
-                show_after_submmit: function () {
-                    this.show_new_label = false;
-                    this.show_progress_label = true;
-                },
-                get_terminal_url: function (t_name) {
-{#                    var url = "";#}
-{#                    $.each(this.terminal_list, function () {#}
-{#                        if (this.terminal_name == t_name) {#}
-{#                            url = "http://" + this.terminal_addr + ":" + this.terminal_port + "/";#}
-{#                        }#}
-{#                    });#}
-{#                    return url;#}
-                    for (t in this.terminal_list){
-                        var temp = this.terminal_list[t];
-                        if(temp.terminal_name == t_name){
-                            return "http://" + temp.terminal_addr + ":" + temp.terminal_port + "/"
+                methods: {
+                    update_progress: function (num) {
+                        this.progress_percent = "width: " + num + "%";
+                    },
+                    get_form_json_data: function () {
+                        return JSON.stringify(this.mission_form);
+                    },
+                    show_before_submmit: function () {
+                        this.update_progress(0);
+                        this.show_new_label = true;
+                        this.show_progress_label = false;
+                    },
+                    show_after_submmit: function () {
+                        this.show_new_label = false;
+                        this.show_progress_label = true;
+                    },
+                    get_terminal_url: function (t_name) {
+                        {#                    var url = "";#}
+                        {#                    $.each(this.terminal_list, function () {#}
+                        {#                        if (this.terminal_name == t_name) {#}
+                        {#                            url = "http://" + this.terminal_addr + ":" + this.terminal_port + "/";#}
+                        {#                        }#}
+                        {#                    });#}
+                        {#                    return url;#}
+                        for (t in this.terminal_list) {
+                            var temp = this.terminal_list[t];
+                            if (temp.terminal_name == t_name) {
+                                return "http://" + temp.terminal_addr + ":" + temp.terminal_port + "/"
+                            }
                         }
-                    };
-                    return ""
-                },
-                push_to_terminal: function () {
-                    $.ajax(
-                    )
-                },
-            }
-        })
+                        ;
+                        return ""
+                    },
+                    push_to_terminal: function (module, t_url, mission_info, terminal_name, m_url) {
+                        var push_data = {
+                            "module": module,
+                            "data": mission_info,
+                        };
+                        $.ajax({
+                            type: "POST",
+                            url: t_url,
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: JSON.stringify(push_data),
+                            success: function (msg) {
+                                console.log("successed push to terminal:" + msg);
+                                this.show_after_submmit();
+                            },
+                            error: function (e) {
+                                console.log("failed to push to terminal,push to mission queue", e);
+                                this.push_to_mission_queue(terminal_name, mission_info.id, module, m_url)
+
+                            }
+                        });
+                    },
+                    push_to_mission_queue: function (terminal_name, mission_id, mission_from, mission_url) {
+                        var mission_info = {
+                            "terminal_name": terminal_name,
+                            "mission_id": mission_id,
+                            "mission_from": mission_from,
+                            "mission_url": mission_url,
+                            "mission_status": 1
+                        };
+                        $.ajax({
+                            type: "POST",
+                            url: "/terminal/api/inner/bindterminal/",
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: JSON.stringify(mission_info),
+                            success: function (msg) {
+                                console.log("push to mission queue", msg);
+                            },
+                            error: function (e) {
+                                console.log("failed to push to mission queue", e);
+                            }
+                        });
+                    },
+                    push_to_server: function () {
+                        var form_data = this.mission_form;
+                        console.log(form_data)
+                        $.ajax({
+                            type: "POST",
+                            url: "/api/v1/inner/missions/",
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: this.get_form_json_data(),
+                            success: function (msg) {
+                                console.log("push to server success", msg);
+
+                                this.push_to_terminal(module = "iottest",
+                                    t_url = this.get_terminal_url(form_data.terminal_name),
+                                    mission_info = form_data,
+                                    terminal_name = form_data.terminal_name,
+                                    m_url = "/iottest/api/v1/inner/missions/?id=" + msg.data.terminal_name);
+
+                                {#                            timer_id = window.setInterval(on_time_check_scan, 5000);#}
+                                {#                            console.log('start timer:' + timer_id);#}
+                            },
+                            error: function (e) {
+                                console.log("push to sever failed", e);
+                                alert("创建失败！ 错误：" + e.status + "," + e.errors);
+                            }
+                        });
+                    }
+                }
+            })
+        ;
+
+        <!--开始任务-->
+{#        $('#confirm_scan_btn').click(function () {#}
+{#            var m_data = {#}
+{#                'editor_name': $('#login_user_name').val(),#}
+{#                'mission_id': getTimeId(),#}
+{#                'start_ip': $('#auto_start_ip').val(),#}
+{#                'total_count': $('#auto_total_count').val(),#}
+{#                'mission_type': 2,#}
+{#                'progress': 0,#}
+{#                'run_status': 1,#}
+{#                'remote_id': $('#assign_terminal').val(),#}
+{#                'user_name': $('#login_user_name').val(),#}
+{#            };#}
+{#            if (m_data.start_ip.split('.').length != 4) {#}
+{#                alert("错误:请输入合法IP地址！");#}
+{#                return;#}
+{#            }#}
+{#            ;#}
+{#            if (m_data.total_count == '') {#}
+{#                alert("错误:请输入扫描数量");#}
+{#                return;#}
+{#            }#}
+{#            ;#}
+{#            if (m_data.remote_id == '' || m_data.remote_id == null) {#}
+{#                alert("错误:终端不能为空！");#}
+{#                return;#}
+{#            }#}
+{#            ;#}
+{##}
+{#            $.ajax({#}
+{#                type: "POST",#}
+{#                url: "/ipcset/api/mission/",#}
+{#                dataType: "json",#}
+{#                contentType: "application/json",#}
+{#                data: JSON.stringify(m_data),#}
+{#                success: function (msg) {#}
+{#                    console.log("push to server success", msg);#}
+{##}
+{#                    push_to_terminal(module = "ipcset",#}
+{#                        t_url = get_terminal_url_by_name(m_data.remote_id),#}
+{#                        mission_info = m_data,#}
+{#                        terminal_name = m_data.remote_id,#}
+{#                        m_url = "/ipcset/api/mission/info/" + m_data.mission_id);#}
+{##}
+{#                    $('#confirm_scan_btn').hide();#}
+{#                    $("#scan_terminate_btn").show();#}
+{#                    $("#show_scan_detail_btn").show();#}
+{##}
+{#                    $('#show_scan_progress').show();#}
+{#                    $('#show_scan_detail_btn').attr("name", m_data.mission_id);#}
+{#                    $('#abort_scan_btn').attr("name", m_data.mission_id);#}
+{#                    timer_id = window.setInterval(on_time_check_scan, 5000);#}
+{#                    console.log('start timer:' + timer_id);#}
+{#                    $('#confirm_scan_btn').attr({'disabled': "disabled"});#}
+{#                    $('#scan_modal_body').hide();#}
+{#                    $('#confirm_scan_btn').hide();#}
+{#                    $('#scan_terminate_btn').show();#}
+{#                },#}
+{#                error: function (e) {#}
+{#                    console.log("failed", e);#}
+{#                    alert("添加失败！ error-" + e.status);#}
+{#                }#}
+{#            });#}
+{#        });#}
     </script>
 {% endblock %}

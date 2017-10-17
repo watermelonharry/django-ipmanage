@@ -28,7 +28,8 @@
                     <td>{{ mission.other }}</td>
                     <td>{{ mission.editor_name }}</td>
                     <td>{{ mission.mission_status }}</td>
-                    <td><a class="btn-sm btn-success btn-show-detail" role="button" v-bind:name="mission.id">查看详细</a>
+                    <td><a class="btn-sm btn-success btn-show-detail" role="button" v-bind:name="mission.id"
+                        v-bind:href="'/iottest/missiondetail/'+mission.id">查看详细</a>
                     </td>
                 </tr>
                 {% endverbatim %}
@@ -48,12 +49,21 @@
             data: {
                 table_head_list: table_head_list,
                 mission_list: mission_list,
+            },
+            methods: {
+                go_to_detail: function (id) {
+                    window.open('/iottest/missiondetail/' + id);
+                },
+                show_pop: function (id) {
+                    console.log(id);
+                    console.log(this.name);
+                }
             }
         })
-
-        $('.btn-show-detail').on('click', function () {
-            window.open('/iottest/missiondetail/' + this.name);
-        });
+        {##}
+        {#        $('.btn-show-detail').on('click', function () {#}
+        {#            window.open('/iottest/missiondetail/' + this.name);#}
+        {#        });#}
 
         $(document).ready(update_mission_list());
         function update_mission_list() {

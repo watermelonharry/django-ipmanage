@@ -1,7 +1,8 @@
 {% extends "iot_banner.html" %}
 {% block iot_content %}
     <div class="container">
-        <h4>当前位置：<a href={% url "iot_main_page" %}>IOT测试</a> >> 查看任务明细 >> 任务ID：{{ mission_id }}</h4>
+        <h4>当前位置：<a href={% url "iot_main_page" %}>IOT测试</a> >> <a href={% url "iot_mission_list_page" %}>历史任务查看</a> >>
+            任务明细-ID：{{ mission_id }}</h4>
         <div class="table-responsive" id="v_mission_detail_table">
             <table class="table table-striped">
                 <thead>
@@ -16,19 +17,32 @@
                 </thead>
                 <tbody>
                 {% for detail in mission_detail_list %}
-                <tr>
-                    <td>{{ forloop.counter }}</td>
-                    <td>{{ detail.iot_device_id.device_addr }}</td>
-                    <td>{{ detail.iot_device_id.device_name }}</td>
-                    <td>{{ detail.iot_device_id.device_type }}</td>
-                    <td>发现：{{ detail.can_discover }}
-                        <p>添加：{{ detail.can_add }}</p>
-                        <p>在线：{{ detail.can_preview }}</p>
-                        <p>带宽：{{ detail.can_calculate }}</p>
-                        <p>删除：{{ detail.can_delete }}</p>
-                    </td>
-                    <td>{{ detail.other_info }}</td>
-                </tr>
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ detail.iot_device_id.device_addr }}</td>
+                        <td>{{ detail.iot_device_id.device_name }}</td>
+                        <td>{{ detail.iot_device_id.device_type }}</td>
+                        <td class="col-sm-6">
+                            {#                        <ul>#}
+                            {#                            <li>发现：{{ detail.can_discover }}</li>#}
+                            {#                            <li>添加：{{ detail.can_add }}</li>#}
+                            {#                            <li>在线：{{ detail.can_preview }}</li>#}
+                            {#                            <li>带宽：{{ detail.can_calculate }}</li>#}
+                            {#                            <li>删除：{{ detail.can_delete }}</li>#}
+                            {#                        </ul>#}
+                            <table class="table table-striped">
+                                <tbody>
+                                <tr><td>发现：{{ detail.can_discover }}</td></tr>
+                                <tr><td>添加：{{ detail.can_add }}</td></tr>
+                                <tr><td>在线：{{ detail.can_preview }}</td></tr>
+                                <tr><td>带宽：{{ detail.can_calculate }}</td></tr>
+                                <tr><td>删除：{{ detail.can_delete }}</td></tr>
+
+                                </tbody>
+                            </table>
+                        </td>
+                        <td>{{ detail.other_info }}</td>
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>
