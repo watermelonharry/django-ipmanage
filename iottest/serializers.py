@@ -20,7 +20,7 @@ class MissionTableGetSerializer(serializers.ModelSerializer):
         model = MissionTable
         fields = ('id', 'dut_name', 'dut_version', 'dut_addr',
                   'dut_type', 'dut_username', 'dut_password', 'dut_cmp_lock', 'other_info', 'editor_name', "sut_ids",
-                  'mission_status', 'create_time')
+                  'mission_status', 'create_time','terminal_name','mission_total')
 
 class MissionTablePostSerializer(serializers.ModelSerializer):
     sut_ids = serializers.PrimaryKeyRelatedField(many=True, blank=True)
@@ -28,7 +28,7 @@ class MissionTablePostSerializer(serializers.ModelSerializer):
         model = MissionTable
         fields = ('id', 'dut_name', 'dut_version', 'dut_addr',
                   'dut_type', 'dut_username', 'dut_password', 'dut_cmp_lock', 'other_info', 'editor_name', "sut_ids",
-                  'mission_status', 'create_time')
+                  'mission_status', 'create_time','terminal_name','username','mission_total')
 
 class MissionDetailGetSerializer(serializers.ModelSerializer):
     mission_id = serializers.PrimaryKeyRelatedField(blank=True)
