@@ -141,7 +141,7 @@
                         </div>
                     </div>
                     <button type="button" v-if="show_progress_label" class="btn btn-sm btn-success"
-                            id="show_scan_detail_btn" name="">查看详细
+                            id="show_scan_detail_btn" name="" v-on:click="go_to_detail">查看详细
                     </button>
                     <button type="button" v-on:click="push_to_server()" v-if="show_new_label"
                             class="btn btn-sm btn-success" id="confirm_scan_btn">
@@ -176,207 +176,222 @@
             });
         });
 
-        $(document).ready(function(){
+        $(document).ready(function () {
             var uname = $('#login_user_name').val();
             v_new_mission_form.mission_form.username = uname;
             v_new_mission_form.mission_form.editor_name = uname;
             v_new_mission_form.update_sut_ids();
         });
         var v_new_mission_form = new Vue({
-                el: '#new_mission_modal',
-                data: {
-                    timer_id:null,
-                    mission_id:0,
-                    show_new_label: true,
-                    mission_form: {
-                        "dut_name": null,
-                        "dut_version": null,
-                        "dut_addr": "192.168.1.240",
-                        "dut_type": 'h265',
-                        "dut_username": "admin",
-                        "dut_password": "qqqqqq",
-                        "other_info": null,
-                        "editor_name": null,
-                        "mission_status": 0,
-                        "username": null,
-                        "terminal_name": null,
-                        "mission_progress": 0,
-                        "mission_total":1,
-                        "sut_ids":[],
-                        "dut_cmp_lock":0,
-                    },
-                    show_progress_label: false,
-                    progress_percent: "width: 0%",
-                    terminal_list: [],
+            el: '#new_mission_modal',
+            data: {
+                timer_id: null,
+                mission_id: 0,
+                show_new_label: true,
+                mission_form: {
+                    "dut_name": null,
+                    "dut_version": null,
+                    "dut_addr": "192.168.1.240",
+                    "dut_type": 'h265',
+                    "dut_username": "admin",
+                    "dut_password": "qqqqqq",
+                    "other_info": null,
+                    "editor_name": null,
+                    "mission_status": 0,
+                    "username": null,
+                    "terminal_name": null,
+                    "mission_progress": 0,
+                    "mission_total": 1,
+                    "sut_ids": [],
+                    "dut_cmp_lock": 0,
                 },
-                methods: {
-                    update_progress: function () {
-                        $.getJSON('./api/v1/inner/missionprogress/'+v_new_mission_form.mission_id, function (ret_data) {
-                            console.log(ret_data);
-                            v_new_mission_form.mission_form.mission_progress=ret_data.data.mission_progress;
-                            v_new_mission_form.mission_form.mission_total=ret_data.data.mission_total;
-                            var per = v_new_mission_form.mission_form.mission_progress *100 / v_new_mission_form.mission_form.mission_total;
-                            v_new_mission_form.progress_percent = "width: " + String(per) + "%";
-                            console.log(v_new_mission_form.progress_percent);
-                        });
-                        if(v_new_mission_form.mission_form.mission_progress == v_new_mission_form.mission_form.mission_total){
-                            console.log("progress done");
-                            v_new_mission_form.stop_ontime_check();
-                            alert("设置完成！");
-                            v_new_mission_form.show_before_submmit();
-                        }
-
-                    },
-                    refresh_page:function () {
-{#                        location.reload();#}
-                    },
-                    get_form_json_data: function () {
-                        return JSON.stringify(this.mission_form);
-                    },
-                    show_before_submmit: function () {
-                        this.stop_ontime_check();
-                        this.show_new_label = true;
-                        this.show_progress_label = false;
-                        this.mission_id = null;
-                        this.progress_percent="width: 0%";
-                        this.mission_form.dut_name = null;
-                        this.mission_form.dut_version = null;
-                        this.mission_form.other_info = null;
-                        this.mission_form.mission_progress = 0;
-                        this.mission_form.mission_total = 1;
-                    },
-                    show_after_submmit: function () {
-                        this.show_new_label = false;
-                        this.show_progress_label = true;
-                    },
-                    update_sut_ids: function () {
-                        $.getJSON("./api/v1/inner/suts/ids/", function(ret_data) {
-                            console.log(ret_data);
-                            v_new_mission_form.mission_form.sut_ids = ret_data.data;
-                        });
-                    },
-                    start_ontime_check:function () {
-                        v_new_mission_form.timer_id = window.setInterval(v_new_mission_form.update_progress, 5000);
-                    },
-                    stop_ontime_check:function () {
-                        window.clearInterval(v_new_mission_form.timer_id);
-                        console.log("clear interval");
-                        v_new_mission_form.timer_id = null;
-                    },
-                    terminate_mission: function(){
-                        js_data = {
-                            "data":{
-                                "id":v_new_mission_form.mission_id,
-                                "mission_status":3
-                            }
-                        };
-                        $.ajax({
-                            type: "PUT",
-                            url: "/iottest/api/v1/inner/missions/",
-                            dataType: "json",
-                            contentType: "application/json",
-                            data: JSON.stringify(js_data),
-                            success: function (msg) {
-                                console.log("success put mission:" + msg.data);
-                                alert("任务终止成功")
-                                v_new_mission_form.show_before_submmit();
-                            },
-                            error: function (e) {
-                                console.log("failed to put mission", e.errors);
-                                alert("任务终止失败，请检查网络连接")
-                            }
-                        });
-                    },
-                    get_terminal_url: function (t_name) {
-                        for (var t in this.terminal_list) {
-                            var temp = this.terminal_list[t];
-                            if (temp.terminal_name == t_name) {
-                                return "http://" + temp.terminal_addr + ":" + temp.terminal_port + "/";
-                            }
-                        }
-                        return "";
-                    },
-                    push_to_terminal: function (module, t_url, mission_info, terminal_name, m_url) {
-                        var push_data = {
-                            "module": module,
-                            "data": mission_info,
-                        };
-                        $.ajax({
-                            type: "POST",
-                            url: t_url,
-                            dataType: "json",
-                            contentType: "application/json",
-                            data: JSON.stringify(push_data),
-                            success: function (msg) {
-                                console.log("successed push to terminal:" + msg);
-                                v_new_mission_form.show_after_submmit();
-                                v_new_mission_form.start_ontime_check();
-                            },
-                            error: function (e) {
-                                console.log("failed to push to terminal,push to mission queue", e);
-                                v_new_mission_form.push_to_mission_queue(terminal_name, mission_info.id, module, m_url)
-
-                            }
-                        });
-                    },
-                    push_to_mission_queue: function (terminal_name, mission_id, mission_from, mission_url) {
-                        var mission_info = {
-                            "terminal_name": terminal_name,
-                            "mission_id": mission_id,
-                            "mission_from": mission_from,
-                            "mission_url": mission_url,
-                            "mission_status": 1
-                        };
-                        $.ajax({
-                            type: "POST",
-                            url: "/terminal/api/inner/bindterminal/",
-                            dataType: "json",
-                            contentType: "application/json",
-                            data: JSON.stringify(mission_info),
-                            success: function (msg) {
-                                console.log("push to mission queue", msg);
-                                v_new_mission_form.show_after_submmit();
-                                v_new_mission_form.start_ontime_check();
-                            },
-                            error: function (e) {
-                                console.log("failed to push to mission queue", e);
-                                alert("推送任务失败："+e.toString());
-                            }
-                        });
-                    },
-                    push_to_server: function () {
-                        var form_data = this.mission_form;
-                        var target_url = this.get_terminal_url(form_data.terminal_name);
-                        if(form_data.terminal_name == "" || form_data.terminal_name==null){alert("终端不能为空！");return;}
-                        if(form_data.editor_name == "" || form_data.editor_name==null){alert("编辑人不能为空！");return;}
-                        if(form_data.dut_name == "" || form_data.dut_name==null){alert("DUT型号不能为空！");return;}
-                        if(form_data.dut_version == "" || form_data.dut_version==null){alert("DUT版本不能为空！");return;}
-                        console.log(form_data)
-                        $.ajax({
-                            type: "POST",
-                            url: "/iottest/api/v1/inner/missions/",
-                            dataType: "json",
-                            contentType: "application/json",
-                            data: JSON.stringify({"data": form_data}),
-                            success: function (msg) {
-                                console.log("push to server success", msg);
-                                v_new_mission_form.mission_id=msg.data.id;
-                                v_new_mission_form.push_to_terminal(module = "iottest",
-                                    t_url = target_url,
-                                    mission_info = msg.data,
-                                    terminal_name = msg.data.terminal_name,
-                                    m_url = "/iottest/api/v1/inner/missions/?id=" + msg.data.id);
-
-                                {#                            timer_id = window.setInterval(on_time_check_scan, 5000);#}
-                                {#                            console.log('start timer:' + timer_id);#}
-                            },
-                            error: function (e) {
-                                console.log("push to sever failed", e.responseText);
-                                alert("创建失败！ 错误：" + e.status + "," + e.responseJSON.errors);
-                            }
-                        });
+                show_progress_label: false,
+                progress_percent: "width: 0%",
+                terminal_list: [],
+            },
+            methods: {
+                go_to_detail: function (id) {
+                    window.open('/iottest/missiondetail/' + this.mission_id);
+                },
+                update_progress: function () {
+                    $.getJSON('./api/v1/inner/missionprogress/' + v_new_mission_form.mission_id, function (ret_data) {
+                        console.log(ret_data);
+                        v_new_mission_form.mission_form.mission_progress = ret_data.data.mission_progress;
+                        v_new_mission_form.mission_form.mission_total = ret_data.data.mission_total;
+                        var per = v_new_mission_form.mission_form.mission_progress * 100 / v_new_mission_form.mission_form.mission_total;
+                        v_new_mission_form.progress_percent = "width: " + String(per) + "%";
+                        console.log(v_new_mission_form.progress_percent);
+                    });
+                    if (v_new_mission_form.mission_form.mission_progress == v_new_mission_form.mission_form.mission_total) {
+                        console.log("progress done");
+                        v_new_mission_form.stop_ontime_check();
+                        alert("设置完成！");
+                        v_new_mission_form.show_before_submmit();
                     }
+
+                },
+                refresh_page: function () {
+                    {#                        location.reload();#}
+                },
+                get_form_json_data: function () {
+                    return JSON.stringify(this.mission_form);
+                },
+                show_before_submmit: function () {
+                    this.stop_ontime_check();
+                    this.show_new_label = true;
+                    this.show_progress_label = false;
+                    this.mission_id = null;
+                    this.progress_percent = "width: 0%";
+                    this.mission_form.dut_name = null;
+                    this.mission_form.dut_version = null;
+                    this.mission_form.other_info = null;
+                    this.mission_form.mission_progress = 0;
+                    this.mission_form.mission_total = 1;
+                },
+                show_after_submmit: function () {
+                    this.show_new_label = false;
+                    this.show_progress_label = true;
+                },
+                update_sut_ids: function () {
+                    $.getJSON("./api/v1/inner/suts/ids/", function (ret_data) {
+                        console.log(ret_data);
+                        v_new_mission_form.mission_form.sut_ids = ret_data.data;
+                    });
+                },
+                start_ontime_check: function () {
+                    v_new_mission_form.timer_id = window.setInterval(v_new_mission_form.update_progress, 5000);
+                },
+                stop_ontime_check: function () {
+                    window.clearInterval(v_new_mission_form.timer_id);
+                    console.log("clear interval");
+                    v_new_mission_form.timer_id = null;
+                },
+                terminate_mission: function () {
+                    js_data = {
+                        "data": {
+                            "id": v_new_mission_form.mission_id,
+                            "mission_status": 3
+                        }
+                    };
+                    $.ajax({
+                        type: "PUT",
+                        url: "/iottest/api/v1/inner/missions/",
+                        dataType: "json",
+                        contentType: "application/json",
+                        data: JSON.stringify(js_data),
+                        success: function (msg) {
+                            console.log("success put mission:" + msg.data);
+                            alert("任务终止成功")
+                            v_new_mission_form.show_before_submmit();
+                        },
+                        error: function (e) {
+                            console.log("failed to put mission", e.errors);
+                            alert("任务终止失败，请检查网络连接")
+                        }
+                    });
+                },
+                get_terminal_url: function (t_name) {
+                    for (var t in this.terminal_list) {
+                        var temp = this.terminal_list[t];
+                        if (temp.terminal_name == t_name) {
+                            return "http://" + temp.terminal_addr + ":" + temp.terminal_port + "/";
+                        }
+                    }
+                    return "";
+                },
+                push_to_terminal: function (module, t_url, mission_info, terminal_name, m_url) {
+                    var push_data = {
+                        "module": module,
+                        "data": mission_info,
+                    };
+                    $.ajax({
+                        type: "POST",
+                        url: t_url,
+                        dataType: "json",
+                        contentType: "application/json",
+                        data: JSON.stringify(push_data),
+                        success: function (msg) {
+                            console.log("successed push to terminal:" + msg);
+                            v_new_mission_form.show_after_submmit();
+                            v_new_mission_form.start_ontime_check();
+                        },
+                        error: function (e) {
+                            console.log("failed to push to terminal,push to mission queue", e);
+                            v_new_mission_form.push_to_mission_queue(terminal_name, mission_info.id, module, m_url)
+
+                        }
+                    });
+                },
+                push_to_mission_queue: function (terminal_name, mission_id, mission_from, mission_url) {
+                    var mission_info = {
+                        "terminal_name": terminal_name,
+                        "mission_id": mission_id,
+                        "mission_from": mission_from,
+                        "mission_url": mission_url,
+                        "mission_status": 1
+                    };
+                    $.ajax({
+                        type: "POST",
+                        url: "/terminal/api/inner/bindterminal/",
+                        dataType: "json",
+                        contentType: "application/json",
+                        data: JSON.stringify(mission_info),
+                        success: function (msg) {
+                            console.log("push to mission queue", msg);
+                            v_new_mission_form.show_after_submmit();
+                            v_new_mission_form.start_ontime_check();
+                        },
+                        error: function (e) {
+                            console.log("failed to push to mission queue", e);
+                            alert("推送任务失败：" + e.toString());
+                        }
+                    });
+                },
+                push_to_server: function () {
+                    var form_data = this.mission_form;
+                    var target_url = this.get_terminal_url(form_data.terminal_name);
+                    if (form_data.terminal_name == "" || form_data.terminal_name == null) {
+                        alert("终端不能为空！");
+                        return;
+                    }
+                    if (form_data.editor_name == "" || form_data.editor_name == null) {
+                        alert("编辑人不能为空！");
+                        return;
+                    }
+                    if (form_data.dut_name == "" || form_data.dut_name == null) {
+                        alert("DUT型号不能为空！");
+                        return;
+                    }
+                    if (form_data.dut_version == "" || form_data.dut_version == null) {
+                        alert("DUT版本不能为空！");
+                        return;
+                    }
+                    console.log(form_data)
+                    $.ajax({
+                        type: "POST",
+                        url: "/iottest/api/v1/inner/missions/",
+                        dataType: "json",
+                        contentType: "application/json",
+                        data: JSON.stringify({"data": form_data}),
+                        success: function (msg) {
+                            console.log("push to server success", msg);
+                            v_new_mission_form.mission_id = msg.data.id;
+                            v_new_mission_form.push_to_terminal(module = "iottest",
+                                t_url = target_url,
+                                mission_info = msg.data,
+                                terminal_name = msg.data.terminal_name,
+                                m_url = "/iottest/api/v1/inner/missions/?id=" + msg.data.id);
+
+                            {#                            timer_id = window.setInterval(on_time_check_scan, 5000);#}
+                            {#                            console.log('start timer:' + timer_id);#}
+                        },
+                        error: function (e) {
+                            console.log("push to sever failed", e.responseText);
+                            alert("创建失败！ 错误：" + e.status + "," + e.responseJSON.errors);
+                        }
+                    });
                 }
-            });
+            }
+        });
     </script>
 {% endblock %}
