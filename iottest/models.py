@@ -91,19 +91,20 @@ class MissionDetailTable(models.Model):
 	iot_device_id = models.ForeignKey(IotDeviceTable, blank=True, null=True, on_delete=models.CASCADE)
 
 	can_discover = models.CharField(max_length=10, choices=RESULT_CHOICE, blank=True)
-	discover_comment = models.TextField(null=True, blank=True)
+	# discover_comment = models.TextField(null=True, blank=True)
 
 	can_add = models.CharField(max_length=10, choices=RESULT_CHOICE, blank=True)
-	add_comment = models.TextField(null=True, blank=True)
+	# add_comment = models.TextField(null=True, blank=True)
 
 	can_preview = models.CharField(max_length=10, choices=RESULT_CHOICE, blank=True)
-	preview_comment = models.TextField(null=True, blank=True)
+	# preview_comment = models.TextField(null=True, blank=True)
 
 	can_calculate = models.CharField(max_length=10, choices=RESULT_CHOICE, blank=True)
-	calculate_comment = models.TextField(null=True, blank=True)
+	# calculate_comment = models.TextField(null=True, blank=True)
 
 	can_delete = models.CharField(max_length=10, choices=RESULT_CHOICE, blank=True)
-	delete_comment = models.TextField(null=True, blank=True)
+	# delete_comment = models.TextField(null=True, blank=True)
+	comment = models.TextField(blank=True,null=True)
 
 	other_info = models.TextField(blank=True, null=True)
 	dut_cmp_lock = models.IntegerField(max_length=5, blank=True, null=True)
