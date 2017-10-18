@@ -25,7 +25,7 @@ def api_test_receive_url(request):
 @login_required
 def show_iot_main_page(request):
 	return render_to_response('iot_mainpage.html', {'firstTitle': u'IOT测试',
-	                                                'firstTitle_content': u'hhhhh'},
+	                                                'firstTitle_content': u'-兼容性测试管理'},
 	                          context_instance=RequestContext(request))
 
 
@@ -108,8 +108,10 @@ def api_get_add_put_delete_missions(request):
 				mission_list = MissionTable.objects.all()
 			else:
 				mission_list = MissionTable.objects.filter(id__in=mission_ids)
-
-			serializer = MissionTableGetSerializer(mission_list, many=True)
+			if len(mission_list) ==1:
+				serializer = MissionTableGetSerializer(mission_list[0])
+			else:
+				serializer = MissionTableGetSerializer(mission_list, many=True)
 			return SuccessJsonResponse(serializer.data)
 
 		elif request.method == "POST":
