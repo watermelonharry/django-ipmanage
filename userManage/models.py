@@ -33,22 +33,25 @@ class ApiKeyModel(models.Model):
 			return False
 
 	@classmethod
-	def has_record(cls, input_key_chain):
+	def get_model_by_ak(cls, input_key_chain):
 		try:
 			return cls.objects.get(key_chain=input_key_chain)
 		except:
 			return None
 
 	@classmethod
-	def has_ak(cls, data):
+	def has_ak(cls, data=None, ak=None):
 		"""
 		verify the request data carries valid ak
 		:param request:
 		:return:
 		"""
 		try:
-			terminal_ak = data.get('ak', '')
-			api_model = cls.has_record(terminal_ak)
+			if data:
+				terminal_ak = data.get('ak', '')
+			if ak:
+				terminal_ak = ak
+			api_model = cls.get_model_by_ak(terminal_ak)
 			if not api_model:
 				return None
 			else:
