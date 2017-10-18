@@ -83,14 +83,18 @@ def api_temrinal_register_post(request):
 
         try:
             waiting_mission = TerminalWaitingMissionModel.get_mission_by_terminal_name(terminal_name)
-            m_serializer = TerminalWaitingMissionSerializer(waiting_mission)
-            mission_info = m_serializer.data
+            if waiting_mission:
+                m_serializer = TerminalWaitingMissionSerializer(waiting_mission)
+                mission_info = m_serializer.data
+            else:
+                mission_info={}
         except Exception as e:
             mission_info = {}
 
         reply_dict = {}
         reply_dict.update(mission_info)
-        reply_dict.update(TerminalModelSerializer(TerminalModel.get_terminal_by_name(terminal_name)).data)
+        reply_dict.update({'user_name': user_model.username})
+        # reply_dict.update(TerminalModelSerializer(TerminalModel.get_terminal_by_name(terminal_name)).data)
 
 
         return SuccessJsonResponse(data=reply_dict,
