@@ -40,7 +40,7 @@ class TerminalRegister(DetailView):
         """
         data = JSONParser().parse(request)
         terminal_ak = data.get('ak', '')
-        api_model = ApiKeyModel.has_record(terminal_ak)
+        api_model = ApiKeyModel.get_model_by_ak(terminal_ak)
         user_model = UserApiModel.objects.get(id=api_model.user_id)
 
         return SuccessJsonResponse(data={'user': 'user_model.username', 'ak': terminal_ak}, status=200)
@@ -61,7 +61,7 @@ def api_temrinal_register_post(request):
     terminal_addr = request.META.get('REMOTE_ADDR', '')
     data.update({'terminal_addr':terminal_addr})
     terminal_ak = data.get('ak', '')
-    api_model = ApiKeyModel.has_record(terminal_ak)
+    api_model = ApiKeyModel.get_model_by_ak(terminal_ak)
     if api_model is None:
         return ErrorJsonResponse(data={'ak': 'un verified ak'}, status=400)
 
