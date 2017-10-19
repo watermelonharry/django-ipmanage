@@ -62,7 +62,8 @@ apis here
 @csrf_exempt
 def api_get_add_iot_suts(request):
     if request.method == "GET":
-        sut_ids = request.GET.get('id', [])
+        sut_ids = FormatJsonParser(request).get_content().get('id', [])
+        sut_ids.sort()
         if not sut_ids:
             sut_list = IotDeviceTable.objects.all()
         else:
@@ -100,7 +101,7 @@ def api_get_iot_sut_ids(request):
         return ErrorJsonResponse(data="{0}".format(e))
 
 
-# @csrf_exempt
+@csrf_exempt
 def api_get_add_put_delete_missions(request):
     try:
         if request.method == "GET":

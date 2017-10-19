@@ -15,7 +15,7 @@ class IotDeviceSerializer(serializers.ModelSerializer):
 
 class MissionTableGetSerializer(serializers.ModelSerializer):
 	# sut_ids = serializers.PrimaryKeyRelatedField(many=True, blank=True)
-	sut_ids = IotDeviceSerializer(many=True, blank=True)
+	sut_ids = IotDeviceSerializer(many=True, blank=True, read_only=True)
 
 	class Meta:
 		model = MissionTable

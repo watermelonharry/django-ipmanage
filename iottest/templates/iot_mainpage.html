@@ -237,7 +237,7 @@
                     return JSON.stringify(this.mission_form);
                 },
                 show_before_submmit: function () {
-                    this.stop_ontime_check();
+{#                    this.stop_ontime_check();#}
                     this.show_new_label = true;
                     this.show_progress_label = false;
                     this.mission_id = null;
@@ -282,6 +282,7 @@
                         success: function (msg) {
                             console.log("success put mission:" + msg.data);
                             alert("任务终止成功")
+                            v_new_mission_form.stop_ontime_check();
                             v_new_mission_form.show_before_submmit();
                         },
                         error: function (e) {
