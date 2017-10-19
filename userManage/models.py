@@ -40,7 +40,7 @@ class ApiKeyModel(models.Model):
 			return None
 
 	@classmethod
-	def has_ak(cls, data=None, ak=None):
+	def has_ak(cls, ak=None, data=None):
 		"""
 		verify the request data carries valid ak
 		:param request:
