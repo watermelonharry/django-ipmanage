@@ -62,7 +62,7 @@ apis here
 @csrf_exempt
 def api_get_add_iot_suts(request):
     if request.method == "GET":
-        sut_ids = FormatJsonParser(request).get_content().get('id', [])
+        sut_ids = map(int, FormatJsonParser(request).get_content().get('id', []))
         sut_ids.sort()
         if not sut_ids:
             sut_list = IotDeviceTable.objects.all()
