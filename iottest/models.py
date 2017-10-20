@@ -129,3 +129,20 @@ class MissionDetailTable(models.Model):
 			detail_list = []
 		finally:
 			return detail_list
+
+	def output_result_in_html(self):
+
+		pass_str = u'<td><span class="label label-success">PASS</span> </td>'
+		fail_str = u'<td><span class="label label-danger">FAIL</span> </td>'
+		nt_str = u'<td><span class="label label-info">N/T</span> </td>'
+		ref_str = u'<td><span class="label label-warning">REF</span> </td>'
+		ref_dict = {
+			"PASS":pass_str,
+			"FAIL":fail_str,
+			"N/T":nt_str,
+			"REF":ref_str
+		}
+		output = u''
+		for result in [self.can_discover, self.can_add, self.can_preview,self.can_calculate, self.can_delete]:
+			output+=ref_dict.get(result,u'')
+		return output

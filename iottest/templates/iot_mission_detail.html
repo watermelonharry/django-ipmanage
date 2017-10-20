@@ -4,15 +4,20 @@
         <h4>当前位置：<a href={% url "iot_main_page" %}>IOT测试</a> >> <a href={% url "iot_mission_list_page" %}>历史任务查看</a> >>
             任务明细-ID：{{ mission_id }}</h4>
         <div class="table-responsive" id="v_mission_detail_table">
-            <table class="table table-striped">
+            <table class="table table-striped" style="word-break: break-all; word-wrap: break-all">
                 <thead>
                 <tr class=locktop>
-                    <th>序号</th>
-                    <th>SUT地址</th>
-                    <th>SUT名称</th>
-                    <th>SUT类型</th>
-                    <th>测试结果</th>
-                    <th>其他</th>
+                    <th class="span1">序号</th>
+                    <th class="span2">SUT地址</th>
+                    <th class="span1">SUT名称</th>
+                    <th class="span1">SUT类型</th>
+                    <th class="span1">发现</th>
+                    <th class="span1">添加</th>
+                    <th class="span1">在线</th>
+                    <th class="span1">带宽</th>
+                    <th class="span1">删除</th>
+                    <th class="span1">备注信息</th>
+                    <th class="span1">其他</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -22,25 +27,8 @@
                         <td>{{ detail.iot_device_id.device_addr }}</td>
                         <td>{{ detail.iot_device_id.device_name }}</td>
                         <td>{{ detail.iot_device_id.device_type }}</td>
-                        <td class="col-sm-6">
-                            {#                        <ul>#}
-                            {#                            <li>发现：{{ detail.can_discover }}</li>#}
-                            {#                            <li>添加：{{ detail.can_add }}</li>#}
-                            {#                            <li>在线：{{ detail.can_preview }}</li>#}
-                            {#                            <li>带宽：{{ detail.can_calculate }}</li>#}
-                            {#                            <li>删除：{{ detail.can_delete }}</li>#}
-                            {#                        </ul>#}
-                            <table class="table table-striped">
-                                <tbody>
-                                <tr><td>发现：{{ detail.can_discover }}</td></tr>
-                                <tr><td>添加：{{ detail.can_add }}</td></tr>
-                                <tr><td>在线：{{ detail.can_preview }}</td></tr>
-                                <tr><td>带宽：{{ detail.can_calculate }}</td></tr>
-                                <tr><td>删除：{{ detail.can_delete }}</td></tr>
-
-                                </tbody>
-                            </table>
-                        </td>
+                        {{ detail.output_result_in_html|safe }}
+                        <td>{{ detail.comment }}</td>
                         <td>{{ detail.other_info }}</td>
                     </tr>
                 {% endfor %}
