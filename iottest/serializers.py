@@ -10,7 +10,7 @@ class IotDeviceSerializer(serializers.ModelSerializer):
 		fields = ('id', 'device_name', 'device_type',
 		          'device_addr', 'device_username', 'device_ov_password', 'device_web_password',
 		          'device_software_version',
-		          'other_info', 'editor_name', 'edit_time')
+		          'other_info', 'editor_name', 'edit_time','username')
 
 
 class MissionTableGetSerializer(serializers.ModelSerializer):

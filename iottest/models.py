@@ -28,7 +28,21 @@ class IotDeviceTable(models.Model):
 
 	class Meta:
 		ordering = ("device_addr",)
-		unique_together = (("device_addr", "username"),)
+		unique_together = (("device_addr", "username","device_name","device_type"),)
+
+	@classmethod
+	def get_sut_list(cls,ordering = 'ip'):
+		reverse = False
+		try:
+			if '-' in ordering:
+				reverse=True
+				ordering = ordering.replace('-','')
+			if ordering =="ip":
+				sut_list = list(cls.objects.all())
+				sut_list.sort(key=lambda x:int(x.device_addr.split('.')[-1]),reverse=reverse)
+				return sut_list
+		except Exception as e:
+			return []
 
 	@classmethod
 	def get_sut_ids(cls):

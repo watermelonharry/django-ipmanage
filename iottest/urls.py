@@ -11,6 +11,7 @@ urlpatterns = [
     url('^missiondetail/(?P<m_id>[0-9]+)/$', views.show_mission_detail, name='iot_mission_detail_page'),
 
     url('^api/v1/inner/suts/$', views.api_get_add_iot_suts, name='api_get_add_iot_suts'),
+    url('^api/v1/outter/suts/$', views.api_out_get_add_iot_suts, name='api_out_get_add_iot_suts'),
     url('^api/v1/inner/suts/ids/$', views.api_get_iot_sut_ids, name='api_get_iot_suts_ids'),
 
     url('^api/v1/inner/missions/$', views.api_get_add_put_delete_missions, name='api_get_add_put_delete_missions'),
