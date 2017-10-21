@@ -221,6 +221,11 @@
                         var per = v_new_mission_form.mission_form.mission_progress * 100 / v_new_mission_form.mission_form.mission_total;
                         v_new_mission_form.progress_percent = "width: " + String(per) + "%";
                         console.log(v_new_mission_form.progress_percent);
+
+                        switch (ret_data.data.mission_status){
+                            case 3: alert("任务已终止");v_new_mission_form.stop_ontime_check();v_new_mission_form.show_before_submmit();break;
+                            case 4: alert("任务执行异常，请检查参数、终端的设置");v_new_mission_form.stop_ontime_check();v_new_mission_form.show_before_submmit();break;
+                        }
                     });
                     if (v_new_mission_form.mission_form.mission_progress == v_new_mission_form.mission_form.mission_total) {
                         console.log("progress done");
@@ -228,7 +233,6 @@
                         alert("设置完成！");
                         v_new_mission_form.show_before_submmit();
                     }
-
                 },
                 refresh_page: function () {
                     {#                        location.reload();#}
