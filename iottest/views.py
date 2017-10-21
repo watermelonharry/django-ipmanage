@@ -137,7 +137,7 @@ def api_get_add_put_delete_missions(request):
                     serializer = MissionTablePostSerializer(ori_mission, data=p_content)
                     if serializer.is_valid():
                         serializer.save()
-                        return SuccessJsonResponse(data={'success': [m_id]})
+                        return SuccessJsonResponse(data={'success': [m_id],'mission_status':ori_mission.mission_status})
                     else:
                         return ErrorJsonResponse(data=serializer.errors)
                 except Exception as e:
@@ -223,7 +223,7 @@ def api_outter_get_add_put_delete_missions(request):
                         serializer = MissionTablePostSerializer(ori_mission, data=p_content)
                         if serializer.is_valid():
                             serializer.save()
-                            return SuccessJsonResponse(data={'success': [m_id]})
+                            return SuccessJsonResponse(data={'success': [m_id],'mission_status':ori_mission.mission_status})
                         else:
                             return ErrorJsonResponse(data=serializer.errors)
                     except Exception as e:
