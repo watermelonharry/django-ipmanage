@@ -9,6 +9,7 @@ urlpatterns = [
     url('^sutlist/$', views.show_iot_sut_page, name='iot_sut_list_page'),
     url('^missionlist/$', views.show_mission_list, name='iot_mission_list_page'),
     url('^missiondetail/(?P<m_id>[0-9]+)/$', views.show_mission_detail, name='iot_mission_detail_page'),
+    url('^missioncompare/$', views.show_mission_compare, name='iot_mission_compare_page'),
 
     url('^api/v1/inner/suts/$', views.api_get_add_iot_suts, name='api_get_add_iot_suts'),
     url('^api/v1/outter/suts/$', views.api_out_get_add_iot_suts, name='api_out_get_add_iot_suts'),
