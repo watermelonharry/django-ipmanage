@@ -59,13 +59,13 @@ apis here
 """
 
 
-@csrf_exempt
+# @csrf_exempt
 def api_get_add_iot_suts(request):
     if request.method == "GET":
         sut_ids = map(int, FormatJsonParser(request).get_content().get('id', []))
         sut_ids.sort()
         if not sut_ids:
-            sut_list = IotDeviceTable.objects.all()
+            sut_list = IotDeviceTable.get_sut_list(ordering='ip')
         else:
             sut_list = IotDeviceTable.objects.filter(id__in=sut_ids)
         serializer = IotDeviceSerializer(sut_list, many=True)
@@ -89,6 +89,44 @@ def api_get_add_iot_suts(request):
     else:
         return ErrorJsonResponse(data="method not supported")
 
+@csrf_exempt
+def api_out_get_add_iot_suts(request):
+    if request.method == "GET":
+        parser = FormatJsonParser(request)
+        if ApiKeyModel.has_ak(ak=parser.get_ak()):
+            sut_ids = map(int, parser.get_content().get('id', []))
+            sut_ids.sort()
+            if not sut_ids:
+                sut_list = IotDeviceTable.get_sut_list()
+            else:
+                sut_list = IotDeviceTable.objects.filter(id__in=sut_ids)
+            serializer = IotDeviceSerializer(sut_list, many=True)
+            return SuccessJsonResponse(serializer.data)
+        else:
+            return ErrorJsonResponse("invalid ak")
+
+    elif request.method == "POST":
+        parser = FormatJsonParser(request)
+        if ApiKeyModel.has_ak(ak=parser.get_ak()):
+            data = parser.get_data()
+            if isinstance(data, list):
+                serializer = IotDeviceSerializer(data=data, many=True)
+            elif isinstance(data, dict):
+                serializer = IotDeviceSerializer(data=data)
+            else:
+                return ErrorJsonResponse(data="worng format")
+
+            if serializer.is_valid():
+                serializer.save()
+                return SuccessJsonResponse(data=serializer.data)
+            else:
+                return ErrorJsonResponse(data=serializer.errors)
+        else:
+            return ErrorJsonResponse("invalid ak")
+    else:
+        return ErrorJsonResponse(data="method not supported")
+
+
 
 @csrf_exempt
 def api_get_iot_sut_ids(request):
@@ -110,10 +148,7 @@ def api_get_add_put_delete_missions(request):
                 mission_list = MissionTable.objects.all()
             else:
                 mission_list = MissionTable.objects.filter(id__in=mission_ids)
-            if len(mission_list) == 1:
-                serializer = MissionTableGetSerializer(mission_list[0])
-            else:
-                serializer = MissionTableGetSerializer(mission_list, many=True)
+            serializer = MissionTableGetSerializer(mission_list, many=True)
             return SuccessJsonResponse(serializer.data)
 
         elif request.method == "POST":
