@@ -2,6 +2,7 @@
 {% block iot_content %}
     <div class="container" xmlns:v-bind="http://www.w3.org/1999/xhtml">
         <h4>当前位置：<a href={% url "iot_main_page" %}>IOT测试</a> >> 历史任务查看</h4>
+
         <div class="table-responsive" id="v_mission_table">
             <table class="table table-striped">
                 <thead>
@@ -11,6 +12,7 @@
                     <th>DUT名称</th>
                     <th>DUT版本</th>
                     <th>DUT类型</th>
+                    <th>DUT地址</th>
                     <th>其他</th>
                     <th>创建人</th>
                     <th>任务状态</th>
@@ -25,11 +27,12 @@
                     <td>{{ mission.dut_name }}</td>
                     <td>{{ mission.dut_version }}</td>
                     <td>{{ mission.dut_type }}</td>
+                    <td>{{ mission.dut_addr }}</td>
                     <td>{{ mission.other }}</td>
                     <td>{{ mission.editor_name }}</td>
-                    <td>{{ mission.mission_status }}</td>
+                    <td v-html='mission.status_data'></td>
                     <td><a class="btn-sm btn-success btn-show-detail" role="button" v-bind:name="mission.id"
-                        v-bind:href="'/iottest/missiondetail/'+mission.id">查看详细</a>
+                           v-bind:href="'/iottest/missiondetail/'+mission.id">查看详细</a>
                     </td>
                 </tr>
                 {% endverbatim %}
@@ -39,9 +42,9 @@
     </div>
 
     <script>
-        var mission_list = [{"device_name": "测试", "device_addr": "123456"}, {
+        var mission_list = [{"device_name": "测试", "device_addr": "123456", "mission_status": 0}, {
             "device_name": "测试33332",
-            "device_addr": "!(@#)!#!"
+            "device_addr": "!(@#)!#!", "mission_status": 0
         }];
         var table_head_list = [""];
         var v_mission_table = new Vue({
@@ -57,6 +60,28 @@
                 show_pop: function (id) {
                     console.log(id);
                     console.log(this.name);
+                },
+                show_mission_status: function (status) {
+                    switch (status) {
+                        case 0:
+                            return '<span class="label label-success">等待</span>';
+                        case 1:
+                            return '<span class="label label-success">执行中</span>';
+                        case 2:
+                            return '<span class="label label-success">完成</span>';
+                        case 3:
+                            return '<span class="label label-warning">终止</span>';
+                        case 4:
+                            return '<span class="label label-danger">异常</span>';
+                        default :
+                            break;
+                    }
+                    ;
+                },
+                generate_mission_data: function (m_list) {
+                    for (var m in m_list) {
+                        m_list[m].status_data = v_mission_table.show_mission_status(m_list[m].mission_status);
+                    }
                 }
             }
         })
@@ -68,9 +93,10 @@
         $(document).ready(update_mission_list());
         function update_mission_list() {
             $.getJSON("../api/v1/inner/missions/", function (ret_data) {
-                    console.log(ret_data);
-                    v_mission_table.mission_list = ret_data.data;
-                }
+                        console.log(ret_data);
+                        v_mission_table.mission_list = ret_data.data;
+                        v_mission_table.generate_mission_data(v_mission_table.mission_list);
+                    }
             )
         }
 
