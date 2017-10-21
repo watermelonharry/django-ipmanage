@@ -16,8 +16,8 @@
                     <th width="50">在线</th>
                     <th width="50">带宽</th>
                     <th width="60">删除</th>
-                    <th width="250">备注信息</th>
-                    <th>其他</th>
+                    <th>备注信息</th>
+{#                    <th>其他</th>#}
                 </tr>
                 </thead>
                 <tbody>
@@ -29,7 +29,7 @@
                         <td>{{ detail.iot_device_id.device_type }}</td>
                         {{ detail.output_result_in_html|safe }}
                         <td>{{ detail.comment }}</td>
-                        <td>{{ detail.other_info }}</td>
+{#                        <td>{{ detail.other_info }}</td>#}
                     </tr>
                 {% endfor %}
                 </tbody>
