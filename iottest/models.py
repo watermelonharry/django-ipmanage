@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+import json
+from StringIO import StringIO
 
 
 # Create your models here.
@@ -28,18 +30,18 @@ class IotDeviceTable(models.Model):
 
 	class Meta:
 		ordering = ("device_addr",)
-		unique_together = (("device_addr", "username","device_name","device_type"),)
+		unique_together = (("device_addr", "username", "device_name", "device_type"),)
 
 	@classmethod
-	def get_sut_list(cls,ordering = 'ip'):
+	def get_sut_list(cls, ordering='ip'):
 		reverse = False
 		try:
 			if '-' in ordering:
-				reverse=True
-				ordering = ordering.replace('-','')
-			if ordering =="ip":
+				reverse = True
+				ordering = ordering.replace('-', '')
+			if ordering == "ip":
 				sut_list = list(cls.objects.all())
-				sut_list.sort(key=lambda x:int(x.device_addr.split('.')[-1]),reverse=reverse)
+				sut_list.sort(key=lambda x: int(x.device_addr.split('.')[-1]), reverse=reverse)
 				return sut_list
 		except Exception as e:
 			return []
@@ -76,10 +78,10 @@ class MissionTable(models.Model):
 	other_info = models.TextField(blank=True, null=True)
 	mission_status = models.IntegerField(max_length=5, choices=STATUS_CHOICE, blank=True)
 	mission_progress = models.IntegerField(max_length=5, blank=True, null=True)
-	mission_total= models.IntegerField(max_length=5,blank=True,null=True)
-	sut_ids = models.ManyToManyField(IotDeviceTable,blank=True, null=True)
+	mission_total = models.IntegerField(max_length=5, blank=True, null=True)
+	sut_ids = models.ManyToManyField(IotDeviceTable, blank=True, null=True)
 
-	terminal_name = models.CharField(max_length=40,blank=True)
+	terminal_name = models.CharField(max_length=40, blank=True)
 	username = models.CharField(max_length=20, blank=True, null=True)
 	editor_name = models.CharField(max_length=20, blank=True)
 	create_time = models.DateTimeField(auto_now_add=True)
@@ -118,7 +120,7 @@ class MissionDetailTable(models.Model):
 
 	can_delete = models.CharField(max_length=10, choices=RESULT_CHOICE, blank=True)
 	# delete_comment = models.TextField(null=True, blank=True)
-	comment = models.TextField(blank=True,null=True)
+	comment = models.TextField(blank=True, null=True)
 
 	other_info = models.TextField(blank=True, null=True)
 	dut_cmp_lock = models.IntegerField(max_length=5, blank=True, null=True)
@@ -151,12 +153,21 @@ class MissionDetailTable(models.Model):
 		nt_str = u'<td><span class="label label-info">N/T</span> </td>'
 		ref_str = u'<td><span class="label label-warning">REF</span> </td>'
 		ref_dict = {
-			"PASS":pass_str,
-			"FAIL":fail_str,
-			"N/T":nt_str,
-			"REF":ref_str
+			"PASS": pass_str,
+			"FAIL": fail_str,
+			"N/T": nt_str,
+			"REF": ref_str
 		}
 		output = u''
-		for result in [self.can_discover, self.can_add, self.can_preview,self.can_calculate, self.can_delete]:
-			output+=ref_dict.get(result,u'')
+		for result in [self.can_discover, self.can_add, self.can_preview, self.can_calculate, self.can_delete]:
+			output += ref_dict.get(result, u'')
 		return output
+
+	def get_html_comment(self):
+		try:
+			c_str = self.comment
+			comment_list = map(lambda x: u"<p>{0}</p>".format(x) if x else u"", c_str.split(". "))
+			comment_str = u''.join(comment_list)
+			return comment_str
+		except Exception as e:
+			return u""

@@ -28,7 +28,7 @@
                         <td>{{ detail.iot_device_id.device_name }}</td>
                         <td>{{ detail.iot_device_id.device_type }}</td>
                         {{ detail.output_result_in_html|safe }}
-                        <td>{{ detail.comment }}</td>
+                        <td>{{ detail.get_html_comment|safe }}</td>
 {#                        <td>{{ detail.other_info }}</td>#}
                     </tr>
                 {% endfor %}
