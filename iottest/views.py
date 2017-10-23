@@ -48,8 +48,8 @@ def show_mission_detail(request, m_id):
 @login_required
 def show_mission_compare(request):
     parser =FormatJsonParser(request)
-    src_id = parser.get_content().get("src",None)[0]
-    dst_id = parser.get_content().get("dst",None)[0]
+    src_id = parser.get_content().get("src",[0])[0]
+    dst_id = parser.get_content().get("dst",[0])[0]
     return render_to_response('iot_mission_compare.html', {'firstTitle': u'IOT测试',
                                                           'firstTitle_content': u'-分析任务差异',
                                                            'src_id':src_id,
