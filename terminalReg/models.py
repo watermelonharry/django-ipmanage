@@ -103,6 +103,25 @@ class TerminalModel(models.Model):
         except Exception as e:
             return False
 
+    def get_other_info_html(self):
+        """
+        translate other info to html
+        :return: html output
+        """
+        output_str = u""
+        try:
+
+            other_info_dict = eval(self.other_info)
+            for key,val in other_info_dict.items():
+                if key == "registered_module":
+                    output_str += u"<p>模块: {0}</p>".format(u', '.join(val))
+                else:
+                    output_str += u"<p>{0}: {1}</p>".format(key, u', '.join(val))
+        except Exception as e:
+            pass
+        finally:
+            return output_str
+
 
 class TerminalHistoryModel(models.Model):
     """
