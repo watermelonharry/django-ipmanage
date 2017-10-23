@@ -17,7 +17,7 @@ try:
     import Queue
     import logging
     import unittest
-    from uploaderapi import UploaderThread, UploadDataFormatter
+    import uploaderapi
 except Exception as e:
     print('[*] import error:' + e.message)
     raise e
@@ -63,12 +63,12 @@ class UploaderThreadTester(unittest.TestCase):
         self.log('end api test')
     #
     # def test_init_uploader(self):
-    #     uploader = UploaderThread(ak="123214123")
-    #     self.assertTrue(isinstance(uploader, UploaderThread))
+    #     uploader = uploaderapi.UploaderThread(ak="123214123")
+    #     self.assertTrue(isinstance(uploader, uploaderapi.UploaderThread))
     #     self.assertEqual(uploader.ak, '123214123')
 
     # def test_post_test(self):
-    #     uploader = UploaderThread(ak="123214123")
+    #     uploader = uploaderapi.UploaderThread(ak="123214123")
     #     post_data = {'dst_url':"http://127.0.0.1:8000/iottest/api/test/", 'data':{"v1":"nanana","v2":"bobbo"}, 'expected_reply':200, 'method':"POST"}
     #     get_data = {'dst_url':"http://127.0.0.1:8000/iottest/api/test/", 'data':{"v1":"nanana","v2":"bobbo"}, 'expected_reply':200, 'method':"GET"}
     #     put_data = {'dst_url':"http://127.0.0.1:8000/iottest/api/test/", 'data':{"v1":"nanana","v2":"bobbo"}, 'expected_reply':200, 'method':"PUT"}
@@ -82,7 +82,7 @@ class UploaderThreadTester(unittest.TestCase):
     #     # uploader.terminate_thread()
 
     def test_formatter_get_post_data(self):
-        f = UploadDataFormatter(ak="12341123", terminal_name='test_terminal')
+        f = uploaderapi.UploadDataFormatter(ak="12341123", terminal_name='test_terminal')
         content= f.get_format_post_data(data={"v1":1234,"v2":5678})
         self.assertEqual(content['data'], {"v1":1234,"v2":5678})
         self.assertEqual(content['ak'], '12341123')
@@ -91,10 +91,21 @@ class UploaderThreadTester(unittest.TestCase):
         self.assertEqual(content['limit'], 10)
 
     def test_formatter_get_Get_data(self):
-        f = UploadDataFormatter(ak="12341123", terminal_name='test_terminal')
+        f = uploaderapi.UploadDataFormatter(ak="12341123", terminal_name='test_terminal')
         content= f.get_format_get_data(data={"v1":1234,"v2":5678})
         self.assertEqual(content['data'], {"v1":1234,"v2":5678})
         self.assertEqual(content['ak'], '12341123')
         self.assertEqual(content['terminal_name'], 'test_terminal')
         self.assertEqual(content['offset'], None)
         self.assertEqual(content['limit'], None)
+    
+    def test_singleton_uploader(self):
+        uploader_a = uploaderapi.get_Uploader(ak="1")
+        uploader_a_copy = uploaderapi.get_Uploader(ak="1")
+        print(id(uploader_a), id(uploader_a_copy))
+        self.assertEqual(id(uploader_a), id(uploader_a_copy))
+        uploader_a.terminate_thread()
+        time.sleep(1)
+        uploader_a = uploaderapi.get_Uploader(ak="1")
+        print(id(uploader_a), id(uploader_a_copy))
+        self.assertFalse(uploader_a is uploader_a_copy)
