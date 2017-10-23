@@ -35,7 +35,7 @@
                         <td>{{terminal.user_name}}</td>
                         <td>{{terminal.terminal_addr}}</td>
                         <td>{{terminal.terminal_port}}</td>
-                        <td>{{terminal.other_info}}</td>
+                        <td>{{terminal.get_other_info_html|safe}}</td>
                         <td>{{terminal.edit_time|date:"Y-m-d,G:i:s" }}</td>
 
 
