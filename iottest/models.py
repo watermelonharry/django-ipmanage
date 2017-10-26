@@ -178,11 +178,26 @@ class MissionDetailTable(models.Model):
         :param detail_class: (MissionDetailTable instance)
         :return: dict
         """
+        result_dict = {"sut_addr": self.iot_device_id.device_addr,
+                       "sut_name": self.iot_device_id.device_name,
+                       "sut_type": self.iot_device_id.device_type}
+        check_list = ["can_discover", "can_add", "can_preview", "can_calculate", "can_delete", "comment"]
         try:
-            # todo:implement functions
-            pass
+            for key in check_list:
+                try:
+                    src_result = eval("self.{0}".format(key))
+                except Exception as e:
+                    src_result = u'无'
+
+                try:
+                    dst_result = eval("compare_target.{0}".format(key))
+                except Exception as e:
+                    dst_result = u'无'
+                key_str = "{0}_cmp".format(key)
+                result_dict.update({key_str: ResultDictClass(src=src_result, dst=dst_result)})
+            return result_dict
         except Exception as e:
-            pass
+            raise e
 
     @classmethod
     def compare_multi_details(cls, src=None, dst=None):
@@ -200,47 +215,41 @@ class MissionDetailTable(models.Model):
                     dst_detail = dst.get(iot_device_id_id=src_detail.iot_device_id_id)
                 except Exception as e:
                     dst_detail = None
-                result_dict = src_detail.compare_single_detail(dst=)
-
+                result_dict = src_detail.compare_single_detail(dst=dst_detail)
+                result_list.append(result_dict)
+            return result_list
         except Exception as e:
-            pass
+            raise e
 
 
-class DetailCompareResult(object):
-    def __init__(self, **kwargs):
-        self._result_dict = {"sut_addr": kwargs.get("sut_addr", u'无'),
-                             "sut_name": kwargs.get("sut_name", u'无'),
-                             "sut_type": kwargs.get("sut_type", u'无'),
-                             "pass_result": {"diff": False, "src": None, "dst": None}
+class ResultDictClass(object):
+    def __init__(self, src=None, dst=None, *args, **kwargs):
+        self._cmp_result_dict = {"diff": False,
+                                 "src": src,
+                                 "dst": dst}
+        self._src = src
+        self._dst = dst
+        self._compare()
 
-        class ResultDictClass(object):
-            def __init__(self, src=None, dst=None,*args,**kwargs):
-                self._cmp_result_dict = {"diff": False,
-                                         "src": src,
-                                         "dst": dst}
-                self._src = src
-                self._dst = dst
-                self._compare()
+    def __new__(cls, *args, **kwargs):
+        cls_instance = super(ResultDictClass, cls).__new__(cls, *args, **kwargs)
+        cls_instance.__init__(*args, **kwargs)
+        return cls_instance._get_result()
 
-            def __new__(cls, *args, **kwargs):
-                cls_instance = super(ResultDictClass, cls).__new__(cls, *args, **kwargs)
-                cls_instance.__init__(*args, **kwargs)
-                return cls_instance._get_result()
+    def _get_result(self):
+        temp_dict = {}
+        temp_dict.update(self._cmp_result_dict)
+        return temp_dict
 
-            def _get_result(self):
-                temp_dict = {}
-                temp_dict.update(self._cmp_result_dict)
-                return temp_dict
-
-            def _compare(self):
-                """
-                compare src with dst, storing the comparing result in "diff"
-                :return: None
-                """
-                try:
-                    if self._src == self._dst:
-                        self._cmp_result_dict.update(diff=False)
-                    else:
-                        self._cmp_result_dict.update(diff=True)
-                except Exception as e:
-                    raise e
+    def _compare(self):
+        """
+        compare src with dst, storing the comparing result in "diff"
+        :return: None
+        """
+        try:
+            if self._src == self._dst:
+                self._cmp_result_dict.update(diff=False)
+            else:
+                self._cmp_result_dict.update(diff=True)
+        except Exception as e:
+            raise e
