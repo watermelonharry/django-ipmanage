@@ -217,9 +217,10 @@ class MissionDetailTable(models.Model):
                     dst_detail = None
                 result_dict = src_detail.compare_single_detail(dst=dst_detail)
                 result_list.append(result_dict)
-            return result_list
         except Exception as e:
-            raise e
+            print("{0}".format(e))
+        finally:
+            return result_list
 
 
 class ResultDictClass(object):
