@@ -172,7 +172,7 @@ class MissionDetailTable(models.Model):
         except Exception as e:
             return u""
 
-    def compare_single_detail(self, detail_class=None):
+    def compare_single_detail(self, compare_target=None):
         """
         compare self with the given single mission detail class
         :param detail_class: (MissionDetailTable instance)
@@ -213,6 +213,34 @@ class DetailCompareResult(object):
                              "sut_type": kwargs.get("sut_type", u'无'),
                              "pass_result": {"diff": False, "src": None, "dst": None}
 
-    class ResultDictClass(object):
-        def __init__(self):
-            pass
+        class ResultDictClass(object):
+            def __init__(self, src=None, dst=None,*args,**kwargs):
+                self._cmp_result_dict = {"diff": False,
+                                         "src": src,
+                                         "dst": dst}
+                self._src = src
+                self._dst = dst
+                self._compare()
+
+            def __new__(cls, *args, **kwargs):
+                cls_instance = super(ResultDictClass, cls).__new__(cls, *args, **kwargs)
+                cls_instance.__init__(*args, **kwargs)
+                return cls_instance._get_result()
+
+            def _get_result(self):
+                temp_dict = {}
+                temp_dict.update(self._cmp_result_dict)
+                return temp_dict
+
+            def _compare(self):
+                """
+                compare src with dst, storing the comparing result in "diff"
+                :return: None
+                """
+                try:
+                    if self._src == self._dst:
+                        self._cmp_result_dict.update(diff=False)
+                    else:
+                        self._cmp_result_dict.update(diff=True)
+                except Exception as e:
+                    raise e
