@@ -44,7 +44,6 @@
                             <li class="dropdown-header">已有工具</li>
                             <li><a href="/ipcmanage">-IP批量管理工具 [未上线]</a></li>
                             <li><a href="/ipcset">-码流参数批量设置</a></li>
-                            <li><a href={% url "iot_main_page" %}>-兼容性测试</a></li>
                             <li role="separator" class="divider"></li>
                             <li class="dropdown-header">快速应用工具</li>
                             <li><a href={% url "instant_tool" %}>-重启/重置/修改密码</a></li>
@@ -54,6 +53,19 @@
                             <li><a href={% url "show_terminal_list" %}>-查看已注册终端</a></li>
                         </ul>
                     </li>
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                           aria-expanded="false">兼容性测试<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li class="dropdown-header">基础信息</li>
+                            <li><a href={% url "iot_sut_list_page" %}>-陪测设备信息</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">任务管理</li>
+                            <li><a href={% url "iot_main_page" %}>-测试任务管理</a></li>
+                        </ul>
+                    </li>
+
                     <li><a href={% url 'file_main_page' %}>下载</a></li>
                 </ul>
 
@@ -94,7 +106,7 @@
 <hr>
 <div id="footer">
     <div class="container">
-        <div  align="center">| based on bootstrap| vue | django | django-rest-framework |</div>
+        <div align="center">| based on bootstrap| vue | django | django-rest-framework |</div>
         <div class="copyright" align="center">&copy; 2017</div>
     </div>
 </div>
@@ -103,10 +115,12 @@
 <script>
     $.ajaxSettings.traditional = true;
     var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
     function csrfSafeMethod(method) {
         // these HTTP methods do not require CSRF protection
         return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
     }
+
     $.ajaxSetup({
         beforeSend: function (xhr, settings) {
             if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
