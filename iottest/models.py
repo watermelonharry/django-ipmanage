@@ -215,7 +215,7 @@ class MissionDetailTable(models.Model):
                     dst_detail = dst.get(iot_device_id_id=src_detail.iot_device_id_id)
                 except Exception as e:
                     dst_detail = None
-                result_dict = src_detail.compare_single_detail(dst=dst_detail)
+                result_dict = src_detail.compare_single_detail(compare_target=dst_detail)
                 result_list.append(result_dict)
         except Exception as e:
             print("{0}".format(e))
