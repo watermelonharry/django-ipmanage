@@ -27,5 +27,8 @@ urlpatterns = [
         name='api_get_add_mission_details'),
     url('^api/v1/outter/missiondetails/(?P<m_id>[0-9]+)/$', views.api_outter_get_add_mission_details),
 
+    url('^api/v1/inner/missioncompare/$', views.api_inner_compare_two_mission),
+
+
     url('^api/v1/test/$', views.api_test_receive_url, name='test_api_url'),
 ]
