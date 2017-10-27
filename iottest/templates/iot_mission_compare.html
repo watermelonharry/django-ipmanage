@@ -2,9 +2,6 @@
 {% block iot_content %}
     <div class="container">
     <h4>当前位置：<a href={% url "iot_main_page" %}>IOT测试</a> >> 任务执行结果对比</h4>
-    {#        <p>参照任务:{{ src_id }}</p>#}
-    {#        <p>对比任务:{{ dst_id }}</p>#}
-    {#        <template id="v-choose-target">#}
     {% verbatim %}
     <div class="panel panel-default" id="v-choose-target">
         <div class="panel-heading">
@@ -155,27 +152,6 @@
                             </template>
                         </tr>
                     </template>
-                    
-
-                    {#                    <tr>#}
-                    {#                        <td rowspan="2">add</td>#}
-                    {#                        <td rowspan="2">sut</td>#}
-                    {#                        <td rowspan="2">type</td>#}
-                    {#                        <td bgcolor="#d3d3d3"><span class="label label-success">pass</span></td>#}
-                    {#                        <td>pass</td>#}
-                    {#                        <td>pass</td>#}
-                    {#                        <td>pass</td>#}
-                    {#                        <td>pass</td>#}
-                    {#                        <td>commmmmm</td>#}
-                    {#                    </tr>#}
-                    {#                    <tr>#}
-                    {#                        <td bgcolor="#d3d3d3"><span class="label label-danger">fail</span></td>#}
-                    {#                        <td>pass</td>#}
-                    {#                        <td>pass</td>#}
-                    {#                        <td>pass</td>#}
-                    {#                        <td>pass</td>#}
-                    {#                        <td>commmmmm</td>#}
-                    {#                    </tr>#}
                     </tbody>
                 </table>
             </div>
