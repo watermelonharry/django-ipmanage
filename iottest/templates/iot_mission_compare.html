@@ -2,8 +2,40 @@
 {% block iot_content %}
     <div class="container">
         <h4>当前位置：<a href={% url "iot_main_page" %}>IOT测试</a> >> 任务执行结果对比</h4>
-        <p>参照任务:{{ src_id }}</p>
-        <p>对比任务:{{ dst_id }}</p>
+        {#        <p>参照任务:{{ src_id }}</p>#}
+        {#        <p>对比任务:{{ dst_id }}</p>#}
+        {#        <template id="v-choose-target">#}
+        {% verbatim %}
+        <div class="panel panel-default" id="v-choose-target">
+            <div class="panel-heading">
+                <h3 class="panel-title">任务选择</h3>
+            </div>
+            <div class="panel-body">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-1 control-label">源记录:</label>
+                        <div class="col-sm-4">
+                            <select class="form-control" v-model="choose_src_id">
+                                <template v-for="src of src_mission_list">
+                                <option v-bind:value="src.id">{{ src.dut_name }}-{{ src.dut_version }}</option>
+                                </template>
+                            </select>
+                        </div>
+                        <label class="col-sm-1 control-label">目标记录:</label>
+                        <div class="col-sm-4">
+                            <select class="form-control" v-model="choose_dst_id">
+                                <option>h264</option>
+                                <option>h265</option>
+                            </select>
+                        </div>
+                        <button type="button" v-if="true" class="btn btn-sm btn-success col-sm-1"
+                                id="show_scan_detail_btn" name="" v-on:click="go_to_detail">对比
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endverbatim %}
 
         <div class="table-responsive" id="v_mission_table">
             <table class="table table-striped">
@@ -45,7 +77,7 @@
                     <td rowspan="2">add</td>
                     <td rowspan="2">sut</td>
                     <td rowspan="2">type</td>
-                    <td bgcolor="#696969"><span class="label label-success">pass</span> </td>
+                    <td bgcolor="#696969"><span class="label label-success">pass</span></td>
                     <td>pass</td>
                     <td>pass</td>
                     <td>pass</td>
@@ -53,47 +85,99 @@
                     <td>commmmmm</td>
                 </tr>
                 <tr>
-                    <td bgcolor="#696969"><span class="label label-danger">fail</span> </td>
+                    <td bgcolor="#696969"><span class="label label-danger">fail</span></td>
                     <td>pass</td>
                     <td>pass</td>
                     <td>pass</td>
                     <td>pass</td>
                     <td>commmmmm</td>
                 </tr>
-                {#                {% verbatim %}#}
-                {#                <tr v-for="(mission, index) in mission_list">#}
-                {#                    <td>{{ index+1 }}</td>#}
-                {#                    <td>{{ mission.create_time }}</td>#}
-                {#                    <td>{{ mission.dut_name }}</td>#}
-                {#                    <td>{{ mission.dut_version }}</td>#}
-                {#                    <td>{{ mission.dut_type }}</td>#}
-                {#                    <td>{{ mission.dut_addr }}</td>#}
-                {#                    <td>{{ mission.other }}</td>#}
-                {#                    <td>{{ mission.editor_name }}</td>#}
-                {#                    <td v-html='mission.status_data'></td>#}
-                {#                    <td><a class="btn-sm btn-success btn-show-detail" role="button" v-bind:name="mission.id"#}
-                {#                           v-bind:href="'/iottest/missiondetail/'+mission.id">查看详细</a>#}
-                {#                    </td>#}
-                {#                </tr>#}
-                {#                {% endverbatim %}#}
                 </tbody>
             </table>
         </div>
     </div>
 
     <script>
-        var mission_list = [{"device_name": "测试", "device_addr": "123456", "mission_status": 0}, {
-            "device_name": "测试33332",
-            "device_addr": "!(@#)!#!", "mission_status": 0
+        var src_l = [{
+            "id": 8,
+            "dut_name": "888888888",
+            "dut_version": "888888888888",
+            "dut_addr": "192.168.1.240",
+            "dut_type": "h265",
+            "dut_username": "admin",
+            "dut_password": "qqqqqq",
+            "dut_cmp_lock": 0,
+            "other_info": "global name 'nvrctrl' is not defined",
+            "editor_name": "harry",
+            "sut_ids": [],
+            "mission_status": 4,
+            "create_time": "2017-10-24T05:35:44.063Z",
+            "terminal_name": "Local_debug",
+            "mission_total": 57,
+            "mission_progress": 0
+        }, {
+            "id": 7,
+            "dut_name": "44444444444",
+            "dut_version": "44444444444",
+            "dut_addr": "192.168.1.240",
+            "dut_type": "h265",
+            "dut_username": "admin",
+            "dut_password": "qqqqqq",
+            "dut_cmp_lock": 0,
+            "other_info": null,
+            "editor_name": "harry",
+            "sut_ids": [],
+            "mission_status": 3,
+            "create_time": "2017-10-24T05:34:37.085Z",
+            "terminal_name": "Local_debug",
+            "mission_total": 1,
+            "mission_progress": 0
         }];
-        var table_head_list = [""];
-        var v_mission_table = new Vue({
-            el: '#v_mission_table',
+        var dst_l = [{
+            "id": 6,
+            "dut_name": "3333333333",
+            "dut_version": "333333333333",
+            "dut_addr": "192.168.1.240",
+            "dut_type": "h265",
+            "dut_username": "admin",
+            "dut_password": "qqqqqq",
+            "dut_cmp_lock": 0,
+            "other_info": "3333333",
+            "editor_name": "harry",
+            "sut_ids": [],
+            "mission_status": 3,
+            "create_time": "2017-10-24T05:31:32.070Z",
+            "terminal_name": "Local_debug",
+            "mission_total": 1,
+            "mission_progress": 0
+        }, {
+            "id": 7,
+            "dut_name": "44444444444",
+            "dut_version": "44444444444",
+            "dut_addr": "192.168.1.240",
+            "dut_type": "h265",
+            "dut_username": "admin",
+            "dut_password": "qqqqqq",
+            "dut_cmp_lock": 0,
+            "other_info": null,
+            "editor_name": "harry",
+            "sut_ids": [],
+            "mission_status": 3,
+            "create_time": "2017-10-24T05:34:37.085Z",
+            "terminal_name": "Local_debug",
+            "mission_total": 1,
+            "mission_progress": 0
+        }];
+        var v_choose_target = new Vue({
+            el: '#v-choose-target',
             data: {
-                table_head_list: table_head_list,
-                mission_list: mission_list,
+                src_mission_list: src_l,
+                dst_mission_list: dst_l,
+                choose_src_id:null,
+                choose_dst_id:null,
             },
             methods: {
+
                 go_to_detail: function (id) {
                     window.open('/iottest/missiondetail/' + id);
                 },
@@ -132,12 +216,12 @@
 
         $(document).ready(update_mission_list());
         function update_mission_list() {
-            $.getJSON("../api/v1/inner/missions/", function (ret_data) {
-                    console.log(ret_data);
-                    v_mission_table.mission_list = ret_data.data;
-                    v_mission_table.generate_mission_data(v_mission_table.mission_list);
-                }
-            )
+{#            $.getJSON("../api/v1/inner/missions/", function (ret_data) {#}
+{#                    console.log(ret_data);#}
+{#                    v_mission_table.mission_list = ret_data.data;#}
+{#                    v_mission_table.generate_mission_data(v_mission_table.mission_list);#}
+{#                }#}
+{#            )#}
         }
 
     </script>
