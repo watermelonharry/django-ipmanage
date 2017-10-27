@@ -387,3 +387,29 @@ def api_outter_get_add_mission_details(request, m_id):
             return ErrorJsonResponse(data='invalid ak')
     else:
         return ErrorJsonResponse(data="{0} is not supported".format(request.method))
+
+@csrf_exempt
+def api_inner_compare_two_mission(request):
+	"""
+	比较两个任务的明细。
+	接受GET方法。
+	:param request:
+	:return: list(CompareResult)
+	"""
+	if request.method == "GET":
+		parse_content = FormatJsonParser(request).get_content()
+		src_id= parse_content.get("src_id",None).pop()
+		dst_id=parse_content.get("dst_id",None).pop()
+		if src_id and dst_id:
+			try:
+				src_detail_list = MissionDetailTable.get_details_by_mission_id(m_id=src_id)
+				dst_detail_list = MissionDetailTable.get_details_by_mission_id(m_id=dst_id)
+				result_list = MissionDetailTable.compare_multi_details(src=src_detail_list,dst=dst_detail_list)
+				return SuccessJsonResponse(data=result_list)
+			except Exception as e:
+				return ErrorJsonResponse("{0}".format(e))
+		else:
+			return ErrorJsonResponse("need src_id and dst_id")
+
+	else:
+		return ErrorJsonResponse("{0} is not supported".format(request.method))
