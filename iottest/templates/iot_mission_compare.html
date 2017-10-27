@@ -1,100 +1,184 @@
 {% extends "iot_banner.html" %}
 {% block iot_content %}
     <div class="container">
-        <h4>当前位置：<a href={% url "iot_main_page" %}>IOT测试</a> >> 任务执行结果对比</h4>
-        {#        <p>参照任务:{{ src_id }}</p>#}
-        {#        <p>对比任务:{{ dst_id }}</p>#}
-        {#        <template id="v-choose-target">#}
-        {% verbatim %}
-        <div class="panel panel-default" id="v-choose-target">
-            <div class="panel-heading">
-                <h3 class="panel-title">任务选择</h3>
-            </div>
-            <div class="panel-body">
-                <form class="form-horizontal" role="form">
-                    <div class="form-group">
-                        <label class="col-sm-1 control-label">源记录:</label>
-                        <div class="col-sm-4">
-                            <select class="form-control" v-model="choose_src_id">
-                                <template v-for="src of src_mission_list">
-                                <option v-bind:value="src.id">{{ src.dut_name }}-{{ src.dut_version }}</option>
-                                </template>
-                            </select>
-                        </div>
-                        <label class="col-sm-1 control-label">目标记录:</label>
-                        <div class="col-sm-4">
-                            <select class="form-control" v-model="choose_dst_id">
-                                <template v-for="dst of dst_mission_list">
-                                <option v-bind:value="dst.id">{{ dst.dut_name }}-{{ dst.dut_version }}</option>
-                                </template>
-                            </select>
-                        </div>
-                        <button type="button" v-if="true" class="btn btn-sm btn-success col-sm-1"
-                                id="show_scan_detail_btn" name="" v-on:click="go_to_detail">对比
-                        </button>
-                    </div>
-                </form>
-            </div>
+    <h4>当前位置：<a href={% url "iot_main_page" %}>IOT测试</a> >> 任务执行结果对比</h4>
+    {#        <p>参照任务:{{ src_id }}</p>#}
+    {#        <p>对比任务:{{ dst_id }}</p>#}
+    {#        <template id="v-choose-target">#}
+    {% verbatim %}
+    <div class="panel panel-default" id="v-choose-target">
+        <div class="panel-heading">
+            <h3 class="panel-title">任务选择</h3>
         </div>
-        {% endverbatim %}
+        <div class="panel-body">
+            <form class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label class="col-sm-1 control-label">源记录:</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" v-model="choose_src_id">
+                            <template v-for="src of src_mission_list">
+                                <option v-bind:value="src.id">{{src.editor_name }}-{{ src.dut_name }}-{{ src.dut_version }}
+                                </option>
+                            </template>
+                        </select>
+                    </div>
+                    <label class="col-sm-1 control-label">目标记录:</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" v-model="choose_dst_id">
+                            <template v-for="dst of dst_mission_list">
+                                <option v-bind:value="dst.id">{{dst.editor_name }}-{{ dst.dut_name }}-{{ dst.dut_version }}
+                                </option>
+                            </template>
+                        </select>
+                    </div>
+                    <button type="button" v-if="true" class="btn btn-sm btn-success col-sm-1"
+                            v-on:click="update_compare_list">对比
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endverbatim %}
+    <div id="v_compare_table">
+        <div class="alert alert-warning" role="alert" v-if="no_result_flag">
+            <strong>差异不存在！</strong> 源任务中的条目与目标任务中的对应条目记录不存在差异，请重新选择任务。
+        </div>
 
-        <div class="table-responsive" id="v_mission_table">
-            <table class="table table-striped">
-                <thead>
-                <tr class=locktop>
-                    <th width="110px">SUT地址</th>
-                    <th width="250">SUT名称</th>
-                    <th width="80">SUT类型</th>
-                    <th width="50">发现</th>
-                    <th width="50">添加</th>
-                    <th width="50">在线</th>
-                    <th width="50">带宽</th>
-                    <th width="60">删除</th>
-                    <th width="250">备注信息</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td rowspan="2">add</td>
-                    <td rowspan="2">sut</td>
-                    <td rowspan="2">type</td>
-                    <td>pass</td>
-                    <td>pass</td>
-                    <td>pass</td>
-                    <td>pass</td>
-                    <td>pass</td>
-                    <td>commmmmm</td>
-                </tr>
-                <tr>
-                    <td>pass</td>
-                    <td>pass</td>
-                    <td>pass</td>
-                    <td>pass</td>
-                    <td>pass</td>
-                    <td>commmmmm</td>
-                </tr>
+        <div v-else>
+            <div class="alert alert-success" role="alert">
+                <strong>检索到差异条目!</strong> 源任务中的条目与目标任务中的对应条目存在如下差异部分。已用<strong>浅灰色</strong>背景标出
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr class=locktop>
+                        <th width="110px">SUT地址</th>
+                        <th width="250">SUT名称</th>
+                        <th width="80">SUT类型</th>
+                        <th width="50">发现</th>
+                        <th width="50">添加</th>
+                        <th width="50">在线</th>
+                        <th width="50">带宽</th>
+                        <th width="60">删除</th>
+                        <th width="250">备注信息</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <template v-for="result of compare_result_list">
+                        <tr>
+                            <td rowspan="2" v-html="result.sut_addr"></td>
+                            <td rowspan="2" v-html="result.sut_name"></td>
+                            <td rowspan="2" v-html="result.sut_type"></td>
+                            <template v-if="result.can_discover_cmp.diff">
+                                <td bgcolor="#d3d3d3" v-html="result.can_discover_cmp.src"></td>
+                            </template>
+                            <template v-else>
+                                <td v-html="result.can_discover_cmp.src"></td>
+                            </template>
 
-                <tr>
-                    <td rowspan="2">add</td>
-                    <td rowspan="2">sut</td>
-                    <td rowspan="2">type</td>
-                    <td bgcolor="#696969"><span class="label label-success">pass</span></td>
-                    <td>pass</td>
-                    <td>pass</td>
-                    <td>pass</td>
-                    <td>pass</td>
-                    <td>commmmmm</td>
-                </tr>
-                <tr>
-                    <td bgcolor="#696969"><span class="label label-danger">fail</span></td>
-                    <td>pass</td>
-                    <td>pass</td>
-                    <td>pass</td>
-                    <td>pass</td>
-                    <td>commmmmm</td>
-                </tr>
-                </tbody>
-            </table>
+                            <template v-if="result.can_add_cmp.diff">
+                                <td bgcolor="#d3d3d3" v-html="result.can_add_cmp.src"></td>
+                            </template>
+                            <template v-else>
+                                <td v-html="result.can_add_cmp.src"></td>
+                            </template>
+
+                            <template v-if="result.can_preview_cmp.diff">
+                                <td bgcolor="#d3d3d3" v-html="result.can_preview_cmp.src"></td>
+                            </template>
+                            <template v-else>
+                                <td v-html="result.can_preview_cmp.src"></td>
+                            </template>
+
+                            <template v-if="result.can_calculate_cmp.diff">
+                                <td bgcolor="#d3d3d3" v-html="result.can_calculate_cmp.src"></td>
+                            </template>
+                            <template v-else>
+                                <td v-html="result.can_calculate_cmp.src"></td>
+                            </template>
+
+                            <template v-if="result.can_delete_cmp.diff">
+                                <td bgcolor="#d3d3d3" v-html="result.can_delete_cmp.src"></td>
+                            </template>
+                            <template v-else>
+                                <td v-html="result.can_delete_cmp.src"></td>
+                            </template>
+
+                            <template v-if="result.comment_cmp.diff">
+                                <td bgcolor="#d3d3d3" v-html="result.comment_cmp.src"></td>
+                            </template>
+                            <template v-else>
+                                <td v-html="result.comment_cmp.src"></td>
+                            </template>
+                        </tr>
+                        <tr>
+                            <template v-if="result.can_discover_cmp.diff">
+                                <td bgcolor="#d3d3d3" v-html="result.can_discover_cmp.dst"></td>
+                            </template>
+                            <template v-else>
+                                <td v-html="result.can_discover_cmp.dst"></td>
+                            </template>
+
+                            <template v-if="result.can_add_cmp.diff">
+                                <td bgcolor="#d3d3d3" v-html="result.can_add_cmp.dst"></td>
+                            </template>
+                            <template v-else>
+                                <td v-html="result.can_add_cmp.dst"></td>
+                            </template>
+
+                            <template v-if="result.can_preview_cmp.diff">
+                                <td bgcolor="#d3d3d3" v-html="result.can_preview_cmp.dst"></td>
+                            </template>
+                            <template v-else>
+                                <td v-html="result.can_preview_cmp.dst"></td>
+                            </template>
+
+                            <template v-if="result.can_calculate_cmp.diff">
+                                <td bgcolor="#d3d3d3" v-html="result.can_calculate_cmp.dst"></td>
+                            </template>
+                            <template v-else>
+                                <td v-html="result.can_calculate_cmp.dst"></td>
+                            </template>
+
+                            <template v-if="result.can_delete_cmp.diff">
+                                <td bgcolor="#d3d3d3" v-html="result.can_delete_cmp.dst"></td>
+                            </template>
+                            <template v-else>
+                                <td v-html="result.can_delete_cmp.dst"></td>
+                            </template>
+
+                            <template v-if="result.comment_cmp.diff">
+                                <td bgcolor="#d3d3d3" v-html="result.comment_cmp.dst"></td>
+                            </template>
+                            <template v-else>
+                                <td v-html="result.comment_cmp.dst"></td>
+                            </template>
+                        </tr>
+                    </template>
+                    
+
+                    {#                    <tr>#}
+                    {#                        <td rowspan="2">add</td>#}
+                    {#                        <td rowspan="2">sut</td>#}
+                    {#                        <td rowspan="2">type</td>#}
+                    {#                        <td bgcolor="#d3d3d3"><span class="label label-success">pass</span></td>#}
+                    {#                        <td>pass</td>#}
+                    {#                        <td>pass</td>#}
+                    {#                        <td>pass</td>#}
+                    {#                        <td>pass</td>#}
+                    {#                        <td>commmmmm</td>#}
+                    {#                    </tr>#}
+                    {#                    <tr>#}
+                    {#                        <td bgcolor="#d3d3d3"><span class="label label-danger">fail</span></td>#}
+                    {#                        <td>pass</td>#}
+                    {#                        <td>pass</td>#}
+                    {#                        <td>pass</td>#}
+                    {#                        <td>pass</td>#}
+                    {#                        <td>commmmmm</td>#}
+                    {#                    </tr>#}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -169,61 +253,65 @@
             "mission_total": 1,
             "mission_progress": 0
         }];
+        var v_compare_table = new Vue({
+            el: "#v_compare_table",
+            data: {
+                compare_result_list: [],
+                no_result_flag: true,
+            },
+            methods: {},
+        })
+
         var v_choose_target = new Vue({
             el: '#v-choose-target',
             data: {
                 src_mission_list: src_l,
                 dst_mission_list: dst_l,
-                choose_src_id:null,
-                choose_dst_id:null,
+                choose_src_id: null,
+                choose_dst_id: null,
+                compare_result_list: [],
+                no_result_flag: false
             },
             methods: {
-
-                go_to_detail: function (id) {
-                    window.open('/iottest/missiondetail/' + id);
+                update_compare_list: function () {
+                    $.getJSON(url = "../api/v1/inner/missioncompare/", data = {
+                            "src_id": this.choose_src_id,
+                            "dst_id": this.choose_dst_id
+                        },
+                        function (ret) {
+                            console.log("get compare result", ret.data);
+                            v_compare_table.compare_result_list = ret.data;
+                            if (ret.data.length > 0) {
+                                v_compare_table.no_result_flag = false;
+                            } else {
+                                v_compare_table.no_result_flag = true;
+                            }
+                            ;
+                        })
                 },
-                show_pop: function (id) {
-                    console.log(id);
-                    console.log(this.name);
+                update_src_list: function () {
+                    $.getJSON(url = "../api/v1/inner/missions/", function (ret) {
+                            console.log("update src list", ret.data);
+                            v_choose_target.src_mission_list = ret.data;
+                        }
+                    )
                 },
-                show_mission_status: function (status) {
-                    switch (status) {
-                        case 0:
-                            return '<span class="label label-success">等待</span>';
-                        case 1:
-                            return '<span class="label label-success">执行中</span>';
-                        case 2:
-                            return '<span class="label label-success">完成</span>';
-                        case 3:
-                            return '<span class="label label-warning">终止</span>';
-                        case 4:
-                            return '<span class="label label-danger">异常</span>';
-                        default :
-                            break;
-                    }
-                    ;
+                update_dst_list: function () {
+                    $.getJSON(url = "../api/v1/inner/missions/", function (ret) {
+                            console.log("update dst list", ret.data);
+                            v_choose_target.dst_mission_list = ret.data;
+                        }
+                    )
                 },
-                generate_mission_data: function (m_list) {
-                    for (var m in m_list) {
-                        m_list[m].status_data = v_mission_table.show_mission_status(m_list[m].mission_status);
-                    }
-                }
             }
-        })
-        {##}
-        {#        $('.btn-show-detail').on('click', function () {#}
-        {#            window.open('/iottest/missiondetail/' + this.name);#}
-        {#        });#}
+        });
 
-        $(document).ready(update_mission_list());
-        function update_mission_list() {
-{#            $.getJSON("../api/v1/inner/missions/", function (ret_data) {#}
-{#                    console.log(ret_data);#}
-{#                    v_mission_table.mission_list = ret_data.data;#}
-{#                    v_mission_table.generate_mission_data(v_mission_table.mission_list);#}
-{#                }#}
-{#            )#}
-        }
+        $(document).ready(get_data_from_server());
+
+        function get_data_from_server() {
+            v_choose_target.update_src_list();
+            v_choose_target.update_dst_list();
+        };
 
     </script>
 {% endblock %}
