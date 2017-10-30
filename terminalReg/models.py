@@ -32,6 +32,7 @@ class TerminalModel(models.Model):
 
     other_info = models.TextField(blank=True, null=True)
 
+    version = models.CharField(max_length=20,blank=True,null=True)
     create_time = models.DateTimeField(auto_now_add=True)
     edit_time = models.DateTimeField(auto_now=True)
 

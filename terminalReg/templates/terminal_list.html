@@ -16,6 +16,7 @@
                     <th>地址</th>
                     <th>端口</th>
                     <th>其他</th>
+                    <th>版本</th>
                     <th>更新时间</th>
                 </tr>
                 </thead>
@@ -36,6 +37,7 @@
                         <td>{{terminal.terminal_addr}}</td>
                         <td>{{terminal.terminal_port}}</td>
                         <td>{{terminal.get_other_info_html|safe}}</td>
+                        <td>{{terminal.version}}</td>
                         <td>{{terminal.edit_time|date:"Y-m-d,G:i:s" }}</td>
 
 
