@@ -43,6 +43,8 @@ class IotDeviceTable(models.Model):
                 sut_list = list(cls.objects.all())
                 sut_list.sort(key=lambda x: int(x.device_addr.split('.')[-1]), reverse=reverse)
                 return sut_list
+            else:
+                return list(cls.objects.all())
         except Exception as e:
             return []
 
