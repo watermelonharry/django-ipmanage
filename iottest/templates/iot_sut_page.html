@@ -2,7 +2,7 @@
 {% block iot_content %}
     <div class="container">
         <h4>当前位置：<a href={% url "iot_main_page" %}>IOT测试</a> >> IOT设备详细列表  >>  <a class="btn-sm btn-info" role="button"
-                                                                            href="../downloads/sutlist/">保存到本地&raquo;</a></h4>
+                                                                            href={% url "iot_download_sut_url" %}>保存到本地&raquo;</a></h4>
         <div class="table-responsive" id="v_sut_table">
             <table class="table table-bordered" id="sut_table">
                 <thead>
