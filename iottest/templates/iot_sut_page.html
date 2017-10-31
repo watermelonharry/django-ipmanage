@@ -1,7 +1,8 @@
 {% extends "iot_banner.html" %}
 {% block iot_content %}
     <div class="container">
-        <h4>当前位置：<a href={% url "iot_main_page" %}>IOT测试</a> >> IOT设备详细列表</h4>
+        <h4>当前位置：<a href={% url "iot_main_page" %}>IOT测试</a> >> IOT设备详细列表  >>  <a class="btn-sm btn-info" role="button"
+                                                                            href="../downloads/sutlist/">保存到本地&raquo;</a></h4>
         <div class="table-responsive" id="v_sut_table">
             <table class="table table-bordered" id="sut_table">
                 <thead>
@@ -37,8 +38,11 @@
     </div>
 
     <script>
-        var sut_list = [{"device_name":"测试", "device_addr":"123456"},{"device_name":"测试33332", "device_addr":"!(@#)!#!"}];
-        var table_head_list=[""];
+        var sut_list = [{"device_name": "测试", "device_addr": "123456"}, {
+            "device_name": "测试33332",
+            "device_addr": "!(@#)!#!"
+        }];
+        var table_head_list = [""];
         var v_sut_table = new Vue({
             el: '#v_sut_table',
             data: {
@@ -49,10 +53,10 @@
 
         $(document).ready(update_sut_list());
 
-        function update_sut_list(){
-            $.getJSON("../api/v1/inner/suts/", function(ret_data){
-                console.log(ret_data);
-                v_sut_table.sut_list=ret_data.data;
+        function update_sut_list() {
+            $.getJSON("../api/v1/inner/suts/", function (ret_data) {
+                    console.log(ret_data);
+                    v_sut_table.sut_list = ret_data.data;
                 }
             )
         }

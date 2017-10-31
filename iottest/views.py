@@ -56,6 +56,18 @@ def show_mission_compare(request):
                                                            'dst_id':dst_id},
                               context_instance=RequestContext(request))
 
+@login_required
+def download_data(request, title):
+    """down load data in file"""
+    if title == 'sutlist':
+        sut_list = (sut.get_download_content() for sut in IotDeviceTable.get_sut_list())
+        response = StreamingHttpResponse(sut_list, content_type='APPLICATION/OCTET=STREAM')
+        response['Content-Disposition'] = 'attachment; filename=iot_device_list.dat'
+        return response
+    elif title == 'missiondetail':
+        pass
+
+
 
 @login_required
 def show_mission_list(request):

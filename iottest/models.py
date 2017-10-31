@@ -61,6 +61,10 @@ class IotDeviceTable(models.Model):
             id_list.sort()
             return id_list
 
+    def get_download_content(self):
+        return u'\t'.join(map(unicode, [self.edit_time.strftime('%Y-%m-%d %H:%M:%S'),
+                                       self.device_name, self.device_type, self.device_addr,
+                                       self.device_ov_password, self.device_web_password, self.device_software_version])) + u'\n'
 
 class MissionTable(models.Model):
     TYPE_CHOICE = (('h264', u'H264'), ('h265', u'H265'))
