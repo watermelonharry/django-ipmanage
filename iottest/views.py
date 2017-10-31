@@ -45,16 +45,19 @@ def show_mission_detail(request, m_id):
                                                           'mission_id': m_id,
                                                           'mission_detail_list': detail_list},
                               context_instance=RequestContext(request))
+
+
 @login_required
 def show_mission_compare(request):
-    parser =FormatJsonParser(request)
-    src_id = parser.get_content().get("src",[0])[0]
-    dst_id = parser.get_content().get("dst",[0])[0]
+    parser = FormatJsonParser(request)
+    src_id = parser.get_content().get("src", [0])[0]
+    dst_id = parser.get_content().get("dst", [0])[0]
     return render_to_response('iot_mission_compare.html', {'firstTitle': u'IOT测试',
-                                                          'firstTitle_content': u'-分析任务差异',
-                                                           'src_id':src_id,
-                                                           'dst_id':dst_id},
+                                                           'firstTitle_content': u'-分析任务差异',
+                                                           'src_id': src_id,
+                                                           'dst_id': dst_id},
                               context_instance=RequestContext(request))
+
 
 @login_required
 def download_sut_data(request):
@@ -65,6 +68,14 @@ def download_sut_data(request):
     return response
 
 
+@login_required
+def download_detail_data(request):
+    id = FormatJsonParser(request).get_content().get('id', [0])[0]
+    details = MissionDetailTable.get_details_by_mission_id(m_id=id)
+    details_list = (detail.get_download_content() for detail in details)
+    response = StreamingHttpResponse(details_list, content_type='APPLICATION/OCTET=STREAM')
+    response['Content-Disposition'] = 'attachment; filename=iot_missin_detail.dat'
+    return response
 
 @login_required
 def show_mission_list(request):
@@ -108,6 +119,7 @@ def api_get_add_iot_suts(request):
     else:
         return ErrorJsonResponse(data="method not supported")
 
+
 @csrf_exempt
 def api_out_get_add_iot_suts(request):
     if request.method == "GET":
@@ -144,7 +156,6 @@ def api_out_get_add_iot_suts(request):
             return ErrorJsonResponse("invalid ak")
     else:
         return ErrorJsonResponse(data="method not supported")
-
 
 
 @csrf_exempt
@@ -191,7 +202,8 @@ def api_get_add_put_delete_missions(request):
                     serializer = MissionTablePostSerializer(ori_mission, data=p_content)
                     if serializer.is_valid():
                         serializer.save()
-                        return SuccessJsonResponse(data={'success': [m_id],'mission_status':ori_mission.mission_status})
+                        return SuccessJsonResponse(
+                            data={'success': [m_id], 'mission_status': ori_mission.mission_status})
                     else:
                         return ErrorJsonResponse(data=serializer.errors)
                 except Exception as e:
@@ -277,7 +289,8 @@ def api_outter_get_add_put_delete_missions(request):
                         serializer = MissionTablePostSerializer(ori_mission, data=p_content)
                         if serializer.is_valid():
                             serializer.save()
-                            return SuccessJsonResponse(data={'success': [m_id],'mission_status':ori_mission.mission_status})
+                            return SuccessJsonResponse(
+                                data={'success': [m_id], 'mission_status': ori_mission.mission_status})
                         else:
                             return ErrorJsonResponse(data=serializer.errors)
                     except Exception as e:
@@ -356,6 +369,7 @@ def api_out_get_mission_progress(request, m_id):
     except Exception as e:
         return ErrorJsonResponse(data="{0}".format(e))
 
+
 @csrf_exempt
 def api_get_add_mission_details(request, m_id):
     if request.method == "GET" and m_id:
@@ -397,28 +411,29 @@ def api_outter_get_add_mission_details(request, m_id):
     else:
         return ErrorJsonResponse(data="{0} is not supported".format(request.method))
 
+
 @csrf_exempt
 def api_inner_compare_two_mission(request):
-	"""
-	比较两个任务的明细。
-	接受GET方法。
-	:param request:
-	:return: list(CompareResult)
-	"""
-	if request.method == "GET":
-		parse_content = FormatJsonParser(request).get_content()
-		src_id= parse_content.get("src_id",None).pop()
-		dst_id=parse_content.get("dst_id",None).pop()
-		if src_id and dst_id:
-			try:
-				src_detail_list = MissionDetailTable.get_details_by_mission_id(m_id=src_id)
-				dst_detail_list = MissionDetailTable.get_details_by_mission_id(m_id=dst_id)
-				result_list = MissionDetailTable.compare_multi_details(src=src_detail_list,dst=dst_detail_list)
-				return SuccessJsonResponse(data=result_list)
-			except Exception as e:
-				return ErrorJsonResponse("{0}".format(e))
-		else:
-			return ErrorJsonResponse("need src_id and dst_id")
+    """
+    比较两个任务的明细。
+    接受GET方法。
+    :param request:
+    :return: list(CompareResult)
+    """
+    if request.method == "GET":
+        parse_content = FormatJsonParser(request).get_content()
+        src_id = parse_content.get("src_id", None).pop()
+        dst_id = parse_content.get("dst_id", None).pop()
+        if src_id and dst_id:
+            try:
+                src_detail_list = MissionDetailTable.get_details_by_mission_id(m_id=src_id)
+                dst_detail_list = MissionDetailTable.get_details_by_mission_id(m_id=dst_id)
+                result_list = MissionDetailTable.compare_multi_details(src=src_detail_list, dst=dst_detail_list)
+                return SuccessJsonResponse(data=result_list)
+            except Exception as e:
+                return ErrorJsonResponse("{0}".format(e))
+        else:
+            return ErrorJsonResponse("need src_id and dst_id")
 
-	else:
-		return ErrorJsonResponse("{0} is not supported".format(request.method))
+    else:
+        return ErrorJsonResponse("{0} is not supported".format(request.method))

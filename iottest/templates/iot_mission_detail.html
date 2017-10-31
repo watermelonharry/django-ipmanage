@@ -2,9 +2,11 @@
 {% block iot_content %}
     <div class="container">
         <h4>当前位置：<a href={% url "iot_main_page" %}>IOT测试</a> >> <a href={% url "iot_mission_list_page" %}>历史任务查看</a> >>
-            任务明细-ID：{{ mission_id }}</h4>
+            任务明细-ID：{{ mission_id }} >> <a class="btn-sm btn-info" role="button"
+                                           href="../../downloads/missiondetail/?id={{ mission_id }}">保存到本地&raquo;</a></h4>
         <div class="table-responsive" id="v_mission_detail_table">
-            <table class="table table-striped" style="word-break: break-all; word-wrap: break-word; white-space: normal;table-layout: fixed">
+            <table class="table table-striped"
+                   style="word-break: break-all; word-wrap: break-word; white-space: normal;table-layout: fixed">
                 <thead>
                 <tr class=locktop>
                     <th style="width: 45px">序号</th>
@@ -17,7 +19,7 @@
                     <th width="50">带宽</th>
                     <th width="60">删除</th>
                     <th>备注信息</th>
-{#                    <th>其他</th>#}
+                    {#                    <th>其他</th>#}
                 </tr>
                 </thead>
                 <tbody>
@@ -29,7 +31,7 @@
                         <td>{{ detail.iot_device_id.device_type }}</td>
                         {{ detail.output_result_in_html|safe }}
                         <td>{{ detail.get_html_comment|safe }}</td>
-{#                        <td>{{ detail.other_info }}</td>#}
+                        {#                        <td>{{ detail.other_info }}</td>#}
                     </tr>
                 {% endfor %}
                 </tbody>

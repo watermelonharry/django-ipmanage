@@ -143,6 +143,12 @@ class MissionDetailTable(models.Model):
         ordering = ("id",)
         unique_together = (("mission_id", "iot_device_id"), ("id",),)
 
+    def get_download_content(self):
+        return u'\t'.join(map(unicode, [self.iot_device_id.device_addr,self.iot_device_id.device_name,
+                                        self.iot_device_id.device_type,
+                                        self.can_discover,self.can_add,self.can_preview,self.can_calculate,self.can_delete,
+                                        self.comment])) + u'\n'
+
     @classmethod
     def get_details_by_mission_id(cls, m_id):
         try:
