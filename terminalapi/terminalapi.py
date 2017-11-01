@@ -8,7 +8,6 @@ change list:
 0918: 新建文件
 """
 
-
 try:
     import requests
     import re
@@ -129,7 +128,7 @@ class DispatcherThread(threading.Thread):
         :param mission(dict): {'module':XXXX, 'data':{....}}
         :return:
         """
-        self.say('new mission appended.')
+        self.say('new mission added to mission queue.')
         self.say('new mission is {0}.'.format(str(mission)))
         self.__mission_queue.put(mission)
 
@@ -172,7 +171,7 @@ class DispatcherThread(threading.Thread):
                 target_func = self.dispatch_dict.get(module, None)(data=data,
                                                                    ak=self.__ak,
                                                                    api_root_url=self.__api_root_url,
-                                                                   terminal_name = self.__terminal_name,
+                                                                   terminal_name=self.__terminal_name,
                                                                    *args,
                                                                    **kwargs)  # todo:, *args, **kwargs
             except Exception as e:
@@ -235,6 +234,8 @@ class RegisterThread(threading.Thread):
         self.api_root_url = api_root_url
         self.register_path = register_path
         self.ak = kwargs.get('ak', 'no_ak')
+        self.version = kwargs.get('version', 'unknown')
+
         self.terminal_name = kwargs.get('terminal_name', 'not set')
         self.reg_url = self.api_root_url + self.register_path
 
@@ -243,15 +244,16 @@ class RegisterThread(threading.Thread):
         self.logger = logging.getLogger("RegisterThread")
 
         self.info_dict = {
-        'terminal_name': self.terminal_name,
-        'ak': self.ak,
-        'terminal_status': CONNECTION_STATUS.IDLE,
-        'assigned_mission': None,
-        'register_url': self.reg_url,
-        'available_time': self.interval_time * 2,
-        'terminal_addr': None,
-        'terminal_port': None,
-        'other_info': {'registered_module': []},
+            'terminal_name': self.terminal_name,
+            'ak': self.ak,
+            'terminal_status': CONNECTION_STATUS.IDLE,
+            'assigned_mission': None,
+            'register_url': self.reg_url,
+            'available_time': self.interval_time * 2,
+            'terminal_addr': None,
+            'terminal_port': None,
+            'other_info': {'registered_module': []},
+            'version': self.version,
         }
 
         self.LOCK = threading.Lock()  # r/w lock for variants
@@ -329,19 +331,30 @@ class RegisterThread(threading.Thread):
         :return: mission_dict, eg. {'module':xxxx, 'data':{....params...}}
         """
         # todo:
+        self.logger.debug("extracting data from reply:{0}".format(reply_dict))
         try:
             mission_data = reply_dict.get('data', {})
-            mission_url = self.api_root_url + mission_data.get('mission_url',None)
+
+            if not mission_data.get('mission_url', None):
+                self.logger.debug("no mission url specified, abort extracting")
+                return None
+
+            mission_url = self.api_root_url + mission_data.get('mission_url', None)
+            self.logger.debug("requesting data from {0}".format(mission_url))
             reply = requests.api.get(url=mission_url, timeout=TIME_OUT)
+
             if reply.status_code == 200:
-                re_dict = reply.json().get("data",{})
+                re_dict = reply.json().get("data", {})
             else:
                 self.say("get data error-{0}".format(reply.status_code))
+                raise ValueError
+
             mission_dict = {'module': mission_data.get('mission_from', 'unknown'),
                             'data': re_dict}
             return mission_dict
         except Exception as e:
-            return {'module': 'unknown'}
+            self.logger.debug("{0}".format(e))
+            return None
 
     def dispatch_mission(self, mission_dict):
         """
@@ -350,12 +363,16 @@ class RegisterThread(threading.Thread):
         :return:
         """
         try:
-            if mission_dict.get('data', {}).get('mission_id', "") == "" and mission_dict.get("data",{}).get("id","") == "":
-                self.say("[*] mission id is empty, skip dispatch.")
-            else:
-                self.__dispath_thread.append_to_mission_queue(mission_dict)
+            if not mission_dict:
+                raise ValueError("[*] no mission, skip dispatch.")
+
+            # if mission_dict.get('data', {}).get('mission_id', "") == "" and mission_dict.get("data",{}).get("id","") == "":
+            #     raise ValueError("[*] no mission, skip dispatch.")
+            # else:
+            self.logger.debug("dispatching mission.")
+            self.__dispath_thread.append_to_mission_queue(mission_dict)
         except Exception as e:
-            pass
+            self.logger.debug("{0}".format(e))
 
     def set_status(self, status):
         """
