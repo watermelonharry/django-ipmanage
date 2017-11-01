@@ -206,8 +206,13 @@ class MissionDetailTable(models.Model):
                 except Exception as e:
                     dst_result = u'无'
                 key_str = "{0}_cmp".format(key)
-                result_dict.update({key_str: ResultDictClass(src=src_result, dst=dst_result)})
-            return result_dict
+                cmp_result = ResultDictClass(src=src_result, dst=dst_result)
+                result_dict.update({key_str: cmp_result})
+
+            if cmp_result.get("diff",True):
+                return result_dict
+            else:
+                return None
         except Exception as e:
             raise e
 
@@ -228,7 +233,9 @@ class MissionDetailTable(models.Model):
                 except Exception as e:
                     dst_detail = None
                 result_dict = src_detail.compare_single_detail(compare_target=dst_detail)
-                result_list.append(result_dict)
+
+                if result_dict:
+                    result_list.append(result_dict)
         except Exception as e:
             print("{0}".format(e))
         finally:
