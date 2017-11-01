@@ -177,7 +177,7 @@ def api_get_add_put_delete_missions(request):
             if not mission_ids:
                 mission_list = MissionTable.objects.all()
             else:
-                mission_list = MissionTable.objects.filter(id__in=mission_ids)
+                mission_list = MissionTable.objects.filter(id=mission_ids)
             serializer = MissionTableGetSerializer(mission_list, many=True)
             return SuccessJsonResponse(serializer.data)
 
@@ -254,7 +254,7 @@ def api_outter_get_add_put_delete_missions(request):
             if not mission_ids:
                 mission_list = MissionTable.objects.all()
             else:
-                mission_list = MissionTable.objects.filter(id__in=mission_ids)
+                mission_list = MissionTable.objects.filter(id=mission_ids)
             if len(mission_list) == 1:
                 serializer = MissionTableGetSerializer(mission_list[0])
             else:
