@@ -79,6 +79,18 @@ class BaseTypeTable(models.Model):
     class Meta:
         ordering = ('id',)
 
+    @classmethod
+    def get_param_by_alias(cls, alias_name):
+        """
+        get the params of the model by the given alias name
+        :param alias_name: eg. "323"
+        :return: instance of BaseTypeTable or {}
+        """
+        try:
+            return cls.objects.get(alias_name=alias_name)
+        except Exception as e:
+            raise e
+
 
 class VideoSettingTable(models.Model):
     """

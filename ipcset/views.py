@@ -402,3 +402,17 @@ def api_batch_detele_videosetting(request):
             return JSONResponse({'success': 0}, status=200)
         except Exception as e:
             return JSONResponse({'error': e.message}, status=501)
+
+@csrf_exempt
+def api_query_params_by_model(request):
+    """
+    通过指定alias_name查询对应参数
+    :param request:
+    :return:
+    """
+    try:
+        query_name = FormatJsonParser(request).get_content().get('alias',None)[0]
+        type_model = BaseTypeTable.get_param_by_alias(alias_name=query_name)
+        return SuccessJsonResponse(data=BaseTypeSerializer(type_model).data)
+    except Exception as e:
+        return ErrorJsonResponse(data=e.message, status=501)

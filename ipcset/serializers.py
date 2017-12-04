@@ -38,7 +38,6 @@ class BaseTypeSerializer(serializers.ModelSerializer):
                   'min_resolution_set', 'min_bitrate_set', 'min_framerate_set',
                   'editor_name')
 
-
 class VideoSettingSerializer(serializers.ModelSerializer):
     type_id = BaseTypeSerializer(read_only=True)
 
@@ -74,6 +73,6 @@ class MissionDetailSerializer(serializers.HyperlinkedModelSerializer):
 class MissionInfoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = MissionInfoTable
-        ##任务类型，1：设置设备  2：发现设备
+        # 任务类型，1：设置设备  2：发现设备
         fields = ('id', 'mission_id', 'total_count', 'progress', 'run_status', 'start_ip', 'editor_name', 'remote_id',
                   'mission_type','user_name')

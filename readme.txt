@@ -48,3 +48,4 @@ todo:
 5. migrate to vue.js[partly done].
 6. design a module which can auto-generate bootstrap-style tempelates by models.
 7. using the django(or nginx)'s cache system.
+8. unittest for each module.
