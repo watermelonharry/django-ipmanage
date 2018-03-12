@@ -10,7 +10,7 @@ from feedback.forms import FeedBackForm
 
 def hello(request):
     firstTitle = u'WELCOME!! :D'
-    firstTitle_content = u'测试工具集合。点击上方工具列表进行查看。'
+    firstTitle_content = u'测试工具管理平台。'
     return render(request, 'hello.html', {'firstTitle':firstTitle,'firstTitle_content':firstTitle_content})
 
 @login_required
@@ -21,5 +21,5 @@ def show_instance_tool(request):
 
 def show_about_page(request):
     return render_to_response('about.html', {'firstTitle': u'关于本站',
-                                                          'firstTitle_content': u'- 还没想好写什么hhhhh'},
+                                                          'firstTitle_content': u'----------'},
                               context_instance=RequestContext(request))
