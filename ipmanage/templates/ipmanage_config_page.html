@@ -1,0 +1,152 @@
+{% extends "ipmanage_banner.html" %}
+{% block content %}
+    <div class="container marketing">
+
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <h3 class="panel-title">当前位置: <a href={% url "ipmanage_main_page" %}>MAC-IP绑定</a> >> 配置管理</h3>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <p><a class="btn btn-info" role="button" id="auto_scan_btn" data-toggle="modal"
+                              data-target="#scan_modal" data-backdrop="static">新增配置 &raquo;</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h4>已有配置</h4>
+
+        <div class="table-responsive" id="v_config_table">
+            <table class="table table-striped" id="config_table">
+                <thead>
+                <tr class=locktop>
+                    <th>序号</th>
+                    <th>配置名称</th>
+                    <th>包含数量</th>
+                    <th>绑定拓扑</th>
+                    <th>说明</th>
+                    <th>创建者</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% verbatim %}
+                <tr v-for="(config, index) in config_list">
+                    <td>{{ index+1 }}</td>
+                    <td>{{ config.config_name }}</td>
+                    <td>{{ config.config_count }}</td>
+                    <td>{{ config.config_bind_topo }}</td>
+                    <td>{{ config.config_info }}</td>
+                    <td>{{ config.user_name }}</td>
+                    <td> 编辑  |  删除</td>
+                </tr>
+                {% endverbatim %}
+                </tbody>
+            </table>
+        </div>
+
+
+    </div>
+    <!--扫描窗口-->
+    <div class="modal fade" id="scan_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>扫描局域网</h3>
+
+                    <p>自动扫描局域网内的在线设备，获取其信息并添加到数据库</p>
+
+                    <p>点击“开始”后，系统会下发任务至终端，自动开始执行</p>
+
+                    <p><b>请填入所需的起始扫描地址、所需要的扫描数量</b></p>
+                </div>
+                <div class="modal-body" id="scan_modal_body">
+                    <form class="form-horizontal" role="form" id="auto_scan_form" action="../api/mission/"
+                          method="post">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">起始IP</label>
+
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="start_ip" name="start_ip"
+                                       value="192.168.1.2"
+                                       placeholder="eg: 192.168.1.2" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">扫描IP数量</label>
+
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="total_count" name="total_count"
+                                       value="254"
+                                       placeholder="eg: 254" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">分配终端</label>
+
+                            <div class="col-sm-5">
+                                <select class="form-control" id="assign_terminal" name="assign_terminal">
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div id="show_scan_progress" hidden>
+                        <p>请确认执行终端已开启，等待扫描完成</p>
+
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped active" role="progressbar"
+                                 id="auto_scan_probar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-success" id="show_scan_detail_btn" name="">查看详细</button>
+                    <button type="button" class="btn btn-sm btn-success" id="confirm_scan_btn">开始</button>
+                    <button type="button" class="btn btn-sm btn-danger btn_terminate" id="scan_terminate_btn">终止
+                    </button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal" id="abort_scan_btn"
+                            name="">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var sut_list = [{
+            "config_name": "测试",
+            "config_count": "123",
+            "config_bind_topo": "bvt2",
+            "config_info": "这是一个测试说明",
+            "user_name": "tester1"
+        },
+            {
+                "config_name": "测试222",
+                "config_count": "0",
+                "config_bind_topo": "bvt3",
+                "config_info": "这是一个测试说明2",
+                "user_name": "tester2"
+            },];
+
+        var v_config_table = new Vue({
+            el: '#v_config_table',
+            data: {
+                config_list: sut_list
+            }
+        })
+
+{#        $(document).ready(update_sut_list());#}
+{##}
+{#        function update_sut_list() {#}
+{#            $.getJSON("../api/v1/inner/suts/", function (ret_data) {#}
+{#                        console.log(ret_data);#}
+{#                        v_sut_table.sut_list = ret_data.data;#}
+{#                    }#}
+{#            )#}
+{#        }#}
+
+    </script>
+
+{% endblock %}
