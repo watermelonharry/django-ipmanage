@@ -20,7 +20,7 @@ urlpatterns = patterns('',
 
     url('^contact/', include('feedback.urls')),
 
-    url('^ipcmanage/', include('ipcmanage.urls')),
+    url('^ipmanage/', include('ipmanage.urls')),
     url('^ipcset/', include('ipcset.urls')),
     url('^user/', include('userManage.urls')),
     url('^terminal/', include('terminalReg.urls')),
