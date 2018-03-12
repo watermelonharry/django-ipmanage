@@ -7,51 +7,230 @@
 {% endblock %}
 {% block global_banner_content %}
     <div class="container">
-        <div class="well">
-            <h4><b>更新记录：</b></h4>
-            <h5>2017.10.24</h5>
-            <ol>
-                <li>bugfix: iottest的执行模块能够解析list类型的任务输入.</li>
-                <li>ui: 查看在线终端页面,显示已注册功能.</li>
-                <li>ui: iottest-任务明细页面,调整备注信息显示</li>
-            </ol>
-            <h5>2017.10.21</h5>
-            <ol>
-                <li>增加IOT任务管理, 进行IOT任务的新建\执行\查看; 任务对比功能还未完成.</li>
-                <li>更新终端,增加IOT模块.</li>
-            </ol>
-            <h5>2017.10.09</h5>
-            <ol>
-                <li>增加快速设置工具，请更新终端。</li>
-                <li>增加文件下载模块。</li>
-            </ol>
-            <h5>2017.09.25</h5>
-            <p>server端</p>
-            <ol>
-                <li>修改终端注册时间为45秒，超时时间为45*2。</li>
-                <li>增加参数设置页面-设置条目的用户隔离：每个用户只能看到自己操作添加、发现、修改的设备，任务信息依然共享。</li>
-            </ol>
-            <hr>
-            <h5>2017.09.14</h5>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="list-group">
+                    <div class="list-group-item active" > 兼容性测试</div>
 
-            <p>server端</p>
-            <ol>
-                <li>增加终端注册功能，30s注册一次，超过一定时间未注册视为离线。</li>
-                <li>码流参数设置时能够选择在线终端进行任务分配。</li>
-                <li><b>*注意：该版本还未调整IP管理的逻辑,暂时无法使用。</b></li>
-            </ol>
-            <p>local端</p>
-            <ol>
-                <li>更改自动扫描的在线ip获取逻辑，采用多线程ping。</li>
-                <li>分解为注册线程、本地接收线程、任务分发线程。由任务分发线程统一管理、运行任务。</li>
-                <li><b>*注意:IP管理模块还未上线，暂时无法使用。</b></li>
-            </ol>
-            <p>todo:</p>
-            <ol>
-                <li>验证主动推送任务的有效性。 <b>[done]</b></li>
-                <li>更改IP管理的执行逻辑：批量恢复出厂+IP设置，扫描局域网添加MAC。</li>
-            </ol>
-            <hr>
+                    <div class="list-group-item">
+                        <a href={% url 'iot_sut_list_page' %} class="list-group-item-text">-陪测设备信息</a>
+                    </div>
+
+                    <div class="list-group-item">
+                        <a href={% url 'iot_main_page' %} class="list-group-item-text">-兼容性测试任务管理</a>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="list-group">
+                    <div class="list-group-item active">IPC管理</div>
+
+                    <div class="list-group-item">
+                        <a href={% url "ipcset_main_page" %} class="list-group-item-text">-批量设置码流参数</a>
+                    </div>
+                    <div class="list-group-item">
+                        <a href={% url "ipmanage_main_page" %} class="list-group-item-text">-MAC-IP绑定管理[无法使用]</a>
+                    </div>
+
+                    {#                    <div class="list-group-item">#}
+                    {#                        <a href="#" class="list-group-item-text">-拓扑IPC还原</a>#}
+                    {#                    </div>#}
+
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="list-group">
+                    <div class="list-group-item active">IPC-快速应用工具</div>
+
+                    <div class="list-group-item">
+                        <a href={% url 'instant_tool' %} class="list-group-item-text">-批量重启IPC</a>
+                    </div>
+                    <div class="list-group-item">
+                        <a href={% url 'instant_tool' %} class="list-group-item-text">-批量恢复出厂</a>
+                    </div>
+                    <div class="list-group-item">
+                        <a href={% url 'instant_tool' %} class="list-group-item-text">-批量修改密码</a>
+                    </div>
+
+                    {#                    <div class="list-group-item">#}
+                    {#                        <a href="#" class="list-group-item-text">-拓扑IPC还原</a>#}
+                    {#                    </div>#}
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="list-group">
+                    <div class="list-group-item active">基础信息</div>
+
+                    <div class="list-group-item">
+                        <a href={% url "show_terminal_list" %} class="list-group-item-text">-查看已注册终端</a>
+                    </div>
+                    <div class="list-group-item">
+                        <a href={% url 'ipcset_basic_model_info' %} class="list-group-item-text">-IPC型号规格查看</a>
+                    </div>
+
+                    {#                    <div class="list-group-item">#}
+                    {#                        <a href="#" class="list-group-item-text">-拓扑IPC还原</a>#}
+                    {#                    </div>#}
+
+                </div>
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="tabbable" id="tabs-162753">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#panel-459249" data-toggle="tab">Section 1</a>
+                </li>
+                <li>
+                    <a href="#panel-210034" data-toggle="tab">Section 2</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="panel-459249">
+                    <p>
+                        I'm in Section 1.
+                    </p>
+                </div>
+                <div class="tab-pane" id="panel-210034">
+                    <p>
+                        Howdy, I'm in Section 2.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="btn-group">
+
+            <button class="btn btn-default" type="button">
+                <em class="glyphicon glyphicon-align-left"></em> Left
+            </button>
+            <button class="btn btn-default" type="button">
+                <em class="glyphicon glyphicon-align-center"></em> Center
+            </button>
+            <button class="btn btn-default" type="button">
+                <em class="glyphicon glyphicon-align-right"></em> Right
+            </button>
+            <button class="btn btn-default" type="button">
+                <em class="glyphicon glyphicon-align-justify"></em> Justify
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel-group" id="panel-965708">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-965708"
+                               href="#panel-element-729167">Collapsible Group Item #1</a>
+                        </div>
+                        <div id="panel-element-729167" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                Anim pariatur cliche...
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-965708"
+                               href="#panel-element-957267">Collapsible Group Item #2</a>
+                        </div>
+                        <div id="panel-element-957267" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                Anim pariatur cliche...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel-group" id="panel-334072">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-334072"
+                               href="#panel-element-271276">Collapsible Group Item #1</a>
+                        </div>
+                        <div id="panel-element-271276" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                Anim pariatur cliche...
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-334072"
+                               href="#panel-element-103571">Collapsible Group Item #2</a>
+                        </div>
+                        <div id="panel-element-103571" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                Anim pariatur cliche...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel-group" id="panel-679363">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-679363"
+                               href="#panel-element-861647">Collapsible Group Item #1</a>
+                        </div>
+                        <div id="panel-element-861647" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                Anim pariatur cliche...
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <a class="panel-title collapsed" data-toggle="collapse" data-parent="#panel-679363"
+                               href="#panel-element-435316">Collapsible Group Item #2</a>
+                        </div>
+                        <div id="panel-element-435316" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                Anim pariatur cliche...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a id="modal-346357" href="#modal-container-346357" role="button" class="btn" data-toggle="modal">Launch demo
+            modal</a>
+
+        <div class="modal fade" id="modal-container-346357" role="dialog" aria-labelledby="myModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            ×
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Modal title
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        ...
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                            Close
+                        </button>
+                        <button type="button" class="btn btn-primary">
+                            Save changes
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
     </div>
 {% endblock %}

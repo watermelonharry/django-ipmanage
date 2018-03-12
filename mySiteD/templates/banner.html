@@ -5,6 +5,7 @@
     {% load staticfiles %}
     <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.css">
     <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap-theme.css">
+    {#    <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.min.css">#}
     <script type="text/javascript" src="{% static 'bootstrap/js/jquery.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
     {% block js_css %}
@@ -17,11 +18,10 @@
     {% endblock %}
 </head>
 <body>
-<div class="container">
 
     <!-- Static navbar -->
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
                         aria-expanded="false" aria-controls="navbar">
@@ -42,7 +42,7 @@
                            aria-expanded="false">工具列表<span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             <li class="dropdown-header">已有工具</li>
-                            <li><a href="/ipcmanage">-IP批量管理工具 [未上线]</a></li>
+                            <li><a href="/ipcmanage">-IP批量管理工具 [无法使用]</a></li>
                             <li><a href="/ipcset">-码流参数批量设置</a></li>
                             <li role="separator" class="divider"></li>
                             <li class="dropdown-header">快速应用工具</li>
@@ -91,14 +91,15 @@
         </div>
         <!--/.container-fluid -->
     </nav>
+    <hr>
+    <div class="container">
+        <!-- Main component for a primary marketing message or call to action -->
+        <div class="jumbotron">
+            <h1>{{ firstTitle }}</h1>
 
-    <!-- Main component for a primary marketing message or call to action -->
-    <div class="jumbotron">
-        <h1>{{ firstTitle }}</h1>
-
-        <p>{{ firstTitle_content }}</p>
+            <p>{{ firstTitle_content }}</p>
+        </div>
     </div>
-</div>
 <!-- /container -->
 
 {% block global_banner_content %}
