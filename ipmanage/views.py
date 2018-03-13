@@ -15,6 +15,8 @@ from rest_framework.parsers import JSONParser
 from basepkg.jsonreformat import FormatJsonParser, SuccessJsonResponse, ErrorJsonResponse
 from django.db import transaction
 
+from userManage.models import ApiKeyModel
+
 """
 views
 
@@ -27,7 +29,7 @@ def web_welcome(request):
     显示MAC-IP绑定主页面
     """
     return render_to_response('ipmanage_hello.html', {'firstTitle': u'MAC-IP绑定及恢复[new]',
-                                                 'firstTitle_content': u'将设备恢复到出厂设置，随后将其设置到指定IP'},
+                                                      'firstTitle_content': u'将设备恢复到出厂设置，随后将其设置到指定IP'},
                               context_instance=RequestContext(request))
 
 
@@ -41,14 +43,78 @@ def web_config_page(request):
     return render_to_response('ipmanage_config_page.html',
                               {'firstTitle': u'MAC-IP绑定及恢复[new]',
                                'firstTitle_content': u'绑定配置管理',
-                               'config_list':config_list },
+                               'config_list': config_list},
                               context_instance=RequestContext(request))
 
-#
+@login_required
+def web_config_detail_page(request, id):
+    """
+    显示配置明细
+    :param request:
+    :param id: config_id
+    :return: web page
+    """
+    config = ConfigTable.get_config_by_id(id=id)
+    return render_to_response('ipmanage_config_detail_page.html',
+                              {'firstTitle': u'MAC-IP绑定及恢复[new]',
+                               'firstTitle_content': u'配置管理',
+                               'config': config},
+                              context_instance=RequestContext(request))
+
+
+@login_required
+def api_get_config_list(request):
+    """
+    配置表列表-api
+    :param request: {ak="xxxxx", offset=0,limit=10, params={},}
+    """
+    if request.method == "GET":
+        parser = FormatJsonParser(request)
+        # if ApiKeyModel.has_ak(ak=parser.get_ak()):
+        try:
+            offset = int(parser.offset)
+            limit = int(parser.limit)
+            params = parser.params
+
+            config_list = ConfigTable.objects.all()[offset:limit + offset]
+            serializers = ConfigGetterSerializer(config_list, many=True)
+
+            return SuccessJsonResponse(data=serializers.data)
+        except Exception as e:
+            return ErrorJsonResponse(data=u"{0}".format(e))
+
+    else:
+        return ErrorJsonResponse("unsupported http method")
+
+@login_required
+def api_get_config_detail_list(request):
+    """
+    配置明细表
+    """
+    if request.method == "GET":
+        with transaction.atomic():
+            parser = FormatJsonParser(request)
+            try:
+                offset = int(parser.offset)
+                limit = int(parser.limit)
+                config_id = int(parser.config_id)
+
+                config = ConfigTable.get_config_by_id(id=config_id)
+                detail_list = config.detail_table.all()[offset:limit + offset]
+                serializers = ConfigDetailGetterSerializer(detail_list, many=True)
+                return SuccessJsonResponse(data=serializers.data)
+
+            except Exception as e:
+                return ErrorJsonResponse(data=u"{0}".format(e))
+    else:
+        return ErrorJsonResponse("unsupported http method")
+
+
+
 # @login_required
 # def show_mission_datail(request, operate_id):
-#     detail_list = IpMissionDetailTable.objects.filter(operate_id=operate_id)
-#     create_time = IpMissionTable.objects.get(operate_id=operate_id).create_time
+# detail_list = IpMissionDetailTable.objects.filter(operate_id=operate_id)
+# create_time = IpMissionTable.objects.get(operate_id=operate_id).create_time
 #     return render_to_response('mission_detail_table.html', {'firstTitle': u'IP批量设置',
 #                                                             'firstTitle_content': u'查看任务明细',
 #                                                             'detail_list': detail_list,
