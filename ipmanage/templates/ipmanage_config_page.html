@@ -40,7 +40,9 @@
                     <td>{{ config.config_bind_topo }}</td>
                     <td>{{ config.config_info }}</td>
                     <td>{{ config.user_name }}</td>
-                    <td> 编辑  |  删除</td>
+                    <td><a class="btn-sm btn-success btn-show-detail" role="button" v-bind:name="config.id"
+                           v-bind:href="'/ipmanage/config/'+config.id">编辑</a> |  <a class="btn-sm btn-danger btn-delete-detail" role="button" v-bind:name="config.id">删除</a>
+                    </td>
                 </tr>
                 {% endverbatim %}
                 </tbody>
@@ -134,18 +136,51 @@
             el: '#v_config_table',
             data: {
                 config_list: sut_list
+            },
+            methods: {
+                go_to_detail: function (id) {
+                    window.open('/iottest/missiondetail/' + id);
+                },
+                show_pop: function (id) {
+                    console.log(id);
+                    console.log(this.name);
+                },
+                show_mission_status: function (status) {
+                    switch (status) {
+                        case 0:
+                            return '<span class="label label-success">等待</span>';
+                        case 1:
+                            return '<span class="label label-success">执行中</span>';
+                        case 2:
+                            return '<span class="label label-success">完成</span>';
+                        case 3:
+                            return '<span class="label label-warning">终止</span>';
+                        case 4:
+                            return '<span class="label label-danger">异常</span>';
+                        default :
+                            break;
+                    }
+                    ;
+                },
+                generate_mission_data: function (m_list) {
+                    for (var m in m_list) {
+                        m_list[m].status_data = v_mission_table.show_mission_status(m_list[m].mission_status);
+                    }
+                }
             }
         })
 
-{#        $(document).ready(update_sut_list());#}
-{##}
-{#        function update_sut_list() {#}
-{#            $.getJSON("../api/v1/inner/suts/", function (ret_data) {#}
-{#                        console.log(ret_data);#}
-{#                        v_sut_table.sut_list = ret_data.data;#}
-{#                    }#}
-{#            )#}
-{#        }#}
+        $(document).ready(update_list());
+
+        var d = {"offset":0,"limit":10,"ak":"90a3efd02fa8795d2f30"};
+
+        function update_list() {
+            $.getJSON(url="../api/v1/config/", data={"offset":0,"limit":10,"ak":"90a3efd02fa8795d2f30"}, function (ret_data) {
+                        console.log(ret_data);
+                        v_config_table.config_list = ret_data.data;
+                    }
+            )
+        }
 
     </script>
 
