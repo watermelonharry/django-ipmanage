@@ -24,9 +24,9 @@ from rest_framework import routers
 # router.register(r'^tables/(?P<id>[0-9]+)/$',views.api_ip_mac_detail)
 
 urlpatterns = [
-    url('^$', views.welcome),
+    url('^$', views.welcome, name="ipcset_main_page"),
     url('^basic/$',views.show_basic_info),
-    url('^basic/model/$',views.show_basic_model_info),
+    url('^basic/model/$',views.show_basic_model_info,name="ipcset_basic_model_info"),
     url('^settings/$', views.show_settings_info),
     url('^settings/download/$', views.download_settting_table, name='download_video_setting'),
     url('^missions/$', views.show_mission_info),
