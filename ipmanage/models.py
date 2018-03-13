@@ -23,12 +23,33 @@ class ConfigTable(models.Model):
     class Meta():
         ordering = ('-id',)
 
+    @classmethod
+    def get_config_by_id(cls, id):
+        """
+        通过id检索
+        :param id: int 或 list[int, int, int], 分别对应一个条目/多个条目
+        """
+        try:
+            if isinstance(id, list):
+                return cls.objects.filter(id__in=id)
+            elif isinstance(id, int):
+                return cls.objects.get(id=id)
+            elif isinstance(id, str) or isinstance(id, unicode):
+                return cls.objects.get(id=int(id))
+            elif isinstance(id, list) and isinstance(id[0], str):
+                id = map(int, id)
+                return cls.objects.filter(id__in=id)
+            else:
+                return None
+        except Exception as e:
+            return None
+
 
 class ConfigDetailTable(models.Model):
     """
     MAC-IP配置明细表
     """
-    config_table_key = models.ForeignKey(ConfigTable, on_delete=models.CASCADE)
+    config_table_key = models.ForeignKey(ConfigTable, on_delete=models.CASCADE, related_name='detail_table')
 
     mac_addr = models.CharField(max_length=16, blank=True)
 
@@ -122,7 +143,7 @@ class MissionDetailTable(models.Model):
     MISSION_DETAIL_RUN_STATUS_CHOICE = ((0, u"终止"), (1, u"等待"), (2, u"运行"), (3, u"完成"), (11, u"异常"))
 
     # 对应批量操作的任务ID
-    mission_table_key = models.ForeignKey(MissionTable, on_delete=models.CASCADE)
+    mission_table_key = models.ForeignKey(MissionTable, on_delete=models.CASCADE, related_name="mission_detail_table")
 
     mac_addr = models.CharField(max_length=16, blank=True)
     ori_ip = models.IPAddressField(blank=True, null=True)
