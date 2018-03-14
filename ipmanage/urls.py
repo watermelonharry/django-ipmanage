@@ -29,8 +29,8 @@ urlpatterns = [
     url('^config/(?P<id>[0-9]+)/$', views.web_config_detail_page, name="ipmanage_config_detail_page"),
 
     # inner api
-    url('^api/v1/config/$', views.api_get_config_list, name="ipmanage_api_config_list"),
-    url('^api/v1/config/detail/$', views.api_get_config_detail_list, name="ipmanage_api_config_detail_list"),
+    url('^api/v1/config/$', views.api_get_add_edit_delete_config_list, name="ipmanage_api_config_list"),
+    url('^api/v1/config/detail/$', views.api_get_put_delete_add_config_detail, name="ipmanage_api_config_detail_list"),
 
     # terminal api
 
