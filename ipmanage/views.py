@@ -46,6 +46,7 @@ def web_config_page(request):
                                'config_list': config_list},
                               context_instance=RequestContext(request))
 
+
 @login_required
 def web_config_detail_page(request, id):
     """
@@ -63,7 +64,7 @@ def web_config_detail_page(request, id):
 
 
 @login_required
-def api_get_config_list(request):
+def api_get_add_edit_delete_config_list(request):
     """
     配置表列表-api
     :param request: {ak="xxxxx", offset=0,limit=10, params={},}
@@ -72,22 +73,73 @@ def api_get_config_list(request):
         parser = FormatJsonParser(request)
         # if ApiKeyModel.has_ak(ak=parser.get_ak()):
         try:
-            offset = int(parser.offset)
-            limit = int(parser.limit)
-            params = parser.params
+            offset = parser.offset
+            limit = parser.limit
+            id = parser.id
 
-            config_list = ConfigTable.objects.all()[offset:limit + offset]
-            serializers = ConfigGetterSerializer(config_list, many=True)
+            if id:
+                config_list = ConfigTable.objects.get(id=id)
+                serializers = ConfigGetterSerializer(config_list)
+            else:
+                config_list = ConfigTable.objects.all()[offset:limit + offset]
+                serializers = ConfigGetterSerializer(config_list, many=True)
 
             return SuccessJsonResponse(data=serializers.data)
         except Exception as e:
             return ErrorJsonResponse(data=u"{0}".format(e))
 
+    if request.method == "POST":
+        try:
+            with transaction.atomic():
+                parser = FormatJsonParser(request)
+                data = parser.get_body_content()
+                if isinstance(data, dict):
+                    serializer = ConfigPostSerializer(data=data)
+
+                    if serializer.is_valid():
+                        serializer.save()
+                        return SuccessJsonResponse(data=serializer.data)
+                    else:
+                        return ErrorJsonResponse(data=serializer.errors)
+
+                else:
+                    raise AttributeError("invalid data type")
+        except Exception as e:
+            return ErrorJsonResponse("{0}".format(e))
+
+    if request.method == "PUT":
+        try:
+            parser = FormatJsonParser(request)
+            data = parser.get_body_content()
+            config_id = data.get('id')
+            # edit data
+            with transaction.atomic():
+                ori_config = ConfigTable.get_config_by_id(id=config_id)
+                serializer = ConfigPutSerializer(ori_config, data=data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return SuccessJsonResponse(data=serializer.data)
+                else:
+                    return ErrorJsonResponse(data=serializer.errors)
+        except Exception as e:
+            return ErrorJsonResponse(data="{0}".format(e))
+
+    if request.method == "DELETE":
+        try:
+            parser = FormatJsonParser(request)
+            id = parser.id
+            with transaction.atomic():
+                ConfigTable.get_config_by_id(id=id).delete()
+                return SuccessJsonResponse({"id":id})
+        except Exception as e:
+            return ErrorJsonResponse(data="{0}".format(e))
+
     else:
         return ErrorJsonResponse("unsupported http method")
 
+
 @login_required
-def api_get_config_detail_list(request):
+def api_get_put_delete_add_config_detail(request):
     """
     配置明细表
     """
@@ -95,191 +147,52 @@ def api_get_config_detail_list(request):
         with transaction.atomic():
             parser = FormatJsonParser(request)
             try:
-                offset = int(parser.offset)
-                limit = int(parser.limit)
-                config_id = int(parser.config_id)
-
-                config = ConfigTable.get_config_by_id(id=config_id)
-                detail_list = config.detail_table.all()[offset:limit + offset]
-                serializers = ConfigDetailGetterSerializer(detail_list, many=True)
-                return SuccessJsonResponse(data=serializers.data)
+                offset = parser.offset
+                limit = parser.limit
+                config_id = parser.config_id
+                detail_id = parser.id
+                
+                # 通过配置表的id主键进行查询
+                if config_id:
+                    config = ConfigTable.get_config_by_id(id=config_id)
+                    detail_list = config.detail_table.all()[offset:limit + offset]
+                    serializer = ConfigDetailGetterSerializer(detail_list, many=True)
+                
+                # 通过配置明细表的id进行查询
+                elif detail_id:
+                    if isinstance(detail_id, list):
+                        detail = ConfigDetailTable.objects.filter(id__in=detail_id)
+                        serializer = ConfigDetailGetterSerializer(detail, many=True)
+                    else:
+                        detail = ConfigDetailTable.objects.get(id=detail_id)
+                        serializer = ConfigDetailGetterSerializer(detail)
+                    return SuccessJsonResponse(data=serializer.data)
+                # 查询所有
+                else:
+                    detail = ConfigDetailTable.objects.all()
+                    serializer = ConfigDetailGetterSerializer(detail, many=True)
+                
+                return SuccessJsonResponse(data=serializer.data)
+                        
 
             except Exception as e:
                 return ErrorJsonResponse(data=u"{0}".format(e))
+
+    elif request.method == "POST":
+        with transaction.atomic():
+            parser = FormatJsonParser(request)
+            data = parser.get_data()
+            serializer = ConfigDetailPostSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return SuccessJsonResponse(data=serializer.data)
+            else:
+                return ErrorJsonResponse(data=serializer.errors)
+
+    elif request.method == "PUT":
+        pass
+    elif request.method == "DELETE":
+        pass
     else:
         return ErrorJsonResponse("unsupported http method")
 
-
-
-# @login_required
-# def show_mission_datail(request, operate_id):
-# detail_list = IpMissionDetailTable.objects.filter(operate_id=operate_id)
-# create_time = IpMissionTable.objects.get(operate_id=operate_id).create_time
-#     return render_to_response('mission_detail_table.html', {'firstTitle': u'IP批量设置',
-#                                                             'firstTitle_content': u'查看任务明细',
-#                                                             'detail_list': detail_list,
-#                                                             'create_time': create_time},
-#                               context_instance=RequestContext(request))
-#
-#
-# @login_required
-# def show_mission_info(request):
-#     mission_info_list = IpMissionTable.objects.all()
-#     return render_to_response('mission_info.html', {'firstTitle': u'IP批量设置',
-#                                                     'firstTitle_content': u'查看任务信息',
-#                                                     'info_list': mission_info_list},
-#                               context_instance=RequestContext(request))
-#
-#
-# @login_required
-# def download_iptables(reqeust):
-#     ip_list = (k.get_content() for k in StaticIpMacTable.objects.all())
-#     response = StreamingHttpResponse(ip_list, content_type='APPLICATION/OCTET=STREAM')
-#     response['Content-Disposition'] = 'attachment; filename=ip_mac.dat'
-#     return response
-#
-#
-# @csrf_exempt
-# def api_plan_unfinished(request):
-#     """
-#     显示未开始的任务
-#     method: get
-#     return:
-#         success: {json_data}
-#         failed: {'error':1}
-#     """
-#     if request.method == 'GET':
-#         try:
-#             wait_plan_info = IpMissionTable.objects.filter(progress=0)[0]
-#             serializer = IpMissionSerializer(wait_plan_info)
-#             return JSONResponse(serializer.data, status=200)
-#         except:
-#             return JSONResponse({'error': 1}, status=400)
-#
-#
-# @csrf_exempt
-# def api_post_mission_info(request):
-#     """
-#     新建任务
-#     """
-#     if request.method == 'POST':
-#         data = JSONParser().parse(request)
-#         serializer = IpMissionSerializer(data=data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return SuccessJsonResponse(data=serializer.data, status=201)
-#
-#         return ErrorJsonResponse(data=serializer.errors)
-#     else:
-#         return ErrorJsonResponse(data="method not allowed")
-#
-#
-# @csrf_exempt
-# def api_put_get_delete_mission_info(request, operate_id):
-#     """
-#     显示、更新单个任务信息
-#     """
-#     try:
-#         op_info = IpMissionTable.get_mission_by_mission_id(mid=operate_id)
-#     except Exception as e:
-#         return ErrorJsonResponse(data="id not exist")
-#
-#     if request.method == 'GET':
-#         serializer = IpMissionSerializer(op_info)
-#         return SuccessJsonResponse(data=serializer.data, status=200)
-#
-#     elif request.method == 'PUT':
-#         data = JSONParser().parse(request)
-#         serializer = IpMissionSerializer(op_info, data=data)
-#
-#         if data['operate_id'] != operate_id:
-#             return ErrorJsonResponse(data="mission id not match", status=400)
-#
-#         if serializer.is_valid():
-#             serializer.save()
-#             return SuccessJsonResponse(data=serializer.data, status=200)
-#         return ErrorJsonResponse(data=serializer.errors, status=400)
-#
-#     elif request.method == 'DELETE':
-#         op_info.delete()
-#         return SuccessJsonResponse(data='data delete', status=200)
-#
-#
-# @csrf_exempt
-# def api_post_mission_detail(request):
-#     """
-#     任务的详细条目，每个IP的状态
-#     :param request:
-#     :return:
-#     """
-#     data = JSONParser().parse(request)
-#     if request.method == 'POST':
-#         # todo:将记录添加至数据库
-#         serializer = IpMissionDetailSerializer(data=data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return SuccessJsonResponse(data=serializer.data, status=201)
-#         return ErrorJsonResponse(data=serializer.errors, status=400)
-#     else:
-#         return ErrorJsonResponse(data='method not allowed')
-#
-#
-# @csrf_exempt
-# def api_get_add_put_ip_mac_table(request):
-#     '''
-#     展示所有的ip-mac映射，或者创建新的ip-mac映射关系
-#     '''
-#     if request.method == 'GET':
-#         ip_macs = StaticIpMacTable.objects.all()
-#         serializer = IpMacTableSerializer(ip_macs, many=True)
-#
-#         # to json str
-#         # j=JSONRenderer().render(serializer.data)
-#         # to dict list
-#         # import json
-#         # g = json.loads(j)
-#         return JSONResponse(serializer.data)
-#
-#     elif request.method == 'POST':
-#         data = JSONParser().parse(request)
-#         if isinstance(data, dict):
-#             data['mac_addr'] = data['mac_addr'].replace('-', '', 4)
-#             serializer = IpMacTableSerializer(data=data)
-#             if serializer.is_valid():
-#                 serializer.save()
-#                 return JSONResponse(serializer.data, status=201)
-#             return JSONResponse(serializer.errors, status=400)
-#         elif isinstance(data, list):
-#             for record in data:
-#                 record['mac_addr'] = record['mac_addr'].replace('-', '', 4)
-#                 serializer = IpMacTableSerializer(data=record)
-#                 if serializer.is_valid():
-#                     serializer.save()
-#
-#
-# @csrf_exempt
-# def api_get_put_single_mac(request, id):
-#     '''
-#     显示、更新、删除一个ip-mac
-#     '''
-#     try:
-#         ip_mac = StaticIpMacTable.objects.get(id=id)
-#     except StaticIpMacTable.DoesNotExist:
-#         return ErrorJsonResponse(data="{0} not exist".format(id), status=400)
-#
-#     if request.method == 'GET':
-#         serializer = IpMacTableSerializer(ip_mac)
-#         return SuccessJsonResponse(data=serializer.data, status=200)
-#
-#     elif request.method == 'PUT':
-#         data = JSONParser().parse(request)
-#         serializer = IpMacTableSerializer(ip_mac, data=data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return SuccessJsonResponse(data=serializer.data, status=200)
-#         else:
-#             return ErrorJsonResponse(data=serializer.errors, status=400)
-#
-#     elif request.method == 'DELETE':
-#         ip_mac.delete()
-#         return HttpResponse(status=204)
