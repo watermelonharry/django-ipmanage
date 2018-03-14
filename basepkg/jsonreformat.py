@@ -101,6 +101,11 @@ class FormatJsonParser(object):
         temp_dict.update(self.content)
         return temp_dict
 
+    def get_body_content(self):
+        temp_dict = {}
+        temp_dict.update(self.body_content)
+        return temp_dict
+
     def get_data(self):
         return self.content.get('data', None)
 
@@ -108,8 +113,9 @@ class FormatJsonParser(object):
         try:
             param = str(item)
             data = self.content.get(param, None)
+            data = map(lambda x:int(x) if not isinstance(x, int) and x.isdigit() else x, data)
             if isinstance(data, list) and len(data) == 1:
-                return data[0]
+                data =  data[0]
             return data
         except Exception as e:
             return None
