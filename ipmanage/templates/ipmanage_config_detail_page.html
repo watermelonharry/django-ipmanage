@@ -4,18 +4,24 @@
 
         <div class="panel panel-info">
             <div class="panel-heading">
-                <h3 class="panel-title">当前位置: <a href={% url "ipmanage_main_page" %}>MAC-IP绑定</a> >> <a href={% url "ipmanage_config_page" %}> 配置管理 </a> >> 配置详细：{{ config.user_name }} 的配置  [ {{ config.config_name }} ] , 创建于{{ config.create_time|date:"Y-m-d,G:i"}} </a> </h3>
+                <h3 class="panel-title">当前位置: <a href={% url "ipmanage_main_page" %}>MAC-IP绑定</a> >> <a
+                        href={% url "ipmanage_config_page" %}> 配置管理 </a> >> 配置详细：{{ config.user_name }} 的配置
+                    [ {{ config.config_name }} ] , 创建于{{ config.create_time|date:"Y-m-d,G:i" }} </a> </h3>
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-2">
+                        <p><a class="btn btn-info" role="button" data-toggle="modal"
+                              data-target="#v-add-modal" >新增条目 &raquo;</a></p>
+                    </div>
+
+                    <div class="col-lg-2">
                         <p><a class="btn btn-info" role="button" id="auto_scan_btn" data-toggle="modal"
-                              data-target="#scan_modal" data-backdrop="static">新增条目 &raquo;</a></p>
+                              data-target="#scan_modal" data-backdrop="static">自动扫描 &raquo;</a></p>
                     </div>
                 </div>
             </div>
         </div>
-
         <h4>配置明细</h4>
 
         <div class="table-responsive" id="v_config_table">
@@ -43,7 +49,8 @@
                     <td>{{ config.device_firmware }}</td>
                     <td>{{ config.other_info }}</td>
                     <td><a class="btn-sm btn-success btn-show-detail" role="button" v-bind:name="config.id"
-                           v-bind:href="'/ipmanage/config/'+config.id">编辑</a> |  <a class="btn-sm btn-danger btn-delete-detail" role="button" v-bind:name="config.id">删除</a>
+                           v-bind:href="'/ipmanage/config/'+config.id">编辑</a> | <a
+                            class="btn-sm btn-danger btn-delete-detail" role="button" v-bind:name="config.id">删除</a>
                     </td>
                 </tr>
                 {% endverbatim %}
@@ -53,6 +60,59 @@
 
 
     </div>
+
+    <!--新增配置窗口-->
+    <div class="modal fade" id="v-add-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>新增条目</h3>
+
+                    <p>在当前的配置集合下，新增一条MAC-IP对应条目</p>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">*MAC地址</label>
+
+                            <div class="col-sm-7">
+                                <input type="text" class="form-control" v-model="mac_addr" placeholder="MAC地址"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">*设置IP</label>
+
+                            <div class="col-sm-7">
+                                <input type="text" class="form-control" v-model="set_ip" placeholder="设置IP"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">设置密码</label>
+
+                            <div class="col-sm-7">
+                                <input type="text" class="form-control" v-model="set_password" placeholder="设置密码，为空则不设密码"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">备注</label>
+
+                            <div class="col-sm-7">
+                                <textarea type="text" class="form-control" rows="3" v-model="other_info" placeholder="备注说明"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-success" v-on:click="post_config">提交</button>
+                    <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!--扫描窗口-->
     <div class="modal fade" id="scan_modal">
         <div class="modal-dialog">
@@ -119,13 +179,83 @@
     </div>
 
     <script>
+        function verify_input_not_null(input, hint){
+            if (input == null){alert(hint); return false}
+            else return true;
+        };
+
+        var v_add_modal = new Vue({
+            el: '#v-add-modal',
+            data: {
+                config_table_key: null,
+                mac_addr: null,
+                ori_ip: null,
+                set_ip: null,
+                ori_password: null,
+                set_password: null,
+                device_type: null,
+                device_firmware: null,
+                other_info: null,
+                editor_name: "{{ user.username }}",
+                creator_name: "{{ user.username }}",
+                p_data: null
+            },
+            methods: {
+                verify_post_data: function () {
+                    if (verify_input_not_null(this.mac_addr,"MAC不能为空") && verify_input_not_null(this.set_ip,"IP不能为空")){
+                        this.p_data = {
+                            "config_table_key": this.config_table_key,
+                            "mac_addr": this.mac_addr,
+                            "set_ip": this.set_ip,
+                            "set_password": this.set_password,
+                            "creator_name": this.creator_name,
+                            "editor_name": this.editor_name,
+                            "other_info": this.other_info
+                        };
+                        return true;}
+                    else return false;
+                },
+                clean_data: function () {
+
+                },
+                post_config: function () {
+                    if (this.verify_post_data() == true) {
+                        $.ajax({
+                            type: "POST",
+                            url: "{% url "ipmanage_api_config_detail_list" %}",
+                            dataType: "json",
+                            contentType: "application/json",
+                            data: JSON.stringify(this.p_data),
+                            success: function (msg) {
+                                console.log("success:", msg.data);
+                                alert("创建成功！");
+                                update_list();
+                                v_add_modal.clean_data();
+                            },
+                            error: function (e) {
+                                var hint = "";
+                                for (var i in e.responseJSON.errors) {
+                                    hint += i;
+                                    hint += ":";
+                                    hint += e.responseJSON.errors[i][0];
+                                }
+                                console.log("error:", hint);
+                                alert("创建失败：" + hint);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
+
         var sut_list = [{
             "mac_addr": "测试",
             "set_ip": "123",
             "set_password": "bvt2",
             "device_type": "类型2",
             "other_info": "tester2"
-        },{
+        }, {
             "mac_addr": "测试222",
             "set_ip": "122223",
             "set_password": "bvt222",
@@ -174,12 +304,18 @@
 
         $(document).ready(update_list());
 
-        var d = {"offset":0,"limit":10,"ak":"90a3efd02fa8795d2f30"};
+        var d = {"offset": 0, "limit": 10, "ak": "90a3efd02fa8795d2f30"};
 
         function update_list() {
-            $.getJSON(url="../../api/v1/config/detail/", data={"offset":0,"limit":10,"ak":"90a3efd02fa8795d2f30", "config_id":v_config_table.config_id}, function (ret_data) {
+            $.getJSON(url = "../../api/v1/config/detail/", data = {
+                        "offset": 0,
+                        "limit": 10,
+                        "ak": "90a3efd02fa8795d2f30",
+                        "config_id": v_config_table.config_id
+                    }, function (ret_data) {
                         console.log(ret_data);
                         v_config_table.config_detail_list = ret_data.data;
+                        v_add_modal.config_table_key = v_config_table.config_id;
                     }
             )
         }
