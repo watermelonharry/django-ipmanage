@@ -15,6 +15,10 @@ step 3: using "python manage.py syncdb" to create your own database.
 step 4: run test server or deploy the server in apache/nginx.
 
 -----------------------------
+snapshots：
+![main page](https://github.com/watermelonharry/django-ipmanage/blob/master/introduction/main_page.png)
+
+-----------------------------
 function:
 1. MAC-IP bind and management(in reformatting)
 2. devices params management
